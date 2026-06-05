@@ -29,11 +29,13 @@ main{max-width:920px;margin:0 auto;padding:2rem 1.25rem}
 .ph-left h1{font-size:20px;font-weight:600;margin-bottom:4px}
 .ph-left p{font-size:13px;color:var(--text2)}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sel{font-family:'Inter',sans-serif;font-size:13px;padding:7px 12px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;font-weight:500}
+.sel{font-family:'Inter',sans-serif;font-size:13px;padding:7px 12px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none}
 .btn-red{background:var(--red);color:#fff;border:none;padding:7px 14px;border-radius:var(--r);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px}
 .btn-red:hover{opacity:.85}
 .btn-ghost{background:none;border:.5px solid var(--border2);padding:7px 14px;border-radius:var(--r);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
 .btn-ghost:hover{background:var(--surface2)}
+.btn-back{background:var(--surface2);border:.5px solid var(--border2);padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;margin-bottom:1.25rem}
+.btn-back:hover{background:var(--border)}
 .arc-badge{font-size:11px;background:#2a1a0a;color:var(--gold);padding:3px 10px;border-radius:100px;font-weight:500}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
 .metric{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:0 1px 4px var(--shadow)}
@@ -47,39 +49,41 @@ main{max-width:920px;margin:0 auto;padding:2rem 1.25rem}
 .bd-item .bd-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .bd-item .bd-val{font-size:22px;font-weight:600}
 .chart-wrap{position:relative;width:100%;height:210px}
-/* Form */
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--text2);font-weight:500}
 .field input,.field select{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
 .field input:focus,.field select:focus{border-color:var(--blue)}
-.btn-save{background:var(--text);color:var(--bg);border:none;padding:10px 24px;border-radius:var(--r);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:opacity .15s}
+.btn-save{background:var(--text);color:var(--bg);border:none;padding:10px 24px;border-radius:var(--r);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer}
 .btn-save:hover{opacity:.85}
 .save-msg{font-size:12px;color:var(--green);margin-left:10px;display:none}
-/* Session badges */
 .sess{display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:100px}
-.sess.london{background:#1a2a3a;color:#60a5fa}
-.sess.newyork{background:#2a1a2a;color:#c084fc}
-.sess.asia{background:#1a2a1a;color:#86efac}
-[data-theme="light"] .sess.london{background:#dbeafe;color:#1d4ed8}
-[data-theme="light"] .sess.newyork{background:#f3e8ff;color:#7c3aed}
-[data-theme="light"] .sess.asia{background:#dcfce7;color:#166534}
+[data-theme="dark"] .sess.London{background:#1a2a3a;color:#60a5fa}
+[data-theme="dark"] .sess.NewYork{background:#2a1a2a;color:#c084fc}
+[data-theme="dark"] .sess.Asia{background:#1a2a1a;color:#86efac}
+[data-theme="light"] .sess.London{background:#dbeafe;color:#1d4ed8}
+[data-theme="light"] .sess.NewYork{background:#f3e8ff;color:#7c3aed}
+[data-theme="light"] .sess.Asia{background:#dcfce7;color:#166534}
 /* Archive */
 .year-block{margin-bottom:2.5rem}
-.year-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--border)}
+.year-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--border)}
 .year-title{font-size:18px;font-weight:600}
 .year-pnl{font-size:13px;font-weight:500}
-.months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
-.month-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--rlg);padding:14px;box-shadow:0 1px 4px var(--shadow);position:relative;transition:border-color .15s}
-.month-card.has-data{cursor:pointer}.month-card.has-data:hover{border-color:var(--blue);transform:translateY(-1px)}
-.month-card.empty-month{opacity:.4}
+.months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}
+.month-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--rlg);padding:14px;box-shadow:0 1px 4px var(--shadow);position:relative;transition:border-color .15s,transform .1s}
+.month-card.clickable{cursor:pointer}.month-card.clickable:hover{border-color:var(--blue);transform:translateY(-1px)}
+.month-card.is-active{border-color:var(--blue);opacity:1}
+.month-card.no-data{opacity:.35}
 .mc-name{font-size:14px;font-weight:600;margin-bottom:8px}
 .mc-stats{display:flex;flex-direction:column;gap:3px}
 .mc-stat{font-size:12px;color:var(--text2);display:flex;justify-content:space-between}
 .mc-stat span{font-weight:500;color:var(--text)}
 .mc-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px 5px;border-radius:5px;line-height:1}
 .mc-del:hover{color:var(--red)}
-.mc-empty-label{font-size:12px;color:var(--text3);margin-top:4px}
+.mc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:100px;background:#1a2a3a;color:var(--blue);display:inline-block;margin-bottom:6px}
+/* Month detail view */
+.detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+.detail-title{font-size:20px;font-weight:600}
 /* Table */
 .fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
 .fbar select,.fbar input{font-family:'Inter',sans-serif;font-size:12px;padding:6px 10px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none}
@@ -104,10 +108,9 @@ table.tt tr:last-child td{border-bottom:none}
 .del-btn:hover{color:var(--red)}
 .empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px}
 .empty i{font-size:32px;display:block;margin-bottom:10px}
-/* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.modal{background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .modal h2{font-size:16px;font-weight:600;margin-bottom:8px}
 .modal p{font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.5}
 .modal .fg{margin-bottom:1.25rem}
@@ -136,10 +139,7 @@ table.tt tr:last-child td{border-bottom:none}
   <!-- DASHBOARD -->
   <div id="page-dashboard" class="page active">
     <div class="ph">
-      <div class="ph-left">
-        <h1 id="dash-title">Dashboard</h1>
-        <p id="dash-sub">No trades yet.</p>
-      </div>
+      <div class="ph-left"><h1 id="dash-title">Dashboard</h1><p id="dash-sub">No trades yet.</p></div>
       <div class="row">
         <select class="sel" id="month-sel" onchange="onMonthChange()"></select>
         <button class="btn-red" onclick="openCloseModal()"><i class="ti ti-lock"></i> Close Month</button>
@@ -166,7 +166,7 @@ table.tt tr:last-child td{border-bottom:none}
 
   <!-- LOG -->
   <div id="page-log" class="page">
-    <div class="ph"><div class="ph-left"><h1>Log a Trade</h1><p>Add a trade to the current active month.</p></div></div>
+    <div class="ph"><div class="ph-left"><h1>Log a Trade</h1><p>Logs into the current active month.</p></div></div>
     <div class="card">
       <div class="fg">
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
@@ -182,11 +182,7 @@ table.tt tr:last-child td{border-bottom:none}
           </select>
         </div>
         <div class="field"><label>Session</label>
-          <select id="f-sess">
-            <option value="London">London</option>
-            <option value="NewYork">New York</option>
-            <option value="Asia">Asia</option>
-          </select>
+          <select id="f-sess"><option value="London">London</option><option value="NewYork">New York</option><option value="Asia">Asia</option></select>
         </div>
         <div class="field"><label>Direction</label>
           <select id="f-dir"><option value="Long">Long</option><option value="Short">Short</option></select>
@@ -218,33 +214,60 @@ table.tt tr:last-child td{border-bottom:none}
         <option value="XAUUSD">XAU/USD</option><option value="XAGUSD">XAG/USD</option>
         <option value="NQ">NQ</option><option value="YM">YM</option><option value="ES">ES</option>
       </select>
-      <select id="f-fsess" onchange="renderTable()"><option value="">All sessions</option><option>London</option><option>NewYork</option><option>Asia</option></select>
+      <select id="f-fsess" onchange="renderTable()"><option value="">All sessions</option><option value="London">London</option><option value="NewYork">New York</option><option value="Asia">Asia</option></select>
       <select id="f-fdir" onchange="renderTable()"><option value="">All directions</option><option>Long</option><option>Short</option></select>
       <select id="f-fout" onchange="renderTable()"><option value="">All outcomes</option><option>Win</option><option>Loss</option><option>Break Even</option></select>
     </div>
     <div class="card" style="padding:0;overflow:hidden"><div class="twrap" id="twrap"></div></div>
   </div>
 
-  <!-- ARCHIVE -->
+  <!-- ARCHIVE LIST -->
   <div id="page-archive" class="page">
     <div class="ph">
-      <div class="ph-left"><h1>Archive</h1><p>All months grouped by year. Every year shows all 12 months.</p></div>
-      <div class="row">
-        <select class="sel" id="arc-year-sel" onchange="renderArchive()"></select>
-      </div>
+      <div class="ph-left"><h1>Archive</h1><p>All months grouped by year. Click a month to see its trades.</p></div>
+      <div class="row"><select class="sel" id="arc-year-sel" onchange="renderArchive()"></select></div>
     </div>
     <div id="arc-wrap"></div>
+  </div>
+
+  <!-- ARCHIVE MONTH DETAIL -->
+  <div id="page-arc-detail" class="page">
+    <button class="btn-back" onclick="go('archive', document.querySelectorAll('nav button')[3])">
+      <i class="ti ti-arrow-left"></i> Back to Archive
+    </button>
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title">Month Detail</div>
+      <div class="row">
+        <span class="arc-badge">📦 Archived</span>
+        <button class="btn-ghost" onclick="exportDetailCSV()"><i class="ti ti-download"></i> Export</button>
+      </div>
+    </div>
+    <div class="metric-grid">
+      <div class="metric"><div class="lbl">Total Trades</div><div class="val blue" id="d-total">0</div></div>
+      <div class="metric"><div class="lbl">Win Rate</div><div class="val" id="d-wr">—</div></div>
+      <div class="metric"><div class="lbl">Total P&amp;L</div><div class="val" id="d-pnl">$0</div></div>
+      <div class="metric"><div class="lbl">Avg RR</div><div class="val" id="d-rr">—</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden"><div class="twrap" id="detail-twrap"></div></div>
   </div>
 </main>
 
 <!-- CLOSE MONTH MODAL -->
 <div class="overlay" id="close-modal">
   <div class="modal">
-    <h2>Close & Archive Month</h2>
-    <p>Choose which month to close. It will be archived and you can still view it anytime. A fresh active month will start.</p>
-    <div class="fg">
-      <div class="field"><label>Month to close</label>
-        <select class="sel" id="cm-sel" style="width:100%;background:var(--surface2)"></select>
+    <h2>Close &amp; Archive a Month</h2>
+    <p>Pick the year and month you want to archive. All trades logged in the active month will be saved under that label.</p>
+    <div class="fg" style="grid-template-columns:1fr 1fr;margin-bottom:1.25rem">
+      <div class="field"><label>Year</label>
+        <select id="cm-year" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;outline:none"></select>
+      </div>
+      <div class="field"><label>Month</label>
+        <select id="cm-month" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;outline:none">
+          <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+          <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+          <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+        </select>
       </div>
     </div>
     <div class="mactions">
@@ -267,54 +290,63 @@ table.tt tr:last-child td{border-bottom:none}
 </div>
 
 <script>
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const PAIRS = {EURUSD:'EUR/USD',GBPUSD:'GBP/USD',XAUUSD:'XAU/USD',XAGUSD:'XAG/USD',NQ:'NQ',YM:'YM',ES:'ES'};
-const SESS_CLASS = {London:'london',NewYork:'newyork',Asia:'asia'};
+const MONTHS_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const PAIRS={EURUSD:'EUR/USD',GBPUSD:'GBP/USD',XAUUSD:'XAU/USD',XAGUSD:'XAG/USD',NQ:'NQ',YM:'YM',ES:'ES'};
 
-let db = {active:{key:curMonthKey(),trades:[]}, archives:[]};
-let eq=null, pnl=null, pendingDel=null;
+let db={active:{key:curMonthKey(),trades:[]},archives:[]};
+let eq=null,pnl=null,pendingDel=null,detailKey=null;
 
 function today(){return new Date().toISOString().slice(0,10)}
 function curMonthKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
 function mkKey(y,m){return y+'-'+String(m).padStart(2,'0')}
-function keyLabel(k){const[y,m]=k.split('-');return MONTHS[+m-1]+' '+y}
+function keyLabel(k){const[y,m]=k.split('-');return MONTHS_FULL[+m-1]+' '+y}
 
-function persist(){try{localStorage.setItem('tj5',JSON.stringify(db))}catch(e){}}
+function persist(){try{localStorage.setItem('tj6',JSON.stringify(db))}catch(e){}}
 function load(){
-  try{const r=localStorage.getItem('tj5');if(r)db=JSON.parse(r)}catch(e){}
+  try{const r=localStorage.getItem('tj6');if(r)db=JSON.parse(r)}catch(e){}
   if(!db.active)db.active={key:curMonthKey(),trades:[]};
   if(!db.archives)db.archives=[];
-  applyTheme();
-  populateSels();
-  renderDashboard(db.active.key);
+  applyTheme();populateSels();renderDashboard(db.active.key);
 }
 
-function allMonthData(){return [db.active,...db.archives]}
+function allMonths(){return[db.active,...db.archives]}
 function getMonth(key){
   if(db.active.key===key)return db.active;
   return db.archives.find(a=>a.key===key)||null;
 }
 
 function populateSels(){
-  const all=allMonthData();
+  const all=allMonths();
   ['month-sel','t-month-sel'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     el.innerHTML=all.map(m=>`<option value="${m.key}">${keyLabel(m.key)}${m.key===db.active.key?' (Active)':' 📦'}</option>`).join('');
     el.value=db.active.key;
   });
   // Archive year selector
-  const years=[...new Set(db.archives.map(a=>a.key.slice(0,4)))].sort((a,b)=>b-a);
-  const curYear=new Date().getFullYear().toString();
-  if(!years.includes(curYear))years.unshift(curYear);
+  const curY=new Date().getFullYear();
+  const arcYears=[...new Set(db.archives.map(a=>+a.key.slice(0,4)))];
+  if(!arcYears.includes(curY))arcYears.push(curY);
+  arcYears.sort((a,b)=>b-a);
   const ays=document.getElementById('arc-year-sel');
-  if(ays){ays.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');if(!ays.value)ays.value=years[0];}
-  // Close month selector — only active month (or future use)
-  const cms=document.getElementById('cm-sel');
-  if(cms)cms.innerHTML=`<option value="${db.active.key}">${keyLabel(db.active.key)} (Active)</option>`;
+  if(ays){
+    const prev=ays.value;
+    ays.innerHTML=arcYears.map(y=>`<option value="${y}">${y}</option>`).join('');
+    ays.value=arcYears.includes(+prev)?prev:arcYears[0];
+  }
+  // Close modal year selector
+  const cmy=document.getElementById('cm-year');
+  if(cmy){
+    const years=[];for(let y=curY;y>=curY-5;y--)years.push(y);
+    cmy.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');
+    // set current month defaults
+    const now=new Date();
+    cmy.value=now.getFullYear();
+    document.getElementById('cm-month').value=String(now.getMonth()+1).padStart(2,'0');
+  }
 }
 
 function applyTheme(){
-  const t=localStorage.getItem('tj5_theme')||'dark';
+  const t=localStorage.getItem('tj6_theme')||'dark';
   document.documentElement.setAttribute('data-theme',t);
   document.getElementById('theme-icon').className=t==='dark'?'ti ti-sun':'ti ti-moon';
 }
@@ -323,7 +355,7 @@ function toggleTheme(){
   const n=c==='dark'?'light':'dark';
   document.documentElement.setAttribute('data-theme',n);
   document.getElementById('theme-icon').className=n==='dark'?'ti ti-sun':'ti ti-moon';
-  localStorage.setItem('tj5_theme',n);
+  localStorage.setItem('tj6_theme',n);
   renderDashboard(document.getElementById('month-sel')?.value||db.active.key);
 }
 
@@ -331,7 +363,7 @@ function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
+  if(btn)btn.classList.add('active');
   if(id==='dashboard')renderDashboard(document.getElementById('month-sel')?.value||db.active.key);
   if(id==='trades'){populateSels();renderTable();}
   if(id==='archive'){populateSels();renderArchive();}
@@ -349,7 +381,7 @@ function saveTrade(){
     session:document.getElementById('f-sess').value,
     direction:document.getElementById('f-dir').value,
     outcome:document.getElementById('f-out').value,
-    pnl:pnlv, rr:isNaN(rrv)?null:rrv
+    pnl:pnlv,rr:isNaN(rrv)?null:rrv
   });
   db.active.trades.sort((a,b)=>a.date.localeCompare(b.date));
   persist();
@@ -366,18 +398,9 @@ function deleteTrade(id){
   persist();renderTable();renderDashboard(db.active.key);
 }
 
-function renderDashboard(key){
-  const m=getMonth(key);if(!m)return;
-  const isArc=key!==db.active.key;
-  document.getElementById('arc-notice').style.display=isArc?'block':'none';
-  document.getElementById('dash-title').textContent=keyLabel(key);
-  const trades=m.trades,n=trades.length;
-  if(!n){
-    document.getElementById('dash-sub').textContent='No trades logged yet.';
-    document.getElementById('m-total').textContent='0';
-    ['m-wr','m-pnl','m-rr','bd-win','bd-loss','bd-be'].forEach(id=>document.getElementById(id).textContent='—');
-    if(eq){eq.destroy();eq=null}if(pnl){pnl.destroy();pnl=null}return;
-  }
+function statsOf(trades){
+  const n=trades.length;
+  if(!n)return null;
   const wins=trades.filter(t=>t.outcome==='Win').length;
   const losses=trades.filter(t=>t.outcome==='Loss').length;
   const be=trades.filter(t=>t.outcome==='Break Even').length;
@@ -385,123 +408,173 @@ function renderDashboard(key){
   const rrs=trades.filter(t=>t.rr!==null).map(t=>t.rr);
   const avgRR=rrs.length?(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2):null;
   const wr=Math.round(wins/n*100);
-  document.getElementById('dash-sub').textContent=n+' trade'+(n===1?'':'s')+' · '+trades[0].date+' → '+trades[n-1].date;
-  document.getElementById('m-total').textContent=n;
-  const we=document.getElementById('m-wr');we.textContent=wr+'%';we.className='val '+(wr>=50?'green':'red');
-  const pe=document.getElementById('m-pnl');pe.textContent=(tot>=0?'+':'')+'$'+Math.abs(Math.round(tot)).toLocaleString();pe.className='val '+(tot>=0?'green':'red');
-  document.getElementById('m-rr').textContent=avgRR?avgRR+'R':'—';
-  document.getElementById('bd-win').textContent=wins;
-  document.getElementById('bd-loss').textContent=losses;
-  document.getElementById('bd-be').textContent=be;
+  return{n,wins,losses,be,tot,avgRR,wr};
+}
+
+function renderDashboard(key){
+  const m=getMonth(key);if(!m)return;
+  const isArc=key!==db.active.key;
+  document.getElementById('arc-notice').style.display=isArc?'block':'none';
+  document.getElementById('dash-title').textContent=keyLabel(key);
+  const s=statsOf(m.trades);
+  if(!s){
+    document.getElementById('dash-sub').textContent='No trades logged yet.';
+    document.getElementById('m-total').textContent='0';
+    ['m-wr','m-pnl','m-rr','bd-win','bd-loss','bd-be'].forEach(id=>document.getElementById(id).textContent='—');
+    if(eq){eq.destroy();eq=null}if(pnl){pnl.destroy();pnl=null}return;
+  }
+  document.getElementById('dash-sub').textContent=s.n+' trade'+(s.n===1?'':'s')+' · '+m.trades[0].date+' → '+m.trades[s.n-1].date;
+  document.getElementById('m-total').textContent=s.n;
+  const we=document.getElementById('m-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
+  const pe=document.getElementById('m-pnl');pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');
+  document.getElementById('m-rr').textContent=s.avgRR?s.avgRR+'R':'—';
+  document.getElementById('bd-win').textContent=s.wins;
+  document.getElementById('bd-loss').textContent=s.losses;
+  document.getElementById('bd-be').textContent=s.be;
+  drawCharts(m.trades,'equity-chart','pnl-chart');
+}
+
+function drawCharts(trades,ecId,pcId){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
   let cum=0;
   const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
-  const c1=document.getElementById('equity-chart').getContext('2d');
+  const c1=document.getElementById(ecId).getContext('2d');
   if(eq)eq.destroy();
   eq=new Chart(c1,{type:'line',data:{labels:ed.map(d=>d.x),datasets:[{data:ed.map(d=>d.y),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.07)',borderWidth:2,pointRadius:ed.length>30?0:3,fill:true,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});
-  const c2=document.getElementById('pnl-chart').getContext('2d');
+  const c2=document.getElementById(pcId).getContext('2d');
   if(pnl)pnl.destroy();
   pnl=new Chart(c2,{type:'bar',data:{labels:trades.map(t=>PAIRS[t.symbol]||t.symbol),datasets:[{data:trades.map(t=>t.pnl||0),backgroundColor:trades.map(t=>(t.pnl||0)>=0?'rgba(29,158,117,0.75)':'rgba(216,90,48,0.75)'),borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},maxTicksLimit:14,color:tc},grid:{display:false}},y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});
+}
+
+function tradesTableHTML(trades,showDel){
+  if(!trades.length)return'<div class="empty"><i class="ti ti-clipboard-list"></i>No trades found.</div>';
+  return`<table class="tt">
+    <thead><tr><th>Date</th><th>Pair</th><th>Session</th><th>Dir</th><th>Outcome</th><th>P&amp;L</th><th>RR</th>${showDel?'<th></th>':''}</tr></thead>
+    <tbody>${trades.map(t=>`<tr>
+      <td>${t.date}</td>
+      <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}</td>
+      <td><span class="sess ${t.session||''}">${t.session||'—'}</span></td>
+      <td><span class="badge ${t.direction.toLowerCase()}">${t.direction}</span></td>
+      <td><span class="badge ${t.outcome==='Win'?'win':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span></td>
+      <td style="font-weight:500;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</td>
+      <td>${t.rr!==null&&t.rr!==undefined?t.rr+'R':'—'}</td>
+      ${showDel?`<td><button class="del-btn" onclick="deleteTrade(${t.id})">×</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>`;
 }
 
 function renderTable(){
   const key=document.getElementById('t-month-sel')?.value||db.active.key;
   const m=getMonth(key);
-  const trades=m?[...m.trades]:[];
+  let trades=m?[...m.trades]:[];
   const sym=document.getElementById('f-fsym')?.value||'';
   const sess=document.getElementById('f-fsess')?.value||'';
   const dir=document.getElementById('f-fdir')?.value||'';
   const out=document.getElementById('f-fout')?.value||'';
-  const filtered=trades.filter(t=>(!sym||t.symbol===sym)&&(!sess||t.session===sess)&&(!dir||t.direction===dir)&&(!out||t.outcome===out)).reverse();
-  const isActive=key===db.active.key;
-  const wrap=document.getElementById('twrap');
-  if(!filtered.length){wrap.innerHTML='<div class="empty"><i class="ti ti-clipboard-list"></i>No trades found.</div>';return;}
-  wrap.innerHTML=`<table class="tt">
-    <thead><tr><th>Date</th><th>Pair</th><th>Session</th><th>Dir</th><th>Outcome</th><th>P&amp;L</th><th>RR</th>${isActive?'<th></th>':''}</tr></thead>
-    <tbody>${filtered.map(t=>`<tr>
-      <td>${t.date}</td>
-      <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}</td>
-      <td><span class="sess ${SESS_CLASS[t.session]||''}">${t.session||'—'}</span></td>
-      <td><span class="badge ${t.direction.toLowerCase()}">${t.direction}</span></td>
-      <td><span class="badge ${t.outcome==='Win'?'win':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span></td>
-      <td style="font-weight:500;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</td>
-      <td>${t.rr!==null?t.rr+'R':'—'}</td>
-      ${isActive?`<td><button class="del-btn" onclick="deleteTrade(${t.id})">×</button></td>`:''}
-    </tr>`).join('')}</tbody>
-  </table>`;
+  trades=trades.filter(t=>(!sym||t.symbol===sym)&&(!sess||t.session===sess)&&(!dir||t.direction===dir)&&(!out||t.outcome===out)).reverse();
+  document.getElementById('twrap').innerHTML=tradesTableHTML(trades,key===db.active.key);
 }
 
 function renderArchive(){
   const wrap=document.getElementById('arc-wrap');
-  const selYear=document.getElementById('arc-year-sel')?.value||new Date().getFullYear().toString();
-  const year=parseInt(selYear);
-  // build 12 month slots
+  const selYear=parseInt(document.getElementById('arc-year-sel')?.value||new Date().getFullYear());
   const cards=Array.from({length:12},(_,i)=>{
-    const key=mkKey(year,i+1);
-    const m=db.archives.find(a=>a.key===key);
+    const key=mkKey(selYear,i+1);
     const isActive=db.active.key===key;
+    const m=db.archives.find(a=>a.key===key);
     if(isActive){
-      return `<div class="month-card" style="border-color:var(--blue)">
-        <div class="mc-name">${MONTHS[i]}</div>
-        <div class="mc-stats"><div class="mc-stat"><span style="color:var(--blue);font-size:11px">Active Month</span></div></div>
+      return`<div class="month-card is-active">
+        <div class="mc-tag">ACTIVE</div>
+        <div class="mc-name">${MONTHS_FULL[i]}</div>
+        <div class="mc-stats"><div class="mc-stat"><span style="color:var(--blue)">${db.active.trades.length} trades</span></div></div>
       </div>`;
     }
     if(!m){
-      return `<div class="month-card empty-month">
-        <div class="mc-name">${MONTHS[i]}</div>
-        <div class="mc-empty-label">No data</div>
+      return`<div class="month-card no-data">
+        <div class="mc-name">${MONTHS_FULL[i]}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">No data</div>
       </div>`;
     }
-    const n=m.trades.length;
-    const wins=m.trades.filter(t=>t.outcome==='Win').length;
-    const tot=m.trades.reduce((s,t)=>s+(t.pnl||0),0);
-    const wr=n?Math.round(wins/n*100):0;
-    return `<div class="month-card has-data" onclick="viewArc('${key}')">
+    const s=statsOf(m.trades);
+    if(!s){
+      return`<div class="month-card no-data">
+        <div class="mc-name">${MONTHS_FULL[i]}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">Empty</div>
+      </div>`;
+    }
+    return`<div class="month-card clickable" onclick="openDetail('${key}')">
       <button class="mc-del" onclick="event.stopPropagation();askDel('${key}')" title="Delete">×</button>
-      <div class="mc-name">${MONTHS[i]}</div>
+      <div class="mc-name">${MONTHS_FULL[i]}</div>
       <div class="mc-stats">
-        <div class="mc-stat">Trades <span>${n}</span></div>
-        <div class="mc-stat">Win Rate <span style="color:${wr>=50?'var(--green)':'var(--red)'}">${wr}%</span></div>
-        <div class="mc-stat">P&amp;L <span style="color:${tot>=0?'var(--green)':'var(--red)'}">${tot>=0?'+':''}$${Math.abs(Math.round(tot)).toLocaleString()}</span></div>
+        <div class="mc-stat">Trades <span>${s.n}</span></div>
+        <div class="mc-stat">Win Rate <span style="color:${s.wr>=50?'var(--green)':'var(--red)'}">${s.wr}%</span></div>
+        <div class="mc-stat">P&amp;L <span style="color:${s.tot>=0?'var(--green)':'var(--red)'}">${s.tot>=0?'+':''}$${Math.abs(Math.round(s.tot)).toLocaleString()}</span></div>
       </div>
     </div>`;
   }).join('');
-
-  const arcTrades=db.archives.filter(a=>a.key.startsWith(selYear));
-  const yearPnl=arcTrades.reduce((s,m)=>s+m.trades.reduce((ss,t)=>ss+(t.pnl||0),0),0);
-
+  const arcMths=db.archives.filter(a=>a.key.startsWith(selYear+''));
+  const yearPnl=arcMths.reduce((s,m)=>s+m.trades.reduce((ss,t)=>ss+(t.pnl||0),0),0);
   wrap.innerHTML=`<div class="year-block">
     <div class="year-header">
       <div class="year-title">${selYear}</div>
-      <div class="year-pnl" style="color:${yearPnl>=0?'var(--green)':'var(--red)'}">${yearPnl>=0?'+':''}$${Math.abs(Math.round(yearPnl)).toLocaleString()} total P&L</div>
+      <div class="year-pnl" style="color:${yearPnl>=0?'var(--green)':'var(--red)'}">${yearPnl>=0?'+':''}$${Math.abs(Math.round(yearPnl)).toLocaleString()} total P&amp;L</div>
     </div>
     <div class="months-grid">${cards}</div>
   </div>`;
 }
 
-function viewArc(key){
-  populateSels();
-  document.getElementById('month-sel').value=key;
+function openDetail(key){
+  detailKey=key;
+  const m=getMonth(key);if(!m)return;
+  document.getElementById('detail-title').textContent=keyLabel(key);
+  const s=statsOf(m.trades);
+  if(s){
+    document.getElementById('d-total').textContent=s.n;
+    const we=document.getElementById('d-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
+    const pe=document.getElementById('d-pnl');pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');
+    document.getElementById('d-rr').textContent=s.avgRR?s.avgRR+'R':'—';
+  }else{
+    ['d-total','d-wr','d-pnl','d-rr'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+  document.getElementById('detail-twrap').innerHTML=tradesTableHTML([...m.trades].reverse(),false);
+  // Show detail page
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-dashboard').classList.add('active');
-  document.querySelectorAll('nav button')[0].classList.add('active');
-  renderDashboard(key);
+  document.getElementById('page-arc-detail').classList.add('active');
+  document.querySelectorAll('nav button')[3].classList.add('active');
+}
+
+function exportDetailCSV(){
+  if(!detailKey)return;
+  const m=getMonth(detailKey);
+  if(!m||!m.trades.length){alert('No trades to export.');return;}
+  const csv=['Date,Pair,Session,Direction,Outcome,PnL,RR',...m.trades.map(t=>`${t.date},${PAIRS[t.symbol]||t.symbol},${t.session||''},${t.direction},${t.outcome},${t.pnl||0},${t.rr??''}`)].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='trades-'+detailKey+'.csv';a.click();
 }
 
 function openCloseModal(){
-  const cms=document.getElementById('cm-sel');
-  cms.innerHTML=`<option value="${db.active.key}">${keyLabel(db.active.key)} (Active)</option>`;
+  populateSels();
   document.getElementById('close-modal').classList.add('open');
 }
 
 function doCloseMonth(){
+  const year=document.getElementById('cm-year').value;
+  const month=document.getElementById('cm-month').value;
+  const key=year+'-'+month;
+  // Check if already archived
+  if(db.archives.find(a=>a.key===key)){
+    alert(keyLabel(key)+' is already archived!');return;
+  }
   closeOverlay('close-modal');
-  db.archives.unshift({...db.active,trades:[...db.active.trades]});
+  // Archive active trades under chosen key
+  db.archives.unshift({key,trades:[...db.active.trades]});
+  db.archives.sort((a,b)=>b.key.localeCompare(a.key));
+  // Reset active month
   db.active={key:curMonthKey(),trades:[]};
-  // if new active key same as just archived, bump
   persist();populateSels();renderDashboard(db.active.key);
 }
 
@@ -511,7 +584,6 @@ function doDeleteArchive(){
   db.archives=db.archives.filter(a=>a.key!==pendingDel);
   pendingDel=null;persist();closeOverlay('del-modal');populateSels();renderArchive();
 }
-
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
 
 function exportCSV(){
