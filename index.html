@@ -978,8 +978,7 @@ function renderSessionStats(trades){
     wrap.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     return;
   }
-  // Total trades across active sessions for % distribution
-  const totalActive=activeSessions.reduce((s,sess)=>s+trades.filter(t=>t.session===sess).length,0);
+
   const cards=activeSessions.map(sess=>{
     const st=trades.filter(t=>t.session===sess);
     const n=st.length;
@@ -990,7 +989,7 @@ function renderSessionStats(trades){
     const decisive=n-be;
     const wr=decisive>0?Math.round(wins/decisive*100):0;
     // Share of total trades across active sessions
-    const share=Math.round(n/totalActive*100);
+
     const p=st.reduce((s,t)=>s+(t.pnl||0),0);
     const wc=wr>=60?'var(--green)':wr>=40?'var(--gold)':'var(--red)';
     return`<div class="sess-card">
@@ -998,7 +997,6 @@ function renderSessionStats(trades){
       <div class="sess-bar-bg"><div class="sess-bar-fill" style="width:${wr}%;background:${SC[sess].bar}"></div></div>
       <div class="sess-details">
         <div class="sess-detail">Trades <span>${n}</span></div>
-        <div class="sess-detail">Share <span>${share}%</span></div>
         <div class="sess-detail">W <span style="color:var(--green)">${wins}</span></div>
         <div class="sess-detail">L <span style="color:var(--red)">${losses}</span></div>
         <div class="sess-detail">P&L <span style="color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}$${Math.abs(Math.round(p)).toLocaleString()}</span></div>
