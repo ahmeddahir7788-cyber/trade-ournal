@@ -75,6 +75,16 @@ nav button:hover i{color:var(--text)}
 .bd-item .bd-val{font-size:22px;font-weight:600}
 .chart-wrap{position:relative;width:100%;height:210px}
 
+/* STREAK */
+.streak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.streak-item{background:var(--surface2);border-radius:var(--r);padding:12px 14px;text-align:center}
+.streak-item .s-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.streak-item .s-val{font-size:22px;font-weight:700}
+.streak-item .s-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.streak-win{color:var(--green)}
+.streak-loss{color:var(--red)}
+.streak-neutral{color:var(--text2)}
+
 /* CALENDAR */
 .cal-outer{display:grid;grid-template-columns:1fr 210px;gap:16px;align-items:start}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
@@ -312,6 +322,10 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="metric"><div class="lbl">Avg RR</div><div class="val" id="m-rr">—</div></div>
       <div class="metric"><div class="lbl">Total R</div><div class="val purple" id="m-totalr">—</div></div>
     </div>
+    <div class="card" id="streak-card">
+      <h3>Streak Tracker</h3>
+      <div id="streak-stats"></div>
+    </div>
     <div class="card">
       <h3>Trade Breakdown</h3>
       <div class="bd-grid" style="grid-template-columns:repeat(4,1fr)">
@@ -334,6 +348,7 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="card">
       <div class="fg">
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
+        <div class="field"><label>Time</label><input type="time" id="f-time" placeholder="HH:MM"/></div>
         <div class="field"><label>Pair</label>
           <select id="f-sym">
             <option value="" disabled selected>— Select pair —</option>
@@ -515,6 +530,7 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div class="fg" style="margin-bottom:16px">
       <div class="field"><label>Date</label><input type="date" id="et-date"/></div>
+      <div class="field"><label>Time</label><input type="time" id="et-time"/></div>
       <div class="field"><label>Pair</label>
         <select id="et-sym">
           <option value="EURUSD">EUR/USD</option><option value="GBPUSD">GBP/USD</option>
@@ -624,7 +640,7 @@ let db={trades:{},propfirms:[]};
 let eqChart=null,pnlChartInst=null;
 let currentDashKey=null;
 let currentDetailKey=null;
-let pendingDelTradeId=null;
+let pendingDelTradeId=null, pendingDelKey=null;
 let pfEditId=null,pfDeleteId=null;
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -773,6 +789,7 @@ function renderDashboardWithTrades(trades,label){
   document.getElementById('bd-partial').textContent=s.partials;
   document.getElementById('bd-loss').textContent=s.losses;
   document.getElementById('bd-be').textContent=s.be;
+  renderStreaks(trades);
   renderSessionStats(trades);
   drawCharts(trades);
 }
@@ -839,6 +856,7 @@ function renderDashboard(key){
     document.getElementById('m-total').textContent='0';
     ['m-wr','m-pnl','m-rr','m-totalr','bd-win','bd-loss','bd-be'].forEach(id=>document.getElementById(id).textContent='—');
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
+    const sw=document.getElementById('streak-stats');if(sw)sw.innerHTML='';
     renderCalendar(key,[]);
     if(eqChart){eqChart.destroy();eqChart=null}
     if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}
@@ -855,6 +873,7 @@ function renderDashboard(key){
   document.getElementById('bd-loss').textContent=s.losses;
   document.getElementById('bd-be').textContent=s.be;
   renderCalendar(key,trades);
+  renderStreaks(trades);
   renderSessionStats(trades);
   drawCharts(trades);
 }
@@ -968,6 +987,68 @@ function renderCalendar(key,trades){
 }
 
 // ── Session stats ─────────────────────────────────────────────
+function renderStreaks(trades){
+  const wrap=document.getElementById('streak-stats');
+  if(!wrap)return;
+  if(!trades.length){
+    wrap.innerHTML='<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades yet.</div>';
+    return;
+  }
+  // Sort by date then time
+  const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
+  // Calculate streaks - only count Win/Partial as win, Loss as loss, skip BE
+  const decisive=sorted.filter(t=>t.outcome==='Win'||t.outcome==='Partial'||t.outcome==='Loss');
+  let curStreak=0,curType='',longestWin=0,longestLoss=0,tmpW=0,tmpL=0;
+  decisive.forEach(t=>{
+    const isWin=t.outcome==='Win'||t.outcome==='Partial';
+    if(isWin){
+      tmpW++;tmpL=0;
+      if(curType==='win')curStreak++;
+      else{curType='win';curStreak=1;}
+      longestWin=Math.max(longestWin,tmpW);
+    } else {
+      tmpL++;tmpW=0;
+      if(curType==='loss')curStreak++;
+      else{curType='loss';curStreak=1;}
+      longestLoss=Math.max(longestLoss,tmpL);
+    }
+  });
+  // Average streak length
+  let streaks=[],tmp=1;
+  for(let i=1;i<decisive.length;i++){
+    const prev=decisive[i-1].outcome==='Win'||decisive[i-1].outcome==='Partial'?'win':'loss';
+    const cur=decisive[i].outcome==='Win'||decisive[i].outcome==='Partial'?'win':'loss';
+    if(cur===prev)tmp++;
+    else{streaks.push(tmp);tmp=1;}
+  }
+  if(decisive.length)streaks.push(tmp);
+  const avgStreak=streaks.length?Math.round(streaks.reduce((a,b)=>a+b,0)/streaks.length):0;
+  const curColor=curType==='win'?'streak-win':curType==='loss'?'streak-loss':'streak-neutral';
+  const curLabel=curType==='win'?'Win Streak':curType==='loss'?'Loss Streak':'—';
+  wrap.innerHTML=`<div class="streak-grid">
+    <div class="streak-item">
+      <div class="s-label">Current Streak</div>
+      <div class="s-val ${curColor}">${curStreak}</div>
+      <div class="s-sub">${curLabel}</div>
+    </div>
+    <div class="streak-item">
+      <div class="s-label">Longest Win Streak</div>
+      <div class="s-val streak-win">${longestWin}</div>
+      <div class="s-sub">Consecutive wins</div>
+    </div>
+    <div class="streak-item">
+      <div class="s-label">Longest Loss Streak</div>
+      <div class="s-val streak-loss">${longestLoss}</div>
+      <div class="s-sub">Consecutive losses</div>
+    </div>
+    <div class="streak-item">
+      <div class="s-label">Avg Streak Length</div>
+      <div class="s-val streak-neutral">${avgStreak}</div>
+      <div class="s-sub">Trades per streak</div>
+    </div>
+  </div>`;
+}
+
 function renderSessionStats(trades){
   const wrap=document.getElementById('session-stats');if(!wrap)return;
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
@@ -1076,6 +1157,7 @@ function saveTrade(){
   if(!db.trades[key])db.trades[key]=[];
   db.trades[key].push({
     id:Date.now(),date,
+    time:document.getElementById('f-time').value||'',
     symbol:symEl.value,
     session:sessEl.value,
     direction:dirEl.value,
@@ -1166,7 +1248,7 @@ function renderDetailTable(){
   const wrap=document.getElementById('detail-twrap');
   if(!trades.length){wrap.innerHTML='<div class="empty"><i class="ti ti-clipboard-list"></i>No trades found.</div>';return;}
   wrap.innerHTML=`<table class="tt"><thead><tr><th>Date</th><th>Pair</th><th>Session</th><th>Dir</th><th>Outcome</th><th>P&L</th><th>RR</th><th></th></tr></thead><tbody>${trades.map(t=>`<tr style="cursor:pointer" onclick="openEditTrade('${currentDetailKey}',${t.id})">
-    <td>${t.date}</td>
+    <td>${t.date}${t.time?'<br><span style="font-size:10px;color:var(--text3)">'+t.time+'</span>':''}</td>
     <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}</td>
     <td><span class="sess ${t.session||''}">${SESS_LABELS[t.session]||t.session||'—'}</span></td>
     <td><span class="badge ${t.direction.toLowerCase()}">${t.direction}</span></td>
@@ -1319,6 +1401,7 @@ function openEditTrade(key,id){
   if(!t)return;
   editTradeKey=key;editTradeId=id;
   document.getElementById('et-date').value=t.date;
+  document.getElementById('et-time').value=t.time||'';
   document.getElementById('et-sym').value=t.symbol;
   document.getElementById('et-sess').value=t.session;
   document.getElementById('et-dir').value=t.direction;
