@@ -1122,33 +1122,55 @@ function drawCharts(trades){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
+  // Always start from 0
   let cum=0;
   const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
+  const labels=['$0',...ed.map(d=>d.x)];
+  const vals=[0,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
-  if(c1){if(eqChart)eqChart.destroy();// Build green/red gradient for equity curve
-  const gradCanvas=c1.canvas;
-  const gradH=gradCanvas.offsetHeight||210;
-  const allVals=ed.map(d=>d.y);
-  const minV=Math.min(0,...allVals);
-  const maxV=Math.max(0,...allVals);
-  const range=maxV-minV||1;
-  const zeroRatio=maxV/range;
-  const grad=c1.createLinearGradient(0,0,0,gradH);
-  grad.addColorStop(0,'rgba(29,158,117,0.25)');
-  grad.addColorStop(Math.max(0,Math.min(1,zeroRatio)),'rgba(29,158,117,0.05)');
-  grad.addColorStop(Math.max(0,Math.min(1,zeroRatio)),'rgba(216,90,48,0.05)');
-  grad.addColorStop(1,'rgba(216,90,48,0.25)');
-  // Segment colors per point
-  const segColors=ed.map((d,i)=>{
-    if(i===0)return d.y>=0?'#1D9E75':'#D85A30';
-    return d.y>=0?'#1D9E75':'#D85A30';
-  });
-  eqChart=new Chart(c1,{type:'line',data:{labels:ed.map(d=>d.x),datasets:[{data:ed.map(d=>d.y),borderColor:ed.map(d=>d.y>=0?'#1D9E75':'#D85A30'),backgroundColor:grad,borderWidth:2,pointRadius:ed.length>30?0:3,fill:true,tension:0.3,segment:{borderColor:ctx=>ctx.p0.parsed.y>=0&&ctx.p1.parsed.y>=0?'#1D9E75':ctx.p0.parsed.y<0&&ctx.p1.parsed.y<0?'#D85A30':'#888'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});}
-  const c2=document.getElementById('pnl-chart')?.getContext('2d');
-  if(c2){if(pnlChartInst)pnlChartInst.destroy();pnlChartInst=new Chart(c2,{type:'bar',data:{labels:trades.map(t=>PAIRS[t.symbol]||t.symbol),datasets:[{data:trades.map(t=>t.pnl||0),backgroundColor:trades.map(t=>(t.pnl||0)>=0?'rgba(29,158,117,0.75)':'rgba(216,90,48,0.75)'),borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},maxTicksLimit:14,color:tc},grid:{display:false}},y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});}
+  if(c1){
+    if(eqChart)eqChart.destroy();
+    const chartH=c1.canvas.clientHeight||210;
+    const maxV=Math.max(0,...vals);
+    const minV=Math.min(0,...vals);
+    const range=maxV-minV||1;
+    const zeroRatio=maxV/range;
+    const grad=c1.createLinearGradient(0,0,0,chartH);
+    grad.addColorStop(0,'rgba(29,158,117,0.25)');
+    grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(29,158,117,0.05)');
+    grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(216,90,48,0.05)');
+    grad.addColorStop(1,'rgba(216,90,48,0.2)');
+    eqChart=new Chart(c1,{
+      type:'line',
+      data:{
+        labels,
+        datasets:[{
+          data:vals,
+          backgroundColor:grad,
+          borderWidth:2.5,
+          pointRadius:0,
+          pointHoverRadius:4,
+          fill:true,
+          tension:0.3,
+          segment:{
+            borderColor:ctx=>ctx.p0.parsed.y>=0&&ctx.p1.parsed.y>=0?'#1D9E75':
+                            ctx.p0.parsed.y<0&&ctx.p1.parsed.y<0?'#D85A30':'#aaa'
+          }
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},
+          y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}
+        }
+      }
+    });
+  }
 }
 
-// ── Log Trade ─────────────────────────────────────────────────
 function initLogPage(){
   // Only set date, leave dropdowns empty
   document.getElementById('f-date').value=today();
@@ -1185,13 +1207,16 @@ function saveTrade(){
   const date=document.getElementById('f-date').value||today();
   const key=dateToKey(date);
   if(!db.trades[key])db.trades[key]=[];
+  const rawPnl=Math.abs(parseFloat(pnlEl.value));
+  const outcome=outEl.value;
+  const finalPnl=outcome==='Loss'?-rawPnl:rawPnl;
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
     session:sessEl.value,
     direction:dirEl.value,
-    outcome:outEl.value,
-    pnl:parseFloat(pnlEl.value),
+    outcome,
+    pnl:finalPnl,
     rr:parseFloat(rrEl.value)
   });
   db.trades[key].sort((a,b)=>a.date.localeCompare(b.date));
@@ -1450,7 +1475,7 @@ function saveEditTrade(){
     session:document.getElementById('et-sess').value,
     direction:document.getElementById('et-dir').value,
     outcome:document.getElementById('et-out').value,
-    pnl:parseFloat(document.getElementById('et-pnl').value)||0,
+    pnl:(()=>{const v=Math.abs(parseFloat(document.getElementById('et-pnl').value)||0);const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
     rr:parseFloat(document.getElementById('et-rr').value)||null
   };
   // Remove from old key
