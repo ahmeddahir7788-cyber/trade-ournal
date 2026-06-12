@@ -76,14 +76,20 @@ nav button:hover i{color:var(--text)}
 .chart-wrap{position:relative;width:100%;height:210px}
 
 /* STREAK */
-.streak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.streak-item{background:var(--surface2);border-radius:var(--r);padding:12px 14px;text-align:center}
-.streak-item .s-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.streak-item .s-val{font-size:22px;font-weight:700}
-.streak-item .s-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.streak-grid{display:flex;flex-direction:column;gap:8px}
+.streak-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-radius:var(--r)}
+.streak-item .s-label{font-size:13px;color:var(--text2);font-weight:500}
+.streak-item .s-right{text-align:right}
+.streak-item .s-val{font-size:20px;font-weight:700;line-height:1}
+.streak-item .s-sub{font-size:10px;color:var(--text3);margin-top:2px}
 .streak-win{color:var(--green)}
 .streak-loss{color:var(--red)}
 .streak-neutral{color:var(--text2)}
+/* Vertical breakdown */
+.bd-grid-v{display:flex;flex-direction:column;gap:8px}
+.bd-item-v{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-radius:var(--r)}
+.bd-lbl-v{font-size:13px;color:var(--text2);font-weight:500}
+.bd-val-v{font-size:20px;font-weight:700}
 
 /* CALENDAR */
 .cal-outer{display:grid;grid-template-columns:1fr 210px;gap:16px;align-items:start}
@@ -316,17 +322,21 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="metric"><div class="lbl">Avg RR</div><div class="val" id="m-rr">—</div></div>
       <div class="metric"><div class="lbl">Total R</div><div class="val purple" id="m-totalr">—</div></div>
     </div>
-    <div class="card" id="streak-card">
-      <h3>Streak Tracker</h3>
-      <div id="streak-stats"></div>
-    </div>
-    <div class="card">
-      <h3>Trade Breakdown</h3>
-      <div class="bd-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="bd-item"><div class="bd-lbl">Winning</div><div class="bd-val" style="color:var(--green)" id="bd-win">0</div></div>
-        <div class="bd-item"><div class="bd-lbl">Partial</div><div class="bd-val" style="color:var(--gold)" id="bd-partial">0</div></div>
-        <div class="bd-item"><div class="bd-lbl">Losing</div><div class="bd-val" style="color:var(--red)" id="bd-loss">0</div></div>
-        <div class="bd-item"><div class="bd-lbl">Break Even</div><div class="bd-val" id="bd-be">0</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <!-- LEFT: Streak Tracker -->
+      <div class="card" style="margin-bottom:0">
+        <h3>Streak Tracker</h3>
+        <div id="streak-stats"></div>
+      </div>
+      <!-- RIGHT: Trade Breakdown -->
+      <div class="card" style="margin-bottom:0">
+        <h3>Trade Breakdown</h3>
+        <div class="bd-grid-v">
+          <div class="bd-item-v"><div class="bd-lbl-v">Winning</div><div class="bd-val-v" style="color:var(--green)" id="bd-win">0</div></div>
+          <div class="bd-item-v"><div class="bd-lbl-v">Partial</div><div class="bd-val-v" style="color:var(--gold)" id="bd-partial">0</div></div>
+          <div class="bd-item-v"><div class="bd-lbl-v">Losing</div><div class="bd-val-v" style="color:var(--red)" id="bd-loss">0</div></div>
+          <div class="bd-item-v"><div class="bd-lbl-v">Break Even</div><div class="bd-val-v" id="bd-be">0</div></div>
+        </div>
       </div>
     </div>
     <div class="side-by-side" style="grid-template-columns:30% 1fr">
@@ -740,7 +750,20 @@ function onPeriodChange(){
   const year=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
-  if(period==='month'){
+  if(period==='week'){
+    // Current week Mon-Sun
+    ySel.style.display='none';
+    mSel.style.display='none';
+    const now=new Date();
+    const day=now.getDay();
+    const mon=new Date(now);mon.setDate(now.getDate()-(day===0?6:day-1));
+    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+    const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const allTrades=Object.values(db.trades).flat().filter(t=>t.date>=fmt(mon)&&t.date<=fmt(sun)).sort((a,b)=>a.date.localeCompare(b.date));
+    const tb=document.getElementById('top-bar-section');
+    if(tb)tb.textContent='Dashboard';
+    renderDashboardWithTrades(allTrades,'This Week');
+  } else if(period==='month'){
     ySel.style.display='';
     mSel.style.display='';
     onDashMonthChange();
@@ -1021,24 +1044,20 @@ function renderStreaks(trades){
   const curLabel=curType==='win'?'Win Streak':curType==='loss'?'Loss Streak':'—';
   wrap.innerHTML=`<div class="streak-grid">
     <div class="streak-item">
-      <div class="s-label">Current Streak</div>
-      <div class="s-val ${curColor}">${curStreak}</div>
-      <div class="s-sub">${curLabel}</div>
+      <span class="s-label">Current Streak</span>
+      <div class="s-right"><div class="s-val ${curColor}">${curStreak}</div><div class="s-sub">${curLabel}</div></div>
     </div>
     <div class="streak-item">
-      <div class="s-label">Longest Win Streak</div>
-      <div class="s-val streak-win">${longestWin}</div>
-      <div class="s-sub">Consecutive wins</div>
+      <span class="s-label">Longest Win Streak</span>
+      <div class="s-right"><div class="s-val streak-win">${longestWin}</div><div class="s-sub">Consecutive wins</div></div>
     </div>
     <div class="streak-item">
-      <div class="s-label">Longest Loss Streak</div>
-      <div class="s-val streak-loss">${longestLoss}</div>
-      <div class="s-sub">Consecutive losses</div>
+      <span class="s-label">Longest Loss Streak</span>
+      <div class="s-right"><div class="s-val streak-loss">${longestLoss}</div><div class="s-sub">Consecutive losses</div></div>
     </div>
     <div class="streak-item">
-      <div class="s-label">Avg Streak Length</div>
-      <div class="s-val streak-neutral">${avgStreak}</div>
-      <div class="s-sub">Trades per streak</div>
+      <span class="s-label">Avg Streak Length</span>
+      <div class="s-right"><div class="s-val streak-neutral">${avgStreak}</div><div class="s-sub">Trades per streak</div></div>
     </div>
   </div>`;
 }
