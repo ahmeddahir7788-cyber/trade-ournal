@@ -298,12 +298,13 @@ table.tt tr:last-child td{border-bottom:none}
   <div class="top-bar-right" id="top-bar-right">
     <!-- Dashboard period selector - single smart select -->
     <select class="sel" id="dash-period-sel" onchange="onPeriodChange()" style="font-weight:500;display:none">
-      <option value="month">Monthly</option>
-      <option value="alltime">All Time</option>
-      <option value="Q1">Q1 (Jan–Mar)</option>
-      <option value="Q2">Q2 (Apr–Jun)</option>
-      <option value="Q3">Q3 (Jul–Sep)</option>
-      <option value="Q4">Q4 (Oct–Dec)</option>
+          <option value="week">Weekly</option>
+          <option value="month">Monthly</option>
+          <option value="alltime">All Time</option>
+          <option value="Q1">Q1</option>
+          <option value="Q2">Q2</option>
+          <option value="Q3">Q3</option>
+          <option value="Q4">Q4</option>
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
@@ -354,7 +355,6 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="card">
       <div class="fg">
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
-        <div class="field"><label>Time</label><input type="time" id="f-time" placeholder="HH:MM"/></div>
         <div class="field"><label>Pair</label>
           <select id="f-sym">
             <option value="" disabled selected>— Select pair —</option>
@@ -536,7 +536,6 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div class="fg" style="margin-bottom:16px">
       <div class="field"><label>Date</label><input type="date" id="et-date"/></div>
-      <div class="field"><label>Time</label><input type="time" id="et-time"/></div>
       <div class="field"><label>Pair</label>
         <select id="et-sym">
           <option value="EURUSD">EUR/USD</option><option value="GBPUSD">GBP/USD</option>
@@ -1055,22 +1054,27 @@ function renderStreaks(trades){
   const avgStreak=streaks.length?Math.round(streaks.reduce((a,b)=>a+b,0)/streaks.length):0;
   const curColor=curType==='win'?'streak-win':curType==='loss'?'streak-loss':'streak-neutral';
   const curLabel=curType==='win'?'Win Streak':curType==='loss'?'Loss Streak':'—';
-  wrap.innerHTML=`<div class="streak-grid">
-    <div class="streak-item">
-      <span class="s-label">Current Streak</span>
-      <div class="s-right"><div class="s-val ${curColor}">${curStreak}</div><div class="s-sub">${curLabel}</div></div>
+  const maxStreak=Math.max(curStreak,longestWin,longestLoss,avgStreak,1);
+  wrap.innerHTML=`<div class="stat-list">
+    <div class="stat-row">
+      <span class="stat-lbl">Current</span>
+      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(curStreak/maxStreak*100)}%;background:${curType==='win'?'var(--green)':curType==='loss'?'var(--red)':'var(--text3)'}"></div></span>
+      <span class="stat-val ${curColor}">${curStreak}<span style="font-size:9px;color:var(--text3);font-weight:400;margin-left:2px">${curLabel}</span></span>
     </div>
-    <div class="streak-item">
-      <span class="s-label">Longest Win</span>
-      <div class="s-right"><div class="s-val streak-win">${longestWin}</div><div class="s-sub">in a row</div></div>
+    <div class="stat-row">
+      <span class="stat-lbl">Best Win</span>
+      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(longestWin/maxStreak*100)}%;background:var(--green)"></div></span>
+      <span class="stat-val streak-win">${longestWin}</span>
     </div>
-    <div class="streak-item">
-      <span class="s-label">Longest Loss</span>
-      <div class="s-right"><div class="s-val streak-loss">${longestLoss}</div><div class="s-sub">in a row</div></div>
+    <div class="stat-row">
+      <span class="stat-lbl">Best Loss</span>
+      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(longestLoss/maxStreak*100)}%;background:var(--red)"></div></span>
+      <span class="stat-val streak-loss">${longestLoss}</span>
     </div>
-    <div class="streak-item">
-      <span class="s-label">Avg Streak</span>
-      <div class="s-right"><div class="s-val streak-neutral">${avgStreak}</div><div class="s-sub">trades long</div></div>
+    <div class="stat-row">
+      <span class="stat-lbl">Avg Length</span>
+      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(avgStreak/maxStreak*100)}%;background:var(--blue)"></div></span>
+      <span class="stat-val streak-neutral">${avgStreak}</span>
     </div>
   </div>`;
 }
@@ -1183,7 +1187,6 @@ function saveTrade(){
   if(!db.trades[key])db.trades[key]=[];
   db.trades[key].push({
     id:Date.now(),date,
-    time:document.getElementById('f-time').value||'',
     symbol:symEl.value,
     session:sessEl.value,
     direction:dirEl.value,
@@ -1274,7 +1277,7 @@ function renderDetailTable(){
   const wrap=document.getElementById('detail-twrap');
   if(!trades.length){wrap.innerHTML='<div class="empty"><i class="ti ti-clipboard-list"></i>No trades found.</div>';return;}
   wrap.innerHTML=`<table class="tt"><thead><tr><th>Date</th><th>Pair</th><th>Session</th><th>Dir</th><th>Outcome</th><th>P&L</th><th>RR</th><th></th></tr></thead><tbody>${trades.map(t=>`<tr style="cursor:pointer" onclick="openEditTrade('${currentDetailKey}',${t.id})">
-    <td>${t.date}${t.time?'<br><span style="font-size:10px;color:var(--text3)">'+t.time+'</span>':''}</td>
+    <td>${t.date}</td>
     <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}</td>
     <td><span class="sess ${t.session||''}">${SESS_LABELS[t.session]||t.session||'—'}</span></td>
     <td><span class="badge ${t.direction.toLowerCase()}">${t.direction}</span></td>
@@ -1427,7 +1430,6 @@ function openEditTrade(key,id){
   if(!t)return;
   editTradeKey=key;editTradeId=id;
   document.getElementById('et-date').value=t.date;
-  document.getElementById('et-time').value=t.time||'';
   document.getElementById('et-sym').value=t.symbol;
   document.getElementById('et-sess').value=t.session;
   document.getElementById('et-dir').value=t.direction;
