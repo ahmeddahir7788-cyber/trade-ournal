@@ -822,7 +822,7 @@ function onPeriodChange(){
 }
 
 function renderDashboardWithTrades(trades,label){
-  document.getElementById('dash-sub').textContent=trades.length?trades.length+' trades total':'No trades logged yet.';
+  // dash-sub removed
   const s=statsOf(trades);
   if(!s){
     ['m-wr','m-pnl','m-rr','m-totalr','bd-win','bd-partial','bd-loss','bd-be'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
@@ -831,11 +831,11 @@ function renderDashboardWithTrades(trades,label){
     renderCalendar(curMonthKey(),[]);
     if(eqChart){eqChart.destroy();eqChart=null}if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}return;
   }
-  document.getElementById('m-total').textContent=s.n;
+  const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
   const pe=document.getElementById('m-pnl');pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');
-  document.getElementById('m-rr').textContent=s.avgRR?s.avgRR+'R':'—';
-  document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
+  const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
+  const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
 
   const bT=s.n||1;
   const bww=document.getElementById('bar-win');if(bww)bww.style.width=Math.round(s.wins/bT*100)+'%';
@@ -907,11 +907,12 @@ function renderDashboard(key){
   if(mSel)mSel.value=parseInt(km);
 
   if(!s){
-    document.getElementById('dash-sub').textContent='No trades logged for '+keyLabel(key)+'.';
-    document.getElementById('m-total').textContent='0';
-    ['m-wr','m-pnl','m-rr','m-totalr','bd-win','bd-loss','bd-be'].forEach(id=>document.getElementById(id).textContent='—');
+    // dash-sub removed
+    const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    drawGauge(0,0,0);
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
-    const sw=document.getElementById('streak-stats');if(sw)sw.innerHTML='';
+    const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
     if(eqChart){eqChart.destroy();eqChart=null}
     if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}
@@ -933,10 +934,7 @@ function renderDashboard(key){
   const gb=document.getElementById('g-be');if(gb)gb.textContent=s.be;
   const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
   drawGauge(s.wins,s.be,s.losses);
-  document.getElementById('bd-win').textContent=s.wins;
-  document.getElementById('bd-partial').textContent=s.partials;
-  document.getElementById('bd-loss').textContent=s.losses;
-  document.getElementById('bd-be').textContent=s.be;
+
   renderCalendar(key,trades);
   renderStreaks(trades);
   renderSessionStats(trades);
