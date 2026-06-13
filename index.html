@@ -319,13 +319,9 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="dash-sub" style="display:none"></div>
 
     <div class="metric-grid">
-      <div class="metric"><div class="lbl">Net P&amp;L</div><div class="val" id="m-pnl">$0</div></div>
-      <div class="metric"><div class="lbl">Win Rate</div><div class="val" id="m-wr">—</div></div>
-      <div class="metric"><div class="lbl">Profit Factor</div><div class="val" id="m-pf">—</div></div>
-      <div class="metric"><div class="lbl">Day Win %</div><div class="val" id="m-daywr">—</div></div>
-      <div class="metric"><div class="lbl">Avg Win</div><div class="val green" id="m-avgwin">—</div></div>
-      <div class="metric"><div class="lbl">Avg Loss</div><div class="val red" id="m-avgloss">—</div></div>
       <div class="metric"><div class="lbl">Total Trades</div><div class="val blue" id="m-total">0</div></div>
+      <div class="metric"><div class="lbl">Win Rate</div><div class="val" id="m-wr">—</div></div>
+      <div class="metric"><div class="lbl">Total P&amp;L</div><div class="val" id="m-pnl">$0</div></div>
       <div class="metric"><div class="lbl">Avg RR</div><div class="val" id="m-rr">—</div></div>
       <div class="metric"><div class="lbl">Total R</div><div class="val purple" id="m-totalr">—</div></div>
     </div>
@@ -350,7 +346,6 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0"><h3>Session Performance</h3><div id="session-stats"></div></div>
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
-    <div class="card" style="margin-top:12px"><h3>Daily P&amp;L</h3><div class="chart-wrap" style="height:180px"><canvas id="daily-pnl-chart"></canvas></div></div>
     <div class="card" style="margin-top:12px"><h3 id="cal-title">Calendar</h3><div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div></div>
   </div>
 
@@ -896,15 +891,12 @@ function renderDashboard(key){
     if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}
     return;
   }
+  document.getElementById('dash-sub').textContent=s.n+' trade'+(s.n===1?'':'s')+' · '+trades[0].date+' → '+trades[s.n-1].date;
   document.getElementById('m-total').textContent=s.n;
   const we=document.getElementById('m-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
   const pe=document.getElementById('m-pnl');pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');
   document.getElementById('m-rr').textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
-  document.getElementById('m-pf').textContent=s.pf||'—';
-  const dw=document.getElementById('m-daywr');if(dw){dw.textContent=s.dayWr+'%';dw.className='val '+(s.dayWr>=50?'green':'red');}
-  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+$'+s.avgWin:'—';
-  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-$'+s.avgLoss:'—';
   document.getElementById('bd-win').textContent=s.wins;
   document.getElementById('bd-partial').textContent=s.partials;
   document.getElementById('bd-loss').textContent=s.losses;
@@ -925,17 +917,10 @@ function statsOf(trades){
   const rrs=trades.filter(t=>t.rr!=null).map(t=>t.rr);
   const avgRR=rrs.length?(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2):null;
   const totalR=rrs.length?rrs.reduce((a,b)=>a+b,0).toFixed(2):null;
+  // Win rate excludes Break Even trades
   const decisiveTrades=n-be;
   const wr=decisiveTrades>0?Math.round((wins+partials)/decisiveTrades*100):0;
-  const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
-  const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
-  const pf=grossLoss>0?(grossWin/grossLoss).toFixed(2):'∞';
-  const days=[...new Set(trades.map(t=>t.date))];
-  const profitDays=days.filter(d=>trades.filter(t=>t.date===d).reduce((s,t)=>s+(t.pnl||0),0)>0).length;
-  const dayWr=days.length?Math.round(profitDays/days.length*100):0;
-  const avgWin=wins+partials>0?(grossWin/(wins+partials)).toFixed(0):0;
-  const avgLoss=losses>0?(grossLoss/losses).toFixed(0):0;
-  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss};
+  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr};
 }
 
 // ── Calendar ──────────────────────────────────────────────────
@@ -974,16 +959,7 @@ function renderCalendar(key,trades){
     if(info){
       const abs=Math.abs(info.pnl);
       const pnlStr=abs>=1000?(info.pnl>=0?'+':'-')+'$'+(abs/1000).toFixed(1)+'k':(info.pnl>=0?'+':'-')+'$'+abs.toFixed(0);
-      const dayTrades=trades.filter(t=>t.date===ds);
-      const dayWins=dayTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
-      const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
-      const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
-      html+=`<div class="${cls} cal-day-clickable"${style} onclick="openDayJournal('${ds}')" style="cursor:pointer">
-        <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
-        <div style="font-size:10px;color:inherit;opacity:.8">${info.count} trade${info.count>1?'s':''}</div>
-        <div class="cal-day-pnl">${pnlStr}</div>
-        <div style="font-size:9px;opacity:.7">${dayWr}%</div>
-      </div>`;
+      html+=`<div class="${cls} cal-day-clickable"${style} onclick="openDayJournal('${ds}')" style="cursor:pointer"><div class="cal-day-top"><span class="cal-day-num">${d}</span><span class="cal-day-trades">${info.count} ⇄</span></div><div class="cal-day-pnl">${pnlStr}</div></div>`;
     } else {
       html+=`<div class="${cls} cal-day-clickable"${style} onclick="openDayJournal('${ds}')" style="cursor:pointer"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
     }
@@ -1028,14 +1004,11 @@ function renderCalendar(key,trades){
       }
     }
 
-    const wAbs=Math.abs(wPnl);
-    const wPnlStr=wAbs>=1000?(wPnl>=0?'+':'-')+'$'+(wAbs/1000).toFixed(1)+'K':(wPnl>=0?'+':'-')+'$'+wAbs.toFixed(0);
-    wHtml+=`<div class="week-card" style="height:${rowH}px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+    wHtml+=`<div class="week-card" style="height:${rowH}px;display:flex;flex-direction:column;justify-content:center;">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||w+1}</span><span class="week-dates">${fmt(dispStart)} - ${fmt(dispEnd)}</span></div>
       ${wDays>0
-        ?`<div style="font-size:18px;font-weight:700;color:${wPnl>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
-           <div style="display:inline-flex;align-items:center;gap:4px"><span style="background:${wPnl>=0?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)'};color:${wPnl>=0?'var(--green)':'var(--red)'};font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">${wDays} day${wDays>1?'s':''}</span></div>`
-        :`<div style="font-size:14px;font-weight:600;color:var(--text3)">$0</div><div><span style="background:var(--surface2);color:var(--text3);font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">0 days</span></div>`}
+        ?`<div class="week-stats"><span>PnL: <span class="week-pnl" style="color:${wPnl>=0?'var(--green)':'var(--red)'}">${wPnl>=0?'+':'-'}$${Math.abs(wPnl).toFixed(2)}</span></span><span>Days: <strong>${wDays}</strong></span></div>`
+        :`<div class="week-no-trades">No trades</div>`}
     </div>`;
     wIdx++;
   }
@@ -1149,16 +1122,6 @@ function drawCharts(trades){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
-  // Daily P&L bar chart
-  const dayMap={};
-  trades.forEach(t=>{if(!dayMap[t.date])dayMap[t.date]=0;dayMap[t.date]+=(t.pnl||0);});
-  const dayKeys=Object.keys(dayMap).sort();
-  const dayVals=dayKeys.map(d=>Math.round(dayMap[d]));
-  const c0=document.getElementById('daily-pnl-chart')?.getContext('2d');
-  if(c0){
-    if(window.dailyChart)window.dailyChart.destroy();
-    window.dailyChart=new Chart(c0,{type:'bar',data:{labels:dayKeys,datasets:[{data:dayVals,backgroundColor:dayVals.map(v=>v>=0?'rgba(29,158,117,0.75)':'rgba(216,90,48,0.75)'),borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},maxTicksLimit:12,color:tc},grid:{display:false}},y:{ticks:{font:{size:10},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});
-  }
   // Always start from 0
   let cum=0;
   const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
