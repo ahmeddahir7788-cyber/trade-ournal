@@ -116,6 +116,7 @@ nav button:hover i{color:var(--text)}
 .cal-day.empty{background:transparent;height:74px;visibility:hidden}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--surface2)}
+.cal-day-clickable{cursor:pointer}
 .cal-day-clickable:hover{filter:brightness(1.08);transform:scale(1.02);transition:all .1s}
 .cal-day.profit{background:rgba(29,158,117,0.15);border:.5px solid rgba(29,158,117,0.25)}
 .cal-day.loss{background:rgba(216,90,48,0.15);border:.5px solid rgba(216,90,48,0.25)}
@@ -372,15 +373,11 @@ table.tt tr:last-child td{border-bottom:none}
       <!-- Total R -->
       <div class="metric"><div class="lbl">Total R</div><div class="val purple" id="m-totalr">—</div></div>
     </div>
-    <div class="card">
-      <h3>Streak Tracker</h3>
-      <div id="streak-stats"></div>
-    </div>
+
     <div class="side-by-side" style="grid-template-columns:30% 1fr">
       <div class="card" style="margin-bottom:0"><h3>Session Performance</h3><div id="session-stats"></div></div>
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
-    <div class="card" style="margin-top:12px"><h3>Daily P&amp;L</h3><div class="chart-wrap" style="height:180px"><canvas id="daily-pnl-chart"></canvas></div></div>
     <div class="card" style="margin-top:12px"><h3 id="cal-title">Calendar</h3><div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div></div>
   </div>
 
@@ -825,9 +822,10 @@ function renderDashboardWithTrades(trades,label){
   // dash-sub removed
   const s=statsOf(trades);
   if(!s){
-    ['m-wr','m-pnl','m-rr','m-totalr','bd-win','bd-partial','bd-loss','bd-be'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
-    document.getElementById('m-total').textContent='0';
-    document.getElementById('session-stats').innerHTML='';
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
+    const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
+    const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
+    drawGauge(0,0,0);
     renderCalendar(curMonthKey(),[]);
     if(eqChart){eqChart.destroy();eqChart=null}if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}return;
   }
@@ -844,7 +842,6 @@ function renderDashboardWithTrades(trades,label){
   const bbb=document.getElementById('bar-be');if(bbb)bbb.style.width=Math.round(s.be/bT*100)+'%';
   // Update bars
 
-  renderStreaks(trades);
   renderSessionStats(trades);
   drawCharts(trades);
 }
@@ -936,8 +933,8 @@ function renderDashboard(key){
   drawGauge(s.wins,s.be,s.losses);
 
   renderCalendar(key,trades);
-  renderStreaks(trades);
   renderSessionStats(trades);
+  renderCalendar(currentDashKey||curMonthKey(),trades);
   drawCharts(trades);
 }
 
@@ -996,7 +993,8 @@ function renderCalendar(key,trades){
     if(info){cls+=info.pnl>0?' profit':info.pnl<0?' loss':' breakeven';}
     else cls+=' no-trade';
     if(isToday)cls+=' today';
-    const style=d===1&&firstDay>0?` style="grid-column-start:${firstDay+1}"`:'';
+    const baseStyle=d===1&&firstDay>0?`grid-column-start:${firstDay+1};`:'';
+    const style=`style="${baseStyle}cursor:pointer"`;
     if(info){
       const abs=Math.abs(info.pnl);
       const pnlStr=abs>=1000?(info.pnl>=0?'+':'-')+'$'+(abs/1000).toFixed(1)+'k':(info.pnl>=0?'+':'-')+'$'+abs.toFixed(0);
@@ -1004,14 +1002,14 @@ function renderCalendar(key,trades){
       const dayWins=dayTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
-      html+=`<div class="${cls} cal-day-clickable"${style} onclick="openDayJournal('${ds}')" style="cursor:pointer">
+      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div style="font-size:10px;color:inherit;opacity:.8">${info.count} trade${info.count>1?'s':''}</div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div style="font-size:9px;opacity:.7">${dayWr}%</div>
       </div>`;
     } else {
-      html+=`<div class="${cls} cal-day-clickable"${style} onclick="openDayJournal('${ds}')" style="cursor:pointer"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
+      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
     }
   }
   html+='</div>';
@@ -1092,68 +1090,6 @@ function drawGauge(wins,be,losses){
   });
 }
 
-function renderStreaks(trades){
-  const wrap=document.getElementById('streak-stats');
-  if(!wrap)return;
-  if(!trades.length){
-    wrap.innerHTML='<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades yet.</div>';
-    return;
-  }
-  // Sort by date then time
-  const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
-  // Calculate streaks - only count Win/Partial as win, Loss as loss, skip BE
-  const decisive=sorted.filter(t=>t.outcome==='Win'||t.outcome==='Partial'||t.outcome==='Loss');
-  let curStreak=0,curType='',longestWin=0,longestLoss=0,tmpW=0,tmpL=0;
-  decisive.forEach(t=>{
-    const isWin=t.outcome==='Win'||t.outcome==='Partial';
-    if(isWin){
-      tmpW++;tmpL=0;
-      if(curType==='win')curStreak++;
-      else{curType='win';curStreak=1;}
-      longestWin=Math.max(longestWin,tmpW);
-    } else {
-      tmpL++;tmpW=0;
-      if(curType==='loss')curStreak++;
-      else{curType='loss';curStreak=1;}
-      longestLoss=Math.max(longestLoss,tmpL);
-    }
-  });
-  // Average streak length
-  let streaks=[],tmp=1;
-  for(let i=1;i<decisive.length;i++){
-    const prev=decisive[i-1].outcome==='Win'||decisive[i-1].outcome==='Partial'?'win':'loss';
-    const cur=decisive[i].outcome==='Win'||decisive[i].outcome==='Partial'?'win':'loss';
-    if(cur===prev)tmp++;
-    else{streaks.push(tmp);tmp=1;}
-  }
-  if(decisive.length)streaks.push(tmp);
-  const avgStreak=streaks.length?Math.round(streaks.reduce((a,b)=>a+b,0)/streaks.length):0;
-  const curColor=curType==='win'?'streak-win':curType==='loss'?'streak-loss':'streak-neutral';
-  const curLabel=curType==='win'?'Win Streak':curType==='loss'?'Loss Streak':'—';
-  const maxStreak=Math.max(curStreak,longestWin,longestLoss,avgStreak,1);
-  wrap.innerHTML=`<div class="stat-list">
-    <div class="stat-row">
-      <span class="stat-lbl">Current</span>
-      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(curStreak/maxStreak*100)}%;background:${curType==='win'?'var(--green)':curType==='loss'?'var(--red)':'var(--text3)'}"></div></span>
-      <span class="stat-val ${curColor}">${curStreak}<span style="font-size:9px;color:var(--text3);font-weight:400;margin-left:2px">${curLabel}</span></span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-lbl">Best Win</span>
-      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(longestWin/maxStreak*100)}%;background:var(--green)"></div></span>
-      <span class="stat-val streak-win">${longestWin}</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-lbl">Best Loss</span>
-      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(longestLoss/maxStreak*100)}%;background:var(--red)"></div></span>
-      <span class="stat-val streak-loss">${longestLoss}</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-lbl">Avg Length</span>
-      <span class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.round(avgStreak/maxStreak*100)}%;background:var(--blue)"></div></span>
-      <span class="stat-val streak-neutral">${avgStreak}</span>
-    </div>
-  </div>`;
-}
 
 function renderSessionStats(trades){
   const wrap=document.getElementById('session-stats');if(!wrap)return;
@@ -1198,16 +1134,7 @@ function drawCharts(trades){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
-  // Daily P&L bar chart
-  const dayMap={};
-  trades.forEach(t=>{if(!dayMap[t.date])dayMap[t.date]=0;dayMap[t.date]+=(t.pnl||0);});
-  const dayKeys=Object.keys(dayMap).sort();
-  const dayVals=dayKeys.map(d=>Math.round(dayMap[d]));
-  const c0=document.getElementById('daily-pnl-chart')?.getContext('2d');
-  if(c0){
-    if(window.dailyChart)window.dailyChart.destroy();
-    window.dailyChart=new Chart(c0,{type:'bar',data:{labels:dayKeys,datasets:[{data:dayVals,backgroundColor:dayVals.map(v=>v>=0?'rgba(29,158,117,0.75)':'rgba(216,90,48,0.75)'),borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},maxTicksLimit:12,color:tc},grid:{display:false}},y:{ticks:{font:{size:10},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}}}});
-  }
+
   // Always start from 0
   let cum=0;
   const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
