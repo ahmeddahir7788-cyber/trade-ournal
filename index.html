@@ -140,7 +140,7 @@ nav button:hover i{color:var(--text)}
 .week-card{padding:12px 0;border-bottom:.5px solid var(--border);background:transparent}
 .week-card:last-child{border-bottom:none}
 .week-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
-.week-name{font-size:11px;font-weight:700;color:var(--text)}
+.week-name{font-size:12px;font-weight:700;color:var(--text)}
 
 .week-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text2)}
 .week-pnl{font-weight:600}
@@ -1057,7 +1057,7 @@ function renderCalendar(key,trades){
     wHtml+=`<div class="week-card" style="height:${rowH}px;display:flex;flex-direction:column;justify-content:center;gap:3px">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||w+1}</span></div>
       ${wDays>0
-        ?`<div style="font-size:13px;font-weight:700;color:${wPnl>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
+        ?`<div style="font-size:14px;font-weight:700;color:${wPnl>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
            <div style="display:inline-flex;align-items:center;gap:4px"><span style="background:${wPnl>=0?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)'};color:${wPnl>=0?'var(--green)':'var(--red)'};font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">${wDays} day${wDays>1?'s':''}</span></div>`
         :`<div style="font-size:14px;font-weight:600;color:var(--text3)">$0</div><div><span style="background:var(--surface2);color:var(--text3);font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">0 days</span></div>`}
     </div>`;
