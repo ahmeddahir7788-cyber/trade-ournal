@@ -61,18 +61,37 @@ nav button:hover i{color:var(--text)}
 
 /* METRICS */
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
-.top-stats-grid{display:grid;grid-template-columns:1fr 1.8fr 1.8fr 1fr 1fr 1fr;gap:10px;margin-bottom:1.25rem}
-@media(max-width:800px){.top-stats-grid{grid-template-columns:repeat(3,1fr)}}
-.wr-metric{padding:14px 16px}
-.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
-.gauge-counts{display:flex;gap:8px;justify-content:space-between;width:110px}
-.gc{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;text-align:center}
+/* NEW STAT CARDS */
+.stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem}
+@media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:18px 16px 14px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden;min-height:180px}
+.stat-card-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.stat-card-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.stat-card-val{font-size:28px;font-weight:700;line-height:1;margin-bottom:auto}
+.stat-card-bottom{margin-top:12px}
+/* Gauge */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
+.gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
+.gc{font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px;text-align:center}
 .gc.green{background:rgba(29,158,117,0.15);color:var(--green)}
 .gc.blue{background:rgba(55,138,221,0.15);color:var(--blue)}
 .gc.red{background:rgba(216,90,48,0.15);color:var(--red)}
-.avgwl-bar-wrap{display:flex;flex-direction:column;gap:4px}
-.avgwl-bar{display:flex;height:6px;border-radius:100px;overflow:hidden;background:var(--border);width:100%}
-.avgwl-labels{display:flex;justify-content:space-between}
+/* Avg win/loss bar */
+.avgwl-bar-wrap{display:flex;flex-direction:column;gap:6px}
+.avgwl-bar{display:flex;height:8px;border-radius:100px;overflow:hidden;width:100%;position:relative}
+.avgwl-divider{position:absolute;left:50%;top:-2px;width:2px;height:12px;background:var(--bg);z-index:1;border-radius:2px}
+.avgwl-labels{display:flex;justify-content:space-between;margin-top:2px}
+.avgwl-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+/* Mini bar chart for total trades */
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:8px}
+.mini-bar{flex:1;border-radius:3px 3px 0 0;min-width:6px;transition:height .3s}
+/* RR stats list */
+.rr-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.rr-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:.5px solid var(--border)}
+.rr-row:last-child{border-bottom:none;padding-bottom:0}
+.rr-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.rr-val{font-size:16px;font-weight:700}
 .metric{background:var(--card);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:0 1px 4px var(--shadow)}
 .metric .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .metric .val{font-size:22px;font-weight:600}
@@ -331,18 +350,24 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="dash-title" style="display:none"></div>
     <div id="dash-sub" style="display:none"></div>
 
-    <div class="top-stats-grid">
-      <!-- Net P&L -->
-      <div class="metric"><div class="lbl">Net P&amp;L</div><div class="val" id="m-pnl">$0</div></div>
-      <!-- Win Rate with gauge -->
-      <div class="metric wr-metric">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
-          <div>
-            <div class="lbl">Win Rate</div>
-            <div class="val" id="m-wr" style="margin-top:6px">—</div>
-          </div>
+    <div class="stat-cards">
+      <!-- Total Trades -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(139,92,246,0.2)"><i class="ti ti-chart-bar" style="color:#a78bfa"></i></div>
+        <div class="stat-card-lbl">Total Trades</div>
+        <div class="stat-card-val blue" id="m-total">0</div>
+        <div class="stat-card-bottom">
+          <div class="mini-bars" id="mini-bars"></div>
+        </div>
+      </div>
+      <!-- Win Rate -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(55,138,221,0.2)"><i class="ti ti-trending-up" style="color:#378ADD"></i></div>
+        <div class="stat-card-lbl">Win Rate</div>
+        <div class="stat-card-val" id="m-wr" style="color:#378ADD">—</div>
+        <div class="stat-card-bottom">
           <div class="gauge-wrap">
-            <canvas id="wr-gauge" width="110" height="60"></canvas>
+            <canvas id="wr-gauge" width="130" height="70"></canvas>
             <div class="gauge-counts">
               <span class="gc green" id="g-wins">0</span>
               <span class="gc blue" id="g-be">0</span>
@@ -351,27 +376,44 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
         </div>
       </div>
-      <!-- Avg Win/Loss combined -->
-      <div class="metric">
-        <div class="lbl">Avg Win / Loss</div>
-        <div class="val" id="m-rr" style="margin-top:4px">—</div>
-        <div class="avgwl-bar-wrap" style="margin-top:8px">
-          <div class="avgwl-bar">
-            <div id="avgwl-green" style="height:100%;background:var(--green);border-radius:100px 0 0 100px;width:50%"></div>
-            <div id="avgwl-red" style="height:100%;background:var(--red);border-radius:0 100px 100px 0;width:50%"></div>
-          </div>
-          <div class="avgwl-labels">
-            <span class="val green" style="font-size:13px" id="m-avgwin">—</span>
-            <span class="val red" style="font-size:13px" id="m-avgloss">—</span>
+      <!-- Net P&L -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(29,158,117,0.2)"><i class="ti ti-currency-dollar" style="color:var(--green)"></i></div>
+        <div class="stat-card-lbl">Net P&amp;L</div>
+        <div class="stat-card-val" id="m-pnl">$0</div>
+        <div class="stat-card-bottom">
+          <canvas id="mini-eq" width="160" height="50" style="width:100%"></canvas>
+        </div>
+      </div>
+      <!-- Avg Win / Loss -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(167,139,250,0.2)"><i class="ti ti-scale" style="color:var(--purple)"></i></div>
+        <div class="stat-card-lbl">Avg Win / Loss</div>
+        <div class="stat-card-bottom" style="margin-top:8px">
+          <div class="avgwl-bar-wrap">
+            <div class="avgwl-bar">
+              <div id="avgwl-green" style="height:100%;background:var(--green);width:50%"></div>
+              <div class="avgwl-divider"></div>
+              <div id="avgwl-red" style="height:100%;background:var(--red);width:50%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px">
+              <div><div class="stat-card-val green" style="font-size:20px" id="m-avgwin">—</div><div class="avgwl-lbl">Avg Win</div></div>
+              <div style="text-align:right"><div class="stat-card-val red" style="font-size:20px" id="m-avgloss">—</div><div class="avgwl-lbl">Avg Loss</div></div>
+            </div>
           </div>
         </div>
       </div>
-      <!-- Total Trades -->
-      <div class="metric"><div class="lbl">Total Trades</div><div class="val blue" id="m-total">0</div></div>
-      <!-- Avg RR - repurposed for RR display -->
-      <div class="metric"><div class="lbl">Avg RR</div><div class="val" id="m-avgrrx">—</div></div>
-      <!-- Total R -->
-      <div class="metric"><div class="lbl">Total R</div><div class="val purple" id="m-totalr">—</div></div>
+      <!-- RR Stats -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(139,92,246,0.2)"><span style="color:#a78bfa;font-size:18px;font-weight:800">R</span></div>
+        <div class="stat-card-lbl">RR Stats</div>
+        <div class="stat-card-bottom" style="margin-top:4px">
+          <div class="rr-list">
+            <div class="rr-row"><span class="rr-lbl">Avg RR</span><span class="rr-val" id="m-avgrrx">—</span></div>
+            <div class="rr-row"><span class="rr-lbl">Total R</span><span class="rr-val purple" id="m-totalr">—</span></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="side-by-side" style="grid-template-columns:30% 1fr">
@@ -935,6 +977,7 @@ function renderDashboard(key){
   renderCalendar(key,trades);
   renderSessionStats(trades);
   renderCalendar(currentDashKey||curMonthKey(),trades);
+  drawMiniCharts(trades);
   drawCharts(trades);
 }
 
@@ -1073,19 +1116,20 @@ function drawGauge(wins,be,losses){
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height;
   ctx.clearRect(0,0,W,H);
-  const cx=W/2,cy=H-4,r=H-10;
+  const cx=W/2,cy=H-2,r=H-12;
   const total=wins+be+losses||1;
   const pi=Math.PI;
-  // Draw background arc
-  ctx.beginPath();ctx.arc(cx,cy,r,pi,0);ctx.lineWidth=10;ctx.strokeStyle='rgba(128,128,128,0.15)';ctx.stroke();
-  // Angles: left=pi (180deg), right=0 (0deg), total arc = pi
+  // Background arc
+  ctx.beginPath();ctx.arc(cx,cy,r,pi,0);
+  ctx.lineWidth=12;ctx.strokeStyle='rgba(128,128,128,0.15)';ctx.stroke();
+  // Colored segments
   let angle=pi;
   const segs=[{v:wins,c:'#1D9E75'},{v:be,c:'#378ADD'},{v:losses,c:'#D85A30'}];
   segs.forEach(seg=>{
     if(!seg.v)return;
     const sweep=(seg.v/total)*pi;
     ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+sweep);
-    ctx.lineWidth=10;ctx.strokeStyle=seg.c;ctx.lineCap='round';ctx.stroke();
+    ctx.lineWidth=12;ctx.strokeStyle=seg.c;ctx.lineCap='butt';ctx.stroke();
     angle+=sweep;
   });
 }
