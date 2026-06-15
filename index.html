@@ -714,7 +714,7 @@ const PF_STEPS={'1-step':['Phase 1','Funded','Payout'],'2-step':['Phase 1','Phas
 // ── State ─────────────────────────────────────────────────────
 // db.trades: { "2026-06": [{id,date,symbol,session,direction,outcome,pnl,rr},...], ... }
 let db={trades:{},propfirms:[]};
-let eqChart=null,pnlChartInst=null;
+let eqChart=null;
 let currentDashKey=null;
 let currentDetailKey=null;
 let pendingDelTradeId=null, pendingDelKey=null;
@@ -869,7 +869,7 @@ function renderDashboardWithTrades(trades,label){
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
     renderCalendar(curMonthKey(),[]);
-    if(eqChart){eqChart.destroy();eqChart=null}if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}return;
+    if(eqChart){eqChart.destroy();eqChart=null}return;
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
@@ -976,7 +976,6 @@ function renderDashboard(key){
 
   renderCalendar(key,trades);
   renderSessionStats(trades);
-  renderCalendar(currentDashKey||curMonthKey(),trades);
   drawMiniCharts(trades);
   drawCharts(trades);
 }
