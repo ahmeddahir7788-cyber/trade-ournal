@@ -1173,6 +1173,53 @@ function renderSessionStats(trades){
 }
 
 // ── Charts ────────────────────────────────────────────────────
+function drawMiniCharts(trades){
+  // Mini bar chart in Total Trades card
+  const miniBars=document.getElementById('mini-bars');
+  if(miniBars){
+    if(!trades.length){miniBars.innerHTML='';return;}
+    const dayMap={};
+    trades.forEach(t=>{if(!dayMap[t.date])dayMap[t.date]=0;dayMap[t.date]+=(t.pnl||0);});
+    const days=Object.keys(dayMap).sort().slice(-8);
+    const vals=days.map(d=>dayMap[d]);
+    const maxV=Math.max(...vals.map(v=>Math.abs(v)),1);
+    miniBars.innerHTML=vals.map(v=>`<div class="mini-bar" style="height:${Math.max(10,Math.round(Math.abs(v)/maxV*36))}px;background:${v>=0?'rgba(139,92,246,0.75)':'rgba(139,92,246,0.3)'}"></div>`).join('');
+  }
+  // Mini equity line in Net P&L card
+  const miniEq=document.getElementById('mini-eq');
+  if(miniEq&&trades.length){
+    miniEq.width=160;miniEq.height=50;
+    const ctx=miniEq.getContext('2d');
+    ctx.clearRect(0,0,160,50);
+    let cum=0;
+    const pts=[0,...trades.map(t=>{cum+=(t.pnl||0);return Math.round(cum);})];
+    const minV=Math.min(...pts);
+    const maxV=Math.max(...pts);
+    const range=maxV-minV||1;
+    const W=160,H=50;
+    const xs=pts.map((_,i)=>i/(pts.length-1||1)*W);
+    const ys=pts.map(v=>H-4-((v-minV)/range)*(H-10));
+    const isPos=pts[pts.length-1]>=0;
+    const lineColor=isPos?'#1D9E75':'#D85A30';
+    const fillColor=isPos?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)';
+    // Fill area
+    ctx.beginPath();
+    ctx.moveTo(xs[0],H);
+    xs.forEach((x,i)=>ctx.lineTo(x,ys[i]));
+    ctx.lineTo(W,H);ctx.closePath();
+    ctx.fillStyle=fillColor;ctx.fill();
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(xs[0],ys[0]);
+    xs.forEach((x,i)=>{if(i>0)ctx.lineTo(x,ys[i]);});
+    ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+    // Dot at end
+    const lx=xs[xs.length-1],ly=ys[ys.length-1];
+    ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
+    ctx.fillStyle=lineColor;ctx.fill();
+  }
+}
+
 function drawCharts(trades){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
@@ -1185,7 +1232,7 @@ function drawCharts(trades){
   const vals=[0,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
   if(c1){
-    if(eqChart)eqChart.destroy();
+    if(eqChart){eqChart.destroy();eqChart=null;}
     const chartH=c1.canvas.clientHeight||210;
     const maxV=Math.max(0,...vals);
     const minV=Math.min(0,...vals);
