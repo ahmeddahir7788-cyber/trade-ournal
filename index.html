@@ -954,7 +954,7 @@ function renderDashboard(key){
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
     if(eqChart){eqChart.destroy();eqChart=null}
-    if(pnlChartInst){pnlChartInst.destroy();pnlChartInst=null}
+    
     return;
   }
   document.getElementById('m-total').textContent=s.n;
