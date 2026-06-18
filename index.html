@@ -330,7 +330,6 @@ table.tt tr:last-child td{border-bottom:none}
   <div class="top-bar-right" id="top-bar-right">
     <!-- Dashboard period selector - single smart select -->
     <select class="sel" id="dash-period-sel" onchange="onPeriodChange()" style="font-weight:500;display:none">
-          <option value="day">Daily</option>
           <option value="week">Weekly</option>
           <option value="month">Monthly</option>
           <option value="alltime">All Time</option>
@@ -341,7 +340,8 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
-    <input type="date" class="sel" id="dash-date-pick" onchange="onDashDateChange()" style="display:none"/>
+    <input type="date" class="sel" id="dash-date-pick" onchange="onDashDateChange()" title="Jump to a specific date" style="width:140px"/>
+    <button class="btn-ghost" id="dash-date-clear" onclick="clearDashDate()" style="display:none" title="Clear date filter"><i class="ti ti-x"></i></button>
   </div>
 </div>
 <div class="content">
@@ -827,16 +827,6 @@ function onPeriodChange(){
   const year=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
-  const dPick=document.getElementById('dash-date-pick');
-  if(period==='day'){
-    ySel.style.display='none';mSel.style.display='none';
-    if(dPick){
-      dPick.style.display='';
-      if(!dPick.value)dPick.value=today();
-      onDashDateChange();
-    }
-    return;
-  } else if(dPick){dPick.style.display='none';}
   if(period==='week'){
     // Current week Mon-Sun
     ySel.style.display='none';
@@ -935,7 +925,20 @@ function onDashDateChange(){
   const dayTrades=getTradesForKey(monthKey).filter(t=>t.date===dateVal);
   const tb=document.getElementById('top-bar-section');
   if(tb)tb.textContent='Dashboard';
+  // Hide period/year/month selectors while a specific date is active
+  document.getElementById('dash-period-sel').style.display='none';
+  document.getElementById('dash-year-sel').style.display='none';
+  document.getElementById('dash-month-sel').style.display='none';
+  document.getElementById('dash-date-clear').style.display='';
   renderDashboardWithTrades(dayTrades,dateVal);
+}
+
+function clearDashDate(){
+  document.getElementById('dash-date-pick').value='';
+  document.getElementById('dash-date-clear').style.display='none';
+  document.getElementById('dash-period-sel').style.display='';
+  document.getElementById('dash-period-sel').value='month';
+  onPeriodChange();
 }
 
 function onDashYearChange(){
