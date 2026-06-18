@@ -330,6 +330,7 @@ table.tt tr:last-child td{border-bottom:none}
   <div class="top-bar-right" id="top-bar-right">
     <!-- Dashboard period selector - single smart select -->
     <select class="sel" id="dash-period-sel" onchange="onPeriodChange()" style="font-weight:500;display:none">
+          <option value="day">Daily</option>
           <option value="week">Weekly</option>
           <option value="month">Monthly</option>
           <option value="alltime">All Time</option>
@@ -340,6 +341,7 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
+    <input type="date" class="sel" id="dash-date-pick" onchange="onDashDateChange()" style="display:none"/>
   </div>
 </div>
 <div class="content">
@@ -825,6 +827,16 @@ function onPeriodChange(){
   const year=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
+  const dPick=document.getElementById('dash-date-pick');
+  if(period==='day'){
+    ySel.style.display='none';mSel.style.display='none';
+    if(dPick){
+      dPick.style.display='';
+      if(!dPick.value)dPick.value=today();
+      onDashDateChange();
+    }
+    return;
+  } else if(dPick){dPick.style.display='none';}
   if(period==='week'){
     // Current week Mon-Sun
     ySel.style.display='none';
@@ -843,6 +855,7 @@ function onPeriodChange(){
     mSel.style.display='';
     onDashMonthChange();
   } else if(period==='alltime'){
+    
     ySel.style.display='none';
     mSel.style.display='none';
     const allTrades=Object.values(db.trades).flat().sort((a,b)=>a.date.localeCompare(b.date));
@@ -913,6 +926,16 @@ function populateDashMonthSel(year,selMonth){
   const mSel=document.getElementById('dash-month-sel');
   mSel.innerHTML=MONTHS_FULL.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
   mSel.value=selMonth||(new Date().getMonth()+1);
+}
+
+function onDashDateChange(){
+  const dateVal=document.getElementById('dash-date-pick').value;
+  if(!dateVal)return;
+  const monthKey=dateVal.slice(0,7);
+  const dayTrades=getTradesForKey(monthKey).filter(t=>t.date===dateVal);
+  const tb=document.getElementById('top-bar-section');
+  if(tb)tb.textContent='Dashboard';
+  renderDashboardWithTrades(dayTrades,dateVal);
 }
 
 function onDashYearChange(){
