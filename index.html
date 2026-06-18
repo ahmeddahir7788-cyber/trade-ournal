@@ -68,7 +68,7 @@ nav button:hover i{color:var(--text)}
 .stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:14px 16px 12px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden;min-height:0}
 .stat-card-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
 .stat-card-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.stat-card-val{font-size:28px;font-weight:700;line-height:1;margin-bottom:auto}
+.stat-card-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:auto;color:var(--text)}
 .stat-card-bottom{margin-top:12px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
@@ -876,8 +876,8 @@ function renderDashboardWithTrades(trades,label){
     if(eqChart){eqChart.destroy();eqChart=null}return;
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
-  const we=document.getElementById('m-wr');we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');
-  const pe=document.getElementById('m-pnl');pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');
+  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
 
@@ -962,8 +962,8 @@ function renderDashboard(key){
     return;
   }
   document.getElementById('m-total').textContent=s.n;
-  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='val '+(s.wr>=50?'green':'red');}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='val '+(s.tot>=0?'green':'red');}
+  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
   const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
   const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+$'+s.avgWin:'—';
