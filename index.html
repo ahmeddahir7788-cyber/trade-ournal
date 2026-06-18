@@ -340,8 +340,7 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
-    <input type="date" class="sel" id="dash-date-pick" onchange="onDashDateChange()" title="Jump to a specific date" style="width:140px"/>
-    <button class="btn-ghost" id="dash-date-clear" onclick="clearDashDate()" style="display:none" title="Clear date filter"><i class="ti ti-x"></i></button>
+    
   </div>
 </div>
 <div class="content">
@@ -918,29 +917,6 @@ function populateDashMonthSel(year,selMonth){
   mSel.value=selMonth||(new Date().getMonth()+1);
 }
 
-function onDashDateChange(){
-  const dateVal=document.getElementById('dash-date-pick').value;
-  if(!dateVal)return;
-  const monthKey=dateVal.slice(0,7);
-  const dayTrades=getTradesForKey(monthKey).filter(t=>t.date===dateVal);
-  const tb=document.getElementById('top-bar-section');
-  if(tb)tb.textContent='Dashboard';
-  // Hide period/year/month selectors while a specific date is active
-  document.getElementById('dash-period-sel').style.display='none';
-  document.getElementById('dash-year-sel').style.display='none';
-  document.getElementById('dash-month-sel').style.display='none';
-  document.getElementById('dash-date-clear').style.display='';
-  renderDashboardWithTrades(dayTrades,dateVal);
-}
-
-function clearDashDate(){
-  document.getElementById('dash-date-pick').value='';
-  document.getElementById('dash-date-clear').style.display='none';
-  document.getElementById('dash-period-sel').style.display='';
-  document.getElementById('dash-period-sel').value='month';
-  onPeriodChange();
-}
-
 function onDashYearChange(){
   const y=parseInt(document.getElementById('dash-year-sel').value);
   const m=parseInt(document.getElementById('dash-month-sel').value);
@@ -1263,11 +1239,11 @@ function drawCharts(trades){
         labels,
         datasets:[{
           data:vals,
-          backgroundColor:grad,
+          backgroundColor:'transparent',
           borderWidth:2.5,
           pointRadius:0,
           pointHoverRadius:4,
-          fill:true,
+          fill:false,
           tension:0.3,
           segment:{
             borderColor:ctx=>ctx.p0.parsed.y>=0&&ctx.p1.parsed.y>=0?'#1D9E75':
