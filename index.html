@@ -202,6 +202,22 @@ nav button:hover i{color:var(--text)}
 .field input:focus,.field select:focus{border-color:var(--blue)}
 .field input.err{border-color:var(--red)!important}
 .save-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+/* TRADE IMAGES */
+.img-upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:14px}
+.img-upload-zone:hover{border-color:var(--blue);background:var(--surface2)}
+.img-upload-zone i{font-size:22px;color:var(--text3);display:block;margin-bottom:6px}
+.img-upload-zone p{font-size:12px;color:var(--text3)}
+.img-preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.img-preview-grid:empty{margin-bottom:0}
+.img-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:.5px solid var(--border2);flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block}
+.img-thumb .img-remove{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.65);color:#fff;border:none;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.img-thumb .img-remove:hover{background:var(--red)}
+.row-thumb{width:28px;height:28px;border-radius:5px;object-fit:cover;cursor:pointer;border:.5px solid var(--border2);vertical-align:middle}
+.img-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;align-items:center;justify-content:center;cursor:zoom-out}
+.img-lightbox.open{display:flex}
+.img-lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.img-lightbox-close{position:absolute;top:18px;right:24px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .save-msg{font-size:12px;color:var(--green);display:none}
 .err-msg{font-size:12px;color:var(--red);display:none}
 
@@ -470,6 +486,15 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any"/></div>
         <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
       </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Screenshots (optional)</label>
+      </div>
+      <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
+      <div class="img-upload-zone" onclick="document.getElementById('f-img-input').click()">
+        <i class="ti ti-photo-plus"></i>
+        <p>Click to add chart screenshots</p>
+      </div>
+      <div class="img-preview-grid" id="f-img-preview"></div>
       <div class="save-row">
         <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save Trade</button>
         <span class="save-msg" id="save-msg">✓ Saved!</span>
@@ -605,41 +630,6 @@ table.tt tr:last-child td{border-bottom:none}
 
 <!-- EDIT TRADE MODAL -->
 <div class="overlay" id="edit-trade-modal">
-  <div class="modal" style="max-width:540px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-      <h2 style="margin:0">Edit Trade</h2>
-      <button onclick="closeOverlay('edit-trade-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
-    </div>
-    <div class="fg" style="margin-bottom:16px">
-      <div class="field"><label>Date</label><input type="date" id="et-date"/></div>
-      <div class="field"><label>Pair</label>
-        <select id="et-sym">
-          <option value="EURUSD">EUR/USD</option><option value="GBPUSD">GBP/USD</option>
-          <option value="XAUUSD">XAU/USD (Gold)</option><option value="XAGUSD">XAG/USD (Silver)</option>
-          <option value="NQ">NQ (Nasdaq)</option><option value="YM">YM (Dow Jones)</option><option value="ES">ES (S&P 500)</option>
-        </select>
-      </div>
-      <div class="field"><label>Session</label>
-        <select id="et-sess"><option value="London">London</option><option value="NewYork">New York</option><option value="Asia">Asia</option></select>
-      </div>
-      <div class="field"><label>Direction</label>
-        <select id="et-dir"><option value="Long">Long</option><option value="Short">Short</option></select>
-      </div>
-      <div class="field"><label>Outcome</label>
-        <select id="et-out"><option value="Win">Win</option><option value="Partial">Partial</option><option value="Loss">Loss</option><option value="Break Even">Break Even</option></select>
-      </div>
-      <div class="field"><label>P&L ($)</label><input type="number" id="et-pnl" step="any"/></div>
-      <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
-    </div>
-    <div class="mactions">
-      <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
-      <button class="mp" onclick="saveEditTrade()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT TRADE MODAL -->
-<div class="overlay" id="edit-trade-modal">
   <div class="modal" style="max-width:520px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
       <h2 style="margin-bottom:0">Edit Trade</h2>
@@ -685,11 +675,26 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any"/></div>
       <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
     </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Screenshots (optional)</label>
+    </div>
+    <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
+    <div class="img-upload-zone" onclick="document.getElementById('et-img-input').click()">
+      <i class="ti ti-photo-plus"></i>
+      <p>Click to add chart screenshots</p>
+    </div>
+    <div class="img-preview-grid" id="et-img-preview"></div>
     <div class="mactions">
       <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
       <button class="mp" onclick="saveEditTrade()"><i class="ti ti-device-floppy"></i> Save Changes</button>
     </div>
   </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="img-lightbox" id="img-lightbox" onclick="closeLightbox()">
+  <button class="img-lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="img-lightbox-img" src="" onclick="event.stopPropagation()"/>
 </div>
 
 <!-- DELETE TRADE MODAL -->
@@ -722,6 +727,8 @@ let currentDashKey=null;
 let currentDetailKey=null;
 let pendingDelTradeId=null, pendingDelKey=null;
 let pfEditId=null,pfDeleteId=null;
+let fImages=[]; // staged images for Add Trade form
+let etImages=[]; // staged images for Edit Trade form
 
 // ── Helpers ───────────────────────────────────────────────────
 function today(){return new Date().toISOString().slice(0,10)}
@@ -734,7 +741,7 @@ function allYears(){return [...new Set(allKeys().map(k=>k.slice(0,4)))].sort((a,
 function getTradesForKey(k){return db.trades[k]||[]}
 
 // ── Persist ───────────────────────────────────────────────────
-function persist(){try{localStorage.setItem('tj_v10',JSON.stringify(db))}catch(e){}}
+function persist(){try{localStorage.setItem('tj_v10',JSON.stringify(db));return true;}catch(e){return false;}}
 function loadDB(){
   try{const r=localStorage.getItem('tj_v10');if(r)db=JSON.parse(r)}catch(e){}
   if(!db.trades)db.trades={};
@@ -1304,6 +1311,67 @@ function updateLogHint(){
   const date=document.getElementById('f-date').value||today();
   document.getElementById('log-hint').textContent='Saving to: '+keyLabel(dateToKey(date));
 }
+// ── Trade Images ──────────────────────────────────────────────
+function compressImage(file,maxDim,quality){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>h&&w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}
+        else if(h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleTradeImages(event,prefix){
+  const files=Array.from(event.target.files||[]);
+  if(!files.length)return;
+  const arr=prefix==='f'?fImages:etImages;
+  Promise.all(files.map(f=>compressImage(f,1280,0.72))).then(results=>{
+    results.forEach(dataUrl=>arr.push(dataUrl));
+    renderImagePreview(prefix);
+    event.target.value='';
+  }).catch(()=>{
+    alert('Could not load one of the images. Please try a different file.');
+  });
+}
+
+function renderImagePreview(prefix){
+  const arr=prefix==='f'?fImages:etImages;
+  const wrap=document.getElementById(prefix+'-img-preview');
+  if(!wrap)return;
+  wrap.innerHTML=arr.map((src,i)=>`<div class="img-thumb">
+    <img src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/>
+    <button class="img-remove" onclick="removeTradeImage('${prefix}',${i})" title="Remove">×</button>
+  </div>`).join('');
+}
+
+function removeTradeImage(prefix,idx){
+  const arr=prefix==='f'?fImages:etImages;
+  arr.splice(idx,1);
+  renderImagePreview(prefix);
+}
+
+function openLightbox(src){
+  document.getElementById('img-lightbox-img').src=src;
+  document.getElementById('img-lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('img-lightbox').classList.remove('open');
+  document.getElementById('img-lightbox-img').src='';
+}
+
 function saveTrade(){
   const pnlEl=document.getElementById('f-pnl');
   const rrEl=document.getElementById('f-rr');
@@ -1335,13 +1403,20 @@ function saveTrade(){
     direction:dirEl.value,
     outcome,
     pnl:finalPnl,
-    rr:parseFloat(rrEl.value)
+    rr:parseFloat(rrEl.value),
+    images:fImages.slice()
   });
   db.trades[key].sort((a,b)=>a.date.localeCompare(b.date));
-  persist();
+  const ok=persist();
+  if(!ok){
+    errEl.textContent='Storage is full — try removing some screenshots or older trades.';
+    errEl.style.display='inline';
+    return;
+  }
   // Reset form fields to empty
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
+  fImages=[];renderImagePreview('f');
   updateLogHint();
   if(currentDashKey===key)refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
@@ -1421,7 +1496,7 @@ function renderDetailTable(){
   if(!trades.length){wrap.innerHTML='<div class="empty"><i class="ti ti-clipboard-list"></i>No trades found.</div>';return;}
   wrap.innerHTML=`<table class="tt"><thead><tr><th>Date</th><th>Pair</th><th>Session</th><th>Dir</th><th>Outcome</th><th>P&L</th><th>RR</th><th></th></tr></thead><tbody>${trades.map(t=>`<tr style="cursor:pointer" onclick="openEditTrade('${currentDetailKey}',${t.id})">
     <td>${t.date}</td>
-    <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}</td>
+    <td style="font-weight:500">${PAIRS[t.symbol]||t.symbol}${(t.images&&t.images.length)?`<img class="row-thumb" src="${t.images[0]}" style="margin-left:6px" onclick="event.stopPropagation();openLightbox('${t.images[0].replace(/'/g,"\\'")}')" title="${t.images.length} screenshot${t.images.length>1?'s':''}"/>`:''}</td>
     <td><span class="sess ${t.session||''}">${SESS_LABELS[t.session]||t.session||'—'}</span></td>
     <td><span class="badge ${t.direction.toLowerCase()}">${t.direction}</span></td>
     <td><span class="badge ${t.outcome==='Win'?'win':t.outcome==='Partial'?'partial':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span></td>
@@ -1579,6 +1654,8 @@ function openEditTrade(key,id){
   document.getElementById('et-out').value=t.outcome;
   document.getElementById('et-pnl').value=t.pnl;
   document.getElementById('et-rr').value=t.rr??'';
+  etImages=(t.images||[]).slice();
+  renderImagePreview('et');
   document.getElementById('edit-trade-modal').classList.add('open');
 }
 
@@ -1594,7 +1671,8 @@ function saveEditTrade(){
     direction:document.getElementById('et-dir').value,
     outcome:document.getElementById('et-out').value,
     pnl:(()=>{const v=Math.abs(parseFloat(document.getElementById('et-pnl').value)||0);const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
-    rr:parseFloat(document.getElementById('et-rr').value)||null
+    rr:parseFloat(document.getElementById('et-rr').value)||null,
+    images:etImages.slice()
   };
   // Remove from old key
   db.trades[editTradeKey]=db.trades[editTradeKey].filter(t=>t.id!==editTradeId);
@@ -1603,13 +1681,18 @@ function saveEditTrade(){
   if(!db.trades[newKey])db.trades[newKey]=[];
   db.trades[newKey].push(updated);
   db.trades[newKey].sort((a,b)=>a.date.localeCompare(b.date));
-  persist();
+  const ok=persist();
+  if(!ok){
+    alert('Storage is full — try removing some screenshots or older trades.');
+    return;
+  }
   closeOverlay('edit-trade-modal');
   // If date moved to different month, update currentDetailKey
   if(newKey!==editTradeKey)currentDetailKey=newKey;
   renderDetailTable();
   if(currentDashKey===editTradeKey||currentDashKey===newKey)refreshCurrentDashboardView();
   editTradeKey=null;editTradeId=null;
+  etImages=[];
 }
 
 
@@ -1636,6 +1719,7 @@ function openDayJournal(dateStr){
           <span style="font-weight:600">${PAIRS[t.symbol]||t.symbol}</span>
           <span class="badge ${t.direction.toLowerCase()}">${t.direction}</span>
           <span class="badge ${t.outcome==='Win'?'win':t.outcome==='Partial'?'partial':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span>
+          ${(t.images&&t.images.length)?`<img class="row-thumb" src="${t.images[0]}" onclick="openLightbox('${t.images[0].replace(/'/g,"\\'")}')" title="${t.images.length} screenshot${t.images.length>1?'s':''}"/>`:''}
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</div>
