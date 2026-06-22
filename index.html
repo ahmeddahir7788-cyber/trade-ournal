@@ -763,7 +763,16 @@ function toggleTheme(){
   const lbl=document.getElementById('theme-label');
   if(lbl)lbl.textContent=n==='dark'?'Dark Mode':'Light Mode';
   localStorage.setItem('tj_v10_theme',n);
-  if(currentDashKey)renderDashboard(currentDashKey);
+  refreshCurrentDashboardView();
+}
+
+function refreshCurrentDashboardView(){
+  const pSel=document.getElementById('dash-period-sel');
+  if(pSel&&pSel.value&&pSel.value!=='month'){
+    onPeriodChange();
+  } else if(currentDashKey){
+    renderDashboard(currentDashKey);
+  }
 }
 
 // ── Sidebar ───────────────────────────────────────────────────
@@ -816,12 +825,7 @@ function go(id,btn){
   }
   if(id==='dashboard'){
     initDashSelectors();
-    const pSel2=document.getElementById('dash-period-sel');
-    if(pSel2&&pSel2.value&&pSel2.value!=='month'){
-      onPeriodChange();
-    } else {
-      renderDashboard(currentDashKey||curMonthKey());
-    }
+    refreshCurrentDashboardView();
   }
   if(id==='log')initLogPage();
   if(id==='trades'){initTradeYearSel();renderMonthCards();}
@@ -1266,6 +1270,8 @@ function drawCharts(trades){
       options:{
         responsive:true,
         maintainAspectRatio:false,
+        animation:false,
+        resizeDelay:100,
         plugins:{legend:{display:false}},
         scales:{
           x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},
