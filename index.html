@@ -1895,6 +1895,17 @@ document.getElementById('f-date').value=today();
 currentDashKey=curMonthKey();
 initDashSelectors();
 renderDashboard(currentDashKey);
+// Show dashboard-only top bar controls on first load (app opens directly on Dashboard)
+const dmWrapInit=document.getElementById('display-mode-wrap');
+if(dmWrapInit){
+  dmWrapInit.style.display='';
+  document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
+  document.getElementById('dm-btn-pct').classList.toggle('active',displayMode!=='dollar');
+  document.getElementById('dm-btn-pct').textContent=displayMode==='dollar'?'%':(displayMode==='pct-balance'?'% Bal':'% R');
+}
+document.getElementById('dash-period-sel').style.display='';
+document.getElementById('dash-year-sel').style.display='';
+document.getElementById('dash-month-sel').style.display='';
 </script>
 </body>
 </html>
