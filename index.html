@@ -934,6 +934,13 @@ function populateDashMonthSel(year,selMonth){
 }
 
 function onDashYearChange(){
+  const pSel=document.getElementById('dash-period-sel');
+  const period=pSel?pSel.value:'month';
+  if(period!=='month'){
+    // Year changed while a quarter is selected - recompute that quarter for new year
+    onPeriodChange();
+    return;
+  }
   const y=parseInt(document.getElementById('dash-year-sel').value);
   const m=parseInt(document.getElementById('dash-month-sel').value);
   populateDashMonthSel(y,m);
@@ -1336,7 +1343,7 @@ function saveTrade(){
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
   updateLogHint();
-  if(currentDashKey===key)renderDashboard(key);
+  if(currentDashKey===key)refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
   msg.style.display='inline';setTimeout(()=>msg.style.display='none',2000);
 }
@@ -1430,7 +1437,7 @@ function confirmDelTrade(){
   db.trades[pendingDelKey]=db.trades[pendingDelKey].filter(t=>t.id!==pendingDelTradeId);
   if(!db.trades[pendingDelKey].length)delete db.trades[pendingDelKey];
   pendingDelTradeId=null;pendingDelKey=null;persist();closeOverlay('del-trade-modal');renderDetailTable();
-  if(currentDashKey===currentDetailKey)renderDashboard(currentDashKey);
+  if(currentDashKey===currentDetailKey)refreshCurrentDashboardView();
 }
 
 function exportCSV(){
@@ -1601,7 +1608,7 @@ function saveEditTrade(){
   // If date moved to different month, update currentDetailKey
   if(newKey!==editTradeKey)currentDetailKey=newKey;
   renderDetailTable();
-  if(currentDashKey===editTradeKey||currentDashKey===newKey)renderDashboard(currentDashKey);
+  if(currentDashKey===editTradeKey||currentDashKey===newKey)refreshCurrentDashboardView();
   editTradeKey=null;editTradeId=null;
 }
 
