@@ -814,7 +814,15 @@ function go(id,btn){
     if(ySel)ySel.style.display='none';
     if(mSel)mSel.style.display='none';
   }
-  if(id==='dashboard'){initDashSelectors();renderDashboard(currentDashKey||curMonthKey());}
+  if(id==='dashboard'){
+    initDashSelectors();
+    const pSel2=document.getElementById('dash-period-sel');
+    if(pSel2&&pSel2.value&&pSel2.value!=='month'){
+      onPeriodChange();
+    } else {
+      renderDashboard(currentDashKey||curMonthKey());
+    }
+  }
   if(id==='log')initLogPage();
   if(id==='trades'){initTradeYearSel();renderMonthCards();}
   if(id==='accounts')renderAccounts();
@@ -880,15 +888,19 @@ function renderDashboardWithTrades(trades,label){
   const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
-
-  const bT=s.n||1;
-  const bww=document.getElementById('bar-win');if(bww)bww.style.width=Math.round(s.wins/bT*100)+'%';
-  const bpp=document.getElementById('bar-partial');if(bpp)bpp.style.width=Math.round(s.partials/bT*100)+'%';
-  const bll=document.getElementById('bar-loss');if(bll)bll.style.width=Math.round(s.losses/bT*100)+'%';
-  const bbb=document.getElementById('bar-be');if(bbb)bbb.style.width=Math.round(s.be/bT*100)+'%';
-  // Update bars
+  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+$'+s.avgWin:'—';
+  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-$'+s.avgLoss:'—';
+  const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
+  const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
+  const rlb=document.getElementById('avgwl-red');if(rlb)rlb.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg2*100)+'%';
+  const gw3=document.getElementById('g-wins');if(gw3)gw3.textContent=s.wins;
+  const gb3=document.getElementById('g-be');if(gb3)gb3.textContent=s.be;
+  const gl3=document.getElementById('g-losses');if(gl3)gl3.textContent=s.losses;
+  drawGauge(s.wins,s.be,s.losses);
 
   renderSessionStats(trades);
+  renderCalendar(currentDashKey||curMonthKey(),trades);
+  drawMiniCharts(trades);
   drawCharts(trades);
 }
 
