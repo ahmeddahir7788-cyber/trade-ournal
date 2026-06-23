@@ -197,10 +197,6 @@ nav button:hover i{color:var(--text)}
 .dm-btn{background:none;border:none;padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer}
 .dm-btn.active{background:var(--blue);color:#fff}
 .dm-btn:not(.active):hover{background:var(--border)}
-.pct-choice-opt{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:12px 14px;text-align:left;cursor:pointer;font-family:'Inter',sans-serif}
-.pct-choice-opt:hover{border-color:var(--blue);background:var(--surface)}
-.pct-choice-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
-.pct-choice-sub{font-size:12px;color:var(--text3)}
 .sb-toggle-top:hover{background:var(--surface2)}
 
 /* FORM */
@@ -368,7 +364,7 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="display-mode-wrap" id="display-mode-wrap" style="display:none">
       <div class="dm-toggle">
         <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
-        <button class="dm-btn" id="dm-btn-pct" onclick="openPctChoice()">%</button>
+        <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
       </div>
     </div>
   </div>
@@ -705,45 +701,6 @@ table.tt tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- % BASIS CHOOSER -->
-<div class="overlay" id="pct-choice-modal">
-  <div class="modal" style="max-width:380px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <h2 style="margin:0">Show % based on</h2>
-      <button onclick="closeOverlay('pct-choice-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem">
-      <button class="pct-choice-opt" onclick="setDisplayMode('pct-balance')">
-        <div class="pct-choice-title">Account Balance</div>
-        <div class="pct-choice-sub" id="pct-balance-sub">P&amp;L shown as % return on your account size</div>
-      </button>
-      <button class="pct-choice-opt" onclick="setDisplayMode('pct-rr')">
-        <div class="pct-choice-title">Risk / Reward (R)</div>
-        <div class="pct-choice-sub">P&amp;L shown as a multiple of your risk (R)</div>
-      </button>
-      <button class="pct-choice-opt" onclick="openEditBalance()" style="text-align:center">
-        <div class="pct-choice-sub" id="pct-edit-balance-label" style="color:var(--blue)">⚙️ Edit account balance</div>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ACCOUNT BALANCE SETUP -->
-<div class="overlay" id="balance-setup-modal">
-  <div class="modal" style="max-width:380px">
-    <h2>Set your account balance</h2>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Needed to calculate P&amp;L as a % return. You can change this anytime.</p>
-    <div class="field" style="margin-bottom:1.25rem">
-      <label>Account Balance ($)</label>
-      <input type="number" id="balance-input" placeholder="e.g. 10000" step="any"/>
-    </div>
-    <div class="mactions">
-      <button class="mc" onclick="closeOverlay('balance-setup-modal')">Cancel</button>
-      <button class="mp" onclick="saveAccountBalance()">Save &amp; Apply</button>
-    </div>
-  </div>
-</div>
-
 <!-- IMAGE LIGHTBOX -->
 <div class="img-lightbox" id="img-lightbox" onclick="closeLightbox()">
   <button class="img-lightbox-close" onclick="closeLightbox()">×</button>
@@ -782,8 +739,7 @@ let pendingDelTradeId=null, pendingDelKey=null;
 let pfEditId=null,pfDeleteId=null;
 let fImages=[]; // staged images for Add Trade form
 let etImages=[]; // staged images for Edit Trade form
-let displayMode='dollar'; // 'dollar' | 'pct-balance' | 'pct-rr'
-let accountBalance=0;
+let displayMode='dollar'; // 'dollar' | 'percent'
 
 // ── Helpers ───────────────────────────────────────────────────
 function today(){return new Date().toISOString().slice(0,10)}
@@ -798,37 +754,40 @@ function getTradesForKey(k){return db.trades[k]||[]}
 // ── Persist ───────────────────────────────────────────────────
 function persist(){try{localStorage.setItem('tj_v10',JSON.stringify(db));return true;}catch(e){return false;}}
 
-// ── Display Mode ($ / % balance / % RR) ─────────────────────────
-// fmtMoney formats a dollar P&L value according to the active display mode.
-// trade: optional single trade object, used to pull its own RR for pct-rr mode.
-function fmtMoney(val,trade){
+// ── Display Mode ($ / %) ─────────────────────────────────────────
+// In percent mode, every money figure is replaced by the trade's RR shown as a %.
+// Aggregates (a day, a week, a session, a whole period) sum the RR of their trades,
+// exactly mirroring how dollar P&L sums work.
+function rrPct(rr){
+  rr=rr||0;
+  return(rr>=0?'+':'-')+Math.abs(rr).toFixed(2)+'%';
+}
+// fmtMoney: full precision, used in big stat cards. trades = array of trades behind this number (for % mode).
+function fmtMoney(val,trades){
+  if(displayMode==='percent'){
+    const rrSum=(trades||[]).reduce((s,t)=>s+(t.rr||0),0);
+    return rrPct(rrSum);
+  }
   val=val||0;
-  if(displayMode==='pct-rr'){
-    let rr=trade&&trade.rr!=null?trade.rr:null;
-    if(rr==null)return(val>=0?'+':'')+'$'+Math.abs(Math.round(val)).toLocaleString();
-    return(rr>=0?'+':'')+Math.abs(rr).toFixed(2)+'R';
-  }
-  if(displayMode==='pct-balance'){
-    if(!accountBalance)return(val>=0?'+':'')+'$'+Math.abs(Math.round(val)).toLocaleString();
-    const pct=(val/accountBalance)*100;
-    return(pct>=0?'+':'')+Math.abs(pct).toFixed(2)+'%';
-  }
   return(val>=0?'+':'')+'$'+Math.abs(Math.round(val)).toLocaleString();
 }
-function fmtMoneyCompact(val){
-  val=val||0;
-  if(displayMode==='pct-balance'&&accountBalance){
-    const pct=(val/accountBalance)*100;
-    return(pct>=0?'+':'-')+Math.abs(pct).toFixed(1)+'%';
+// fmtMoneyCompact: same idea but for small spaces (calendar cells, weekly summary)
+function fmtMoneyCompact(val,trades){
+  if(displayMode==='percent'){
+    const rrSum=(trades||[]).reduce((s,t)=>s+(t.rr||0),0);
+    return rrPct(rrSum);
   }
+  val=val||0;
   const abs=Math.abs(val);
   const sign=val>=0?'+':'-';
   return sign+(abs>=1000?'$'+(abs/1000).toFixed(1)+'k':'$'+Math.round(abs).toLocaleString());
 }
-// fmtMoneyAbs: same but without forcing a +/- sign (for things like avg win/loss labels already signed elsewhere)
-function fmtMoneyAbs(val){
+// fmtMoneyAbs: unsigned version (avg win / avg loss labels already carry their own +/-)
+function fmtMoneyAbs(val,avgRR){
+  if(displayMode==='percent'){
+    return Math.abs(avgRR||0).toFixed(2)+'%';
+  }
   val=Math.abs(val||0);
-  if(displayMode==='pct-balance'&&accountBalance)return((val/accountBalance)*100).toFixed(2)+'%';
   return val>=1000?'$'+(val/1000).toFixed(1)+'k':'$'+val.toFixed(0);
 }
 
@@ -836,41 +795,7 @@ function setDisplayMode(mode){
   displayMode=mode;
   localStorage.setItem('tj_v10_dispmode',mode);
   document.getElementById('dm-btn-dollar').classList.toggle('active',mode==='dollar');
-  document.getElementById('dm-btn-pct').classList.toggle('active',mode!=='dollar');
-  document.getElementById('dm-btn-pct').textContent=mode==='dollar'?'%':(mode==='pct-balance'?'% Bal':'% R');
-  closeOverlay('pct-choice-modal');
-  if(mode==='pct-balance'&&!accountBalance){
-    document.getElementById('balance-input').value='';
-    document.getElementById('balance-setup-modal').classList.add('open');
-    return;
-  }
-  refreshCurrentDashboardView();
-}
-
-function openPctChoice(){
-  const lbl=document.getElementById('pct-edit-balance-label');
-  if(lbl)lbl.textContent=accountBalance?`⚙️ Edit account balance ($${accountBalance.toLocaleString()})`:'⚙️ Set account balance';
-  document.getElementById('pct-choice-modal').classList.add('open');
-}
-
-function openEditBalance(){
-  closeOverlay('pct-choice-modal');
-  document.getElementById('balance-input').value=accountBalance||'';
-  document.getElementById('balance-setup-modal').classList.add('open');
-}
-
-function saveAccountBalance(){
-  const v=parseFloat(document.getElementById('balance-input').value);
-  if(!v||v<=0){alert('Please enter a valid account balance.');return;}
-  accountBalance=v;
-  db.accountBalance=v;
-  persist();
-  closeOverlay('balance-setup-modal');
-  displayMode='pct-balance';
-  localStorage.setItem('tj_v10_dispmode','pct-balance');
-  document.getElementById('dm-btn-dollar').classList.remove('active');
-  document.getElementById('dm-btn-pct').classList.add('active');
-  document.getElementById('dm-btn-pct').textContent='% Bal';
+  document.getElementById('dm-btn-pct').classList.toggle('active',mode==='percent');
   refreshCurrentDashboardView();
 }
 
@@ -879,8 +804,6 @@ function loadDB(){
   if(!db.trades)db.trades={};
   if(!db.propfirms)db.propfirms=[];
   if(!db.dayNotes)db.dayNotes={};
-  if(!db.accountBalance)db.accountBalance=0;
-  accountBalance=db.accountBalance||0;
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
   // Clean phantom trades (trades with missing required fields)
   Object.keys(db.trades).forEach(k=>{
@@ -964,8 +887,7 @@ function go(id,btn){
     if(dmWrap){
       dmWrap.style.display='';
       document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
-      document.getElementById('dm-btn-pct').classList.toggle('active',displayMode!=='dollar');
-      document.getElementById('dm-btn-pct').textContent=displayMode==='dollar'?'%':(displayMode==='pct-balance'?'% Bal':'% R');
+      document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
     }
   } else {
     if(pSel)pSel.style.display='none';
@@ -1039,11 +961,11 @@ function renderDashboardWithTrades(trades,label){
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot);pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot,s.trades);pe.className='stat-card-val';}
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
-  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin):'—';
-  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss):'—';
+  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin,s.avgWinRR):'—';
+  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss,s.avgLossRR):'—';
   const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
   const rlb=document.getElementById('avgwl-red');if(rlb)rlb.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg2*100)+'%';
@@ -1136,11 +1058,11 @@ function renderDashboard(key){
   }
   document.getElementById('m-total').textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot);pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot,s.trades);pe.className='stat-card-val';}
   const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
-  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin):'—';
-  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss):'—';
+  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin,s.avgWinRR):'—';
+  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss,s.avgLossRR):'—';
   // Avg win/loss bar
   const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
@@ -1177,7 +1099,11 @@ function statsOf(trades){
   const dayWr=days.length?Math.round(profitDays/days.length*100):0;
   const avgWin=wins+partials>0?(grossWin/(wins+partials)).toFixed(0):0;
   const avgLoss=losses>0?(grossLoss/losses).toFixed(0):0;
-  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss};
+  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
+  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
+  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
+  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
+  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss,avgWinRR,avgLossRR,trades};
 }
 
 // ── Calendar ──────────────────────────────────────────────────
@@ -1192,8 +1118,9 @@ function renderCalendar(key,trades){
   if(calTitle)calTitle.textContent=MONTHS_FULL[m-1]+' '+y;
   const byDate={};
   trades.forEach(t=>{
-    if(!byDate[t.date])byDate[t.date]={pnl:0,count:0};
+    if(!byDate[t.date])byDate[t.date]={pnl:0,rr:0,count:0};
     byDate[t.date].pnl+=(t.pnl||0);
+    byDate[t.date].rr+=(t.rr||0);
     byDate[t.date].count++;
   });
   const daysInMonth=new Date(y,m,0).getDate();
@@ -1208,15 +1135,16 @@ function renderCalendar(key,trades){
     const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isToday=ds===todayStr;
     const info=byDate[ds];
+    const dayMetric=info?(displayMode==='percent'?info.rr:info.pnl):0;
     let cls='cal-day';
-    if(info){cls+=info.pnl>0?' profit':info.pnl<0?' loss':' breakeven';}
+    if(info){cls+=dayMetric>0?' profit':dayMetric<0?' loss':' breakeven';}
     else cls+=' no-trade';
     if(isToday)cls+=' today';
     const baseStyle=d===1&&firstDay>0?`grid-column-start:${firstDay+1};`:'';
     const style=`style="${baseStyle}cursor:pointer"`;
     if(info){
-      const pnlStr=fmtMoneyCompact(info.pnl);
       const dayTrades=trades.filter(t=>t.date===ds);
+      const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
       const dayWins=dayTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
@@ -1261,21 +1189,27 @@ function renderCalendar(key,trades){
     const dispEnd=wEnd.getMonth()===m-1&&wEnd.getFullYear()===y?wEnd:new Date(y,m-1,daysInMonth);
 
     // Sum trades in this week within the month
-    let wPnl=0,wDays=0;
+    let wPnl=0,wRR=0,wDays=0,wTrades=[];
     for(let d=0;d<7;d++){
       const dd=new Date(wStart);dd.setDate(dd.getDate()+d);
       if(dd.getMonth()===m-1&&dd.getFullYear()===y){
         const ds=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
-        if(byDate[ds]){wPnl+=byDate[ds].pnl;wDays++;}
+        if(byDate[ds]){
+          wPnl+=byDate[ds].pnl;
+          wRR+=byDate[ds].rr;
+          wDays++;
+          wTrades=wTrades.concat(trades.filter(t=>t.date===ds));
+        }
       }
     }
 
-    const wPnlStr=fmtMoneyCompact(wPnl);
+    const wMetric=displayMode==='percent'?wRR:wPnl;
+    const wPnlStr=fmtMoneyCompact(wPnl,wTrades);
     wHtml+=`<div class="week-card" style="height:${rowH}px;display:flex;flex-direction:column;justify-content:center;gap:3px">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||w+1}</span></div>
       ${wDays>0
-        ?`<div style="font-size:14px;font-weight:700;color:${wPnl>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
-           <div style="display:inline-flex;align-items:center;gap:4px"><span style="background:${wPnl>=0?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)'};color:${wPnl>=0?'var(--green)':'var(--red)'};font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">${wDays} day${wDays>1?'s':''}</span></div>`
+        ?`<div style="font-size:14px;font-weight:700;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
+           <div style="display:inline-flex;align-items:center;gap:4px"><span style="background:${wMetric>=0?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)'};color:${wMetric>=0?'var(--green)':'var(--red)'};font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">${wDays} day${wDays>1?'s':''}</span></div>`
         :`<div style="font-size:14px;font-weight:600;color:var(--text3)">${displayMode==='dollar'?'$0':'0%'}</div><div><span style="background:var(--surface2);color:var(--text3);font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px">0 days</span></div>`}
     </div>`;
     wIdx++;
@@ -1318,6 +1252,8 @@ function renderSessionStats(trades){
     // Share of total trades across active sessions
 
     const p=st.reduce((s,t)=>s+(t.pnl||0),0);
+    const pRR=st.reduce((s,t)=>s+(t.rr||0),0);
+    const pMetric=displayMode==='percent'?pRR:p;
     const wc=wr>=60?'var(--green)':wr>=40?'var(--gold)':'var(--red)';
     return`<div class="sess-card">
       <div class="sess-top"><span class="sess ${sess}">${SESS_LABELS[sess]}</span><span class="sess-wr" style="color:${wc}">${wr}%</span></div>
@@ -1326,7 +1262,7 @@ function renderSessionStats(trades){
         <div class="sess-detail">Trades <span>${n}</span></div>
         <div class="sess-detail">W <span style="color:var(--green)">${wins}</span></div>
         <div class="sess-detail">L <span style="color:var(--red)">${losses}</span></div>
-        <div class="sess-detail">P&L <span style="color:${p>=0?'var(--green)':'var(--red)'}">${fmtMoney(p)}</span></div>
+        <div class="sess-detail">P&L <span style="color:${pMetric>=0?'var(--green)':'var(--red)'}">${fmtMoney(p,st)}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -1386,10 +1322,13 @@ function drawCharts(trades){
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
 
-  // Always start from 0
+  // Always start from 0 — cumulative dollars normally, cumulative RR (%) in percent mode
   let cum=0;
-  const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
-  const labels=['$0',...ed.map(d=>d.x)];
+  const ed=trades.map(t=>{
+    cum+=displayMode==='percent'?(t.rr||0):(t.pnl||0);
+    return{x:t.date,y:displayMode==='percent'?Math.round(cum*100)/100:Math.round(cum)};
+  });
+  const labels=[displayMode==='percent'?'0%':'$0',...ed.map(d=>d.x)];
   const vals=[0,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
   if(c1){
@@ -1430,7 +1369,7 @@ function drawCharts(trades){
         plugins:{legend:{display:false}},
         scales:{
           x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},
-          y:{ticks:{font:{size:11},color:tc,callback:v=>displayMode==='pct-balance'&&accountBalance?((v/accountBalance)*100).toFixed(1)+'%':'$'+v.toLocaleString()},grid:{color:gc}}
+          y:{ticks:{font:{size:11},color:tc,callback:v=>displayMode==='percent'?v+'%':'$'+v.toLocaleString()},grid:{color:gc}}
         }
       }
     });
@@ -1900,8 +1839,7 @@ const dmWrapInit=document.getElementById('display-mode-wrap');
 if(dmWrapInit){
   dmWrapInit.style.display='';
   document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
-  document.getElementById('dm-btn-pct').classList.toggle('active',displayMode!=='dollar');
-  document.getElementById('dm-btn-pct').textContent=displayMode==='dollar'?'%':(displayMode==='pct-balance'?'% Bal':'% R');
+  document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
 }
 document.getElementById('dash-period-sel').style.display='';
 document.getElementById('dash-year-sel').style.display='';
