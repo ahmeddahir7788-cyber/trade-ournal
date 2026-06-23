@@ -361,12 +361,6 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
-    <div class="display-mode-wrap" id="display-mode-wrap" style="display:none">
-      <div class="dm-toggle">
-        <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
-        <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
-      </div>
-    </div>
   </div>
 </div>
 <div class="content">
@@ -449,7 +443,16 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0"><h3>Session Performance</h3><div id="session-stats"></div></div>
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
-    <div class="card" style="margin-top:12px"><h3 id="cal-title">Calendar</h3><div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div></div>
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <h3 id="cal-title" style="margin:0">Calendar</h3>
+        <div class="dm-toggle">
+          <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
+          <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
+        </div>
+      </div>
+      <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
+    </div>
   </div>
 
   <!-- LOG TRADE -->
@@ -762,16 +765,8 @@ function rrPct(rr){
   rr=rr||0;
   return(rr>=0?'+':'-')+Math.abs(rr).toFixed(2)+'%';
 }
-// fmtMoney: full precision, used in big stat cards. trades = array of trades behind this number (for % mode).
-function fmtMoney(val,trades){
-  if(displayMode==='percent'){
-    const rrSum=(trades||[]).reduce((s,t)=>s+(t.rr||0),0);
-    return rrPct(rrSum);
-  }
-  val=val||0;
-  return(val>=0?'+':'')+'$'+Math.abs(Math.round(val)).toLocaleString();
-}
-// fmtMoneyCompact: same idea but for small spaces (calendar cells, weekly summary)
+// fmtMoneyCompact: used only by the Calendar (day cells + weekly summary).
+// trades = the trades behind this number, summed as RR when in percent mode.
 function fmtMoneyCompact(val,trades){
   if(displayMode==='percent'){
     const rrSum=(trades||[]).reduce((s,t)=>s+(t.rr||0),0);
@@ -781,14 +776,6 @@ function fmtMoneyCompact(val,trades){
   const abs=Math.abs(val);
   const sign=val>=0?'+':'-';
   return sign+(abs>=1000?'$'+(abs/1000).toFixed(1)+'k':'$'+Math.round(abs).toLocaleString());
-}
-// fmtMoneyAbs: unsigned version (avg win / avg loss labels already carry their own +/-)
-function fmtMoneyAbs(val,avgRR){
-  if(displayMode==='percent'){
-    return Math.abs(avgRR||0).toFixed(2)+'%';
-  }
-  val=Math.abs(val||0);
-  return val>=1000?'$'+(val/1000).toFixed(1)+'k':'$'+val.toFixed(0);
 }
 
 function setDisplayMode(mode){
@@ -879,21 +866,18 @@ function go(id,btn){
   const pSel=document.getElementById('dash-period-sel');
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
-  const dmWrap=document.getElementById('display-mode-wrap');
   if(id==='dashboard'){
     if(pSel)pSel.style.display='';
     if(ySel)ySel.style.display='';
     if(mSel)mSel.style.display='';
-    if(dmWrap){
-      dmWrap.style.display='';
-      document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
-      document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
-    }
+    const dmDollar=document.getElementById('dm-btn-dollar');
+    const dmPct=document.getElementById('dm-btn-pct');
+    if(dmDollar)dmDollar.classList.toggle('active',displayMode==='dollar');
+    if(dmPct)dmPct.classList.toggle('active',displayMode==='percent');
   } else {
     if(pSel)pSel.style.display='none';
     if(ySel)ySel.style.display='none';
     if(mSel)mSel.style.display='none';
-    if(dmWrap)dmWrap.style.display='none';
   }
   if(id==='dashboard'){
     initDashSelectors();
@@ -961,11 +945,11 @@ function renderDashboardWithTrades(trades,label){
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot,s.trades);pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
-  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin,s.avgWinRR):'—';
-  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss,s.avgLossRR):'—';
+  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
+  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
   const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
   const rlb=document.getElementById('avgwl-red');if(rlb)rlb.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg2*100)+'%';
@@ -1058,11 +1042,11 @@ function renderDashboard(key){
   }
   document.getElementById('m-total').textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=fmtMoney(s.tot,s.trades);pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
   const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
-  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+'+fmtMoneyAbs(s.avgWin,s.avgWinRR):'—';
-  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-'+fmtMoneyAbs(s.avgLoss,s.avgLossRR):'—';
+  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
+  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
   // Avg win/loss bar
   const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
@@ -1099,11 +1083,7 @@ function statsOf(trades){
   const dayWr=days.length?Math.round(profitDays/days.length*100):0;
   const avgWin=wins+partials>0?(grossWin/(wins+partials)).toFixed(0):0;
   const avgLoss=losses>0?(grossLoss/losses).toFixed(0):0;
-  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
-  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
-  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
-  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
-  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss,avgWinRR,avgLossRR,trades};
+  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss};
 }
 
 // ── Calendar ──────────────────────────────────────────────────
@@ -1252,8 +1232,6 @@ function renderSessionStats(trades){
     // Share of total trades across active sessions
 
     const p=st.reduce((s,t)=>s+(t.pnl||0),0);
-    const pRR=st.reduce((s,t)=>s+(t.rr||0),0);
-    const pMetric=displayMode==='percent'?pRR:p;
     const wc=wr>=60?'var(--green)':wr>=40?'var(--gold)':'var(--red)';
     return`<div class="sess-card">
       <div class="sess-top"><span class="sess ${sess}">${SESS_LABELS[sess]}</span><span class="sess-wr" style="color:${wc}">${wr}%</span></div>
@@ -1262,7 +1240,7 @@ function renderSessionStats(trades){
         <div class="sess-detail">Trades <span>${n}</span></div>
         <div class="sess-detail">W <span style="color:var(--green)">${wins}</span></div>
         <div class="sess-detail">L <span style="color:var(--red)">${losses}</span></div>
-        <div class="sess-detail">P&L <span style="color:${pMetric>=0?'var(--green)':'var(--red)'}">${fmtMoney(p,st)}</span></div>
+        <div class="sess-detail">P&L <span style="color:${p>=0?'var(--green)':'var(--red)'}">${(p>=0?'+':'')+'$'+Math.abs(Math.round(p)).toLocaleString()}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -1322,13 +1300,10 @@ function drawCharts(trades){
   const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
   const tc=dark?'#666':'#999';
 
-  // Always start from 0 — cumulative dollars normally, cumulative RR (%) in percent mode
+  // Always start from 0
   let cum=0;
-  const ed=trades.map(t=>{
-    cum+=displayMode==='percent'?(t.rr||0):(t.pnl||0);
-    return{x:t.date,y:displayMode==='percent'?Math.round(cum*100)/100:Math.round(cum)};
-  });
-  const labels=[displayMode==='percent'?'0%':'$0',...ed.map(d=>d.x)];
+  const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
+  const labels=['$0',...ed.map(d=>d.x)];
   const vals=[0,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
   if(c1){
@@ -1369,7 +1344,7 @@ function drawCharts(trades){
         plugins:{legend:{display:false}},
         scales:{
           x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},
-          y:{ticks:{font:{size:11},color:tc,callback:v=>displayMode==='percent'?v+'%':'$'+v.toLocaleString()},grid:{color:gc}}
+          y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}
         }
       }
     });
@@ -1834,13 +1809,9 @@ document.getElementById('f-date').value=today();
 currentDashKey=curMonthKey();
 initDashSelectors();
 renderDashboard(currentDashKey);
-// Show dashboard-only top bar controls on first load (app opens directly on Dashboard)
-const dmWrapInit=document.getElementById('display-mode-wrap');
-if(dmWrapInit){
-  dmWrapInit.style.display='';
-  document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
-  document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
-}
+// Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
+document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
+document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
 document.getElementById('dash-period-sel').style.display='';
 document.getElementById('dash-year-sel').style.display='';
 document.getElementById('dash-month-sel').style.display='';
