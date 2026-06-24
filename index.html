@@ -759,7 +759,7 @@ function persist(){try{localStorage.setItem('tj_v10',JSON.stringify(db));return 
 // exactly mirroring how dollar P&L sums work.
 function rrPct(rr){
   rr=rr||0;
-  return(rr>=0?'+':'-')+Math.abs(rr).toFixed(2)+'%';
+  return(rr>=0?'+':'-')+Math.abs(rr).toFixed(1)+'R';
 }
 // fmtMoneyCompact: used only by the Calendar (day cells + weekly summary).
 // trades = the trades behind this number, summed as RR when in percent mode.
@@ -1121,10 +1121,13 @@ function renderCalendar(key,trades){
     if(info){
       const dayTrades=trades.filter(t=>t.date===ds);
       const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
+      const dayWins=dayTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+      const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
+      const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
-        <div class="cal-day-trades">${info.count} trade${info.count>1?'s':''}</div>
+        <div class="cal-day-trades">${dayWr}% win rate</div>
       </div>`;
     } else {
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
@@ -1176,13 +1179,16 @@ function renderCalendar(key,trades){
     const wMetric=displayMode==='percent'?wRR:wPnl;
     const wPnlStr=fmtMoneyCompact(wPnl,wTrades);
     const wTradeCount=wTrades.length;
+    const wWins=wTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+    const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
+    const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
     wHtml+=`<div class="week-card" style="height:92px;margin-bottom:${isLastRow?0:6}px">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||(w+1)}</span></div>
       ${wTradeCount>0
         ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
-           <div class="cal-day-trades">${wTradeCount} trade${wTradeCount>1?'s':''}</div>`
-        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0%'}</div><div class="cal-day-trades">0 trades</div>`}
+           <div class="cal-day-trades">${wWr}% win rate</div>`
+        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div><div class="cal-day-trades">0% win rate</div>`}
     </div>`;
     wIdx++;
   }
