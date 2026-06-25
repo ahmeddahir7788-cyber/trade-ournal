@@ -197,6 +197,8 @@ nav button:hover i{color:var(--text)}
 
 /* FORM */
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.side-by-side-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.side-by-side-2{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--text2);font-weight:500}
 .field input,.field select,.field textarea{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
@@ -496,20 +498,24 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any"/></div>
         <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
       </div>
-      <div class="field" style="margin-bottom:6px">
-        <label>Screenshots (optional)</label>
+      <div class="side-by-side-2">
+        <div>
+          <div class="field" style="margin-bottom:6px">
+            <label>Screenshots (optional)</label>
+          </div>
+          <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
+          <div class="img-upload-zone" onclick="document.getElementById('f-img-input').click()">
+            <i class="ti ti-photo-plus"></i>
+            <p>Add chart screenshots</p>
+          </div>
+          <div class="img-preview-grid" id="f-img-preview"></div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Notes (optional)</label>
+          <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="height:100%;min-height:90px"></textarea>
+        </div>
       </div>
-      <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
-      <div class="img-upload-zone" onclick="document.getElementById('f-img-input').click()">
-        <i class="ti ti-photo-plus"></i>
-        <p>Add chart screenshots</p>
-      </div>
-      <div class="img-preview-grid" id="f-img-preview"></div>
-      <div class="field" style="margin-bottom:16px">
-        <label>Notes (optional)</label>
-        <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..."></textarea>
-      </div>
-      <div class="save-row">
+      <div class="save-row" style="margin-top:16px">
         <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save Trade</button>
         <span class="save-msg" id="save-msg">✓ Saved!</span>
         <span class="err-msg" id="err-msg"></span>
@@ -689,18 +695,22 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any"/></div>
       <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
     </div>
-    <div class="field" style="margin-bottom:6px">
-      <label>Screenshots (optional)</label>
-    </div>
-    <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
-    <div class="img-upload-zone" onclick="document.getElementById('et-img-input').click()">
-      <i class="ti ti-photo-plus"></i>
-      <p>Add chart screenshots</p>
-    </div>
-    <div class="img-preview-grid" id="et-img-preview"></div>
-    <div class="field" style="margin-bottom:0">
-      <label>Notes (optional)</label>
-      <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..."></textarea>
+    <div class="side-by-side-2">
+      <div>
+        <div class="field" style="margin-bottom:6px">
+          <label>Screenshots (optional)</label>
+        </div>
+        <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
+        <div class="img-upload-zone" onclick="document.getElementById('et-img-input').click()">
+          <i class="ti ti-photo-plus"></i>
+          <p>Add chart screenshots</p>
+        </div>
+        <div class="img-preview-grid" id="et-img-preview"></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Notes (optional)</label>
+        <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="height:100%;min-height:90px"></textarea>
+      </div>
     </div>
     <div class="mactions" style="margin-top:16px">
       <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
