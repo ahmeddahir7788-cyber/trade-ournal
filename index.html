@@ -199,15 +199,16 @@ nav button:hover i{color:var(--text)}
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--text2);font-weight:500}
-.field input,.field select{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
-.field input:focus,.field select:focus{border-color:var(--blue)}
+.field input,.field select,.field textarea{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
+.field textarea{resize:vertical;min-height:64px;line-height:1.5}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
 .field input.err{border-color:var(--red)!important}
 .save-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 /* TRADE IMAGES */
-.img-upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:14px}
+.img-upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:8px 12px;text-align:left;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .img-upload-zone:hover{border-color:var(--blue);background:var(--surface2)}
-.img-upload-zone i{font-size:22px;color:var(--text3);display:block;margin-bottom:6px}
-.img-upload-zone p{font-size:12px;color:var(--text3)}
+.img-upload-zone i{font-size:16px;color:var(--text3);flex-shrink:0}
+.img-upload-zone p{font-size:12px;color:var(--text3);margin:0}
 .img-preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .img-preview-grid:empty{margin-bottom:0}
 .img-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:.5px solid var(--border2);flex-shrink:0}
@@ -495,15 +496,19 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any"/></div>
         <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
       </div>
-      <div class="field" style="margin-bottom:0">
+      <div class="field" style="margin-bottom:6px">
         <label>Screenshots (optional)</label>
       </div>
       <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
       <div class="img-upload-zone" onclick="document.getElementById('f-img-input').click()">
         <i class="ti ti-photo-plus"></i>
-        <p>Click to add chart screenshots</p>
+        <p>Add chart screenshots</p>
       </div>
       <div class="img-preview-grid" id="f-img-preview"></div>
+      <div class="field" style="margin-bottom:16px">
+        <label>Notes (optional)</label>
+        <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..."></textarea>
+      </div>
       <div class="save-row">
         <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save Trade</button>
         <span class="save-msg" id="save-msg">✓ Saved!</span>
@@ -684,16 +689,20 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any"/></div>
       <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
     </div>
-    <div class="field" style="margin-bottom:0">
+    <div class="field" style="margin-bottom:6px">
       <label>Screenshots (optional)</label>
     </div>
     <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
     <div class="img-upload-zone" onclick="document.getElementById('et-img-input').click()">
       <i class="ti ti-photo-plus"></i>
-      <p>Click to add chart screenshots</p>
+      <p>Add chart screenshots</p>
     </div>
     <div class="img-preview-grid" id="et-img-preview"></div>
-    <div class="mactions">
+    <div class="field" style="margin-bottom:0">
+      <label>Notes (optional)</label>
+      <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..."></textarea>
+    </div>
+    <div class="mactions" style="margin-top:16px">
       <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
       <button class="mp" onclick="saveEditTrade()"><i class="ti ti-device-floppy"></i> Save Changes</button>
     </div>
@@ -1462,7 +1471,8 @@ function saveTrade(){
     outcome,
     pnl:finalPnl,
     rr:parseFloat(rrEl.value),
-    images:fImages.slice()
+    images:fImages.slice(),
+    notes:document.getElementById('f-notes').value.trim()
   });
   db.trades[key].sort((a,b)=>a.date.localeCompare(b.date));
   const ok=persist();
@@ -1475,6 +1485,7 @@ function saveTrade(){
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
   fImages=[];renderImagePreview('f');
+  document.getElementById('f-notes').value='';
   updateLogHint();
   if(currentDashKey===key)refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
@@ -1714,6 +1725,7 @@ function openEditTrade(key,id){
   document.getElementById('et-rr').value=t.rr??'';
   etImages=(t.images||[]).slice();
   renderImagePreview('et');
+  document.getElementById('et-notes').value=t.notes||'';
   document.getElementById('edit-trade-modal').classList.add('open');
 }
 
@@ -1730,7 +1742,8 @@ function saveEditTrade(){
     outcome:document.getElementById('et-out').value,
     pnl:(()=>{const v=Math.abs(parseFloat(document.getElementById('et-pnl').value)||0);const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
     rr:parseFloat(document.getElementById('et-rr').value)||null,
-    images:etImages.slice()
+    images:etImages.slice(),
+    notes:document.getElementById('et-notes').value.trim()
   };
   // Remove from old key
   db.trades[editTradeKey]=db.trades[editTradeKey].filter(t=>t.id!==editTradeId);
@@ -1772,16 +1785,19 @@ function openDayJournal(dateStr){
     const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
     sub.innerHTML=`<span style="color:var(--text3)">${trades.length} trade${trades.length>1?'s':''} · </span><span style="color:${tot>=0?'var(--green)':'var(--red)'};font-weight:600">${tot>=0?'+':''}$${tot.toFixed(2)}</span>`;
     tradesWrap.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px">
-      ${trades.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border-radius:var(--r);font-size:13px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-weight:600">${PAIRS[t.symbol]||t.symbol}</span>
-          <span class="badge ${t.direction.toLowerCase()}">${t.direction}</span>
-          <span class="badge ${t.outcome==='Win'?'win':t.outcome==='Partial'?'partial':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span>
+      ${trades.map(t=>`<div style="padding:8px 12px;background:var(--surface2);border-radius:var(--r);font-size:13px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:600">${PAIRS[t.symbol]||t.symbol}</span>
+            <span class="badge ${t.direction.toLowerCase()}">${t.direction}</span>
+            <span class="badge ${t.outcome==='Win'?'win':t.outcome==='Partial'?'partial':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</div>
+            <div style="font-size:11px;color:var(--text3)">${t.rr!=null?t.rr+'R':'—'}</div>
+          </div>
         </div>
-        <div style="text-align:right">
-          <div style="font-weight:700;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</div>
-          <div style="font-size:11px;color:var(--text3)">${t.rr!=null?t.rr+'R':'—'}</div>
-        </div>
+        ${t.notes?`<div style="margin-top:6px;padding-top:6px;border-top:.5px solid var(--border);font-size:12px;color:var(--text2);line-height:1.4">${t.notes}</div>`:''}
       </div>`).join('')}
     </div>`;
   } else {
