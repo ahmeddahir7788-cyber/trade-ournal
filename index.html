@@ -209,8 +209,10 @@ nav button:hover i{color:var(--text)}
 /* TRADE IMAGES */
 .img-upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:8px 12px;text-align:left;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:10px;display:flex;align-items:center;gap:8px;min-height:90px;align-items:center;justify-content:center;flex-direction:column}
 .img-upload-zone:hover{border-color:var(--blue);background:var(--surface2)}
+.img-upload-zone:focus{outline:none;border-color:var(--blue);background:var(--surface2);box-shadow:0 0 0 3px rgba(55,138,221,0.15)}
 .img-upload-zone i{font-size:20px;color:var(--text3);flex-shrink:0;margin-bottom:4px}
-.img-upload-zone p{font-size:12px;color:var(--text3);margin:0;text-align:center}
+.img-upload-zone p{font-size:12px;color:var(--text3);margin:0;text-align:center;line-height:1.5}
+.img-upload-zone p a{color:var(--blue);text-decoration:underline;font-weight:500}
 .img-preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .img-preview-grid:empty{margin-bottom:0}
 .img-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:.5px solid var(--border2);flex-shrink:0}
@@ -504,9 +506,9 @@ table.tt tr:last-child td{border-bottom:none}
             <label>Screenshots (optional)</label>
           </div>
           <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
-          <div class="img-upload-zone" onclick="document.getElementById('f-img-input').click()">
+          <div class="img-upload-zone" id="f-img-zone" tabindex="0">
             <i class="ti ti-photo-plus"></i>
-            <p>Add chart screenshots</p>
+            <p>Click here, then <strong>Ctrl+V</strong> to paste<br/>or <a href="javascript:void(0)" onclick="event.stopPropagation();document.getElementById('f-img-input').click()">browse files</a></p>
           </div>
           <div class="img-preview-grid" id="f-img-preview"></div>
         </div>
@@ -701,9 +703,9 @@ table.tt tr:last-child td{border-bottom:none}
           <label>Screenshots (optional)</label>
         </div>
         <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
-        <div class="img-upload-zone" onclick="document.getElementById('et-img-input').click()">
+        <div class="img-upload-zone" id="et-img-zone" tabindex="0">
           <i class="ti ti-photo-plus"></i>
-          <p>Add chart screenshots</p>
+          <p>Click here, then <strong>Ctrl+V</strong> to paste<br/>or <a href="javascript:void(0)" onclick="event.stopPropagation();document.getElementById('et-img-input').click()">browse files</a></p>
         </div>
         <div class="img-preview-grid" id="et-img-preview"></div>
       </div>
@@ -1424,6 +1426,27 @@ function handleTradeImages(event,prefix){
   });
 }
 
+function handleTradePaste(event,prefix){
+  const items=(event.clipboardData||window.clipboardData)?.items;
+  if(!items)return;
+  const files=[];
+  for(let i=0;i<items.length;i++){
+    if(items[i].type&&items[i].type.startsWith('image/')){
+      const f=items[i].getAsFile();
+      if(f)files.push(f);
+    }
+  }
+  if(!files.length)return; // nothing image-like was pasted, let default paste behavior (if any) proceed
+  event.preventDefault();
+  const arr=prefix==='f'?fImages:etImages;
+  Promise.all(files.map(f=>compressImage(f,1280,0.72))).then(results=>{
+    results.forEach(dataUrl=>arr.push(dataUrl));
+    renderImagePreview(prefix);
+  }).catch(()=>{
+    alert('Could not load the pasted image. Please try again.');
+  });
+}
+
 function renderImagePreview(prefix){
   const arr=prefix==='f'?fImages:etImages;
   const wrap=document.getElementById(prefix+'-img-preview');
@@ -1844,6 +1867,15 @@ document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='p
 document.getElementById('dash-period-sel').style.display='';
 document.getElementById('dash-year-sel').style.display='';
 document.getElementById('dash-month-sel').style.display='';
+
+// Global paste fallback: if a screenshot zone is focused, route pasted clipboard images into it
+document.addEventListener('paste',function(e){
+  const active=document.activeElement;
+  if(!active||!active.classList||!active.classList.contains('img-upload-zone'))return;
+  const prefix=active.id==='f-img-zone'?'f':active.id==='et-img-zone'?'et':null;
+  if(!prefix)return;
+  handleTradePaste(e,prefix);
+});
 </script>
 </body>
 </html>
