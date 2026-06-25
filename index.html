@@ -514,25 +514,17 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
         <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any"/></div>
         <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
-      </div>
-      <div class="side-by-side-2">
-        <div>
-          <div class="field" style="margin-bottom:6px">
-            <label>Screenshots (optional)</label>
-          </div>
-          <button type="button" class="screenshots-trigger" onclick="openScreenshotsManager('f')">
+        <div class="field">
+          <label>Screenshots</label>
+          <button type="button" id="f-img-btn" class="screenshots-icon-btn" onclick="openScreenshotsManager('f')" title="Add screenshots">
             <i class="ti ti-photo-plus"></i>
-            <div class="screenshots-trigger-text">
-              <span class="screenshots-trigger-title" id="f-img-trigger-title">Add screenshots</span>
-              <span class="screenshots-trigger-sub" id="f-img-trigger-sub">Click to open</span>
-            </div>
-            <div class="screenshots-trigger-thumbs" id="f-img-trigger-thumbs"></div>
+            <span id="f-img-trigger-title">Add</span>
           </button>
         </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Notes (optional)</label>
-          <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="height:100%;min-height:90px"></textarea>
-        </div>
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <label>Notes (optional)</label>
+        <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:90px"></textarea>
       </div>
       <div class="save-row" style="margin-top:16px">
         <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save Trade</button>
@@ -713,25 +705,17 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
       <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any"/></div>
       <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
-    </div>
-    <div class="side-by-side-2">
-      <div>
-        <div class="field" style="margin-bottom:6px">
-          <label>Screenshots (optional)</label>
-        </div>
-        <button type="button" class="screenshots-trigger" onclick="openScreenshotsManager('et')">
+      <div class="field">
+        <label>Screenshots</label>
+        <button type="button" id="et-img-btn" class="screenshots-icon-btn" onclick="openScreenshotsManager('et')" title="Add screenshots">
           <i class="ti ti-photo-plus"></i>
-          <div class="screenshots-trigger-text">
-            <span class="screenshots-trigger-title" id="et-img-trigger-title">Add screenshots</span>
-            <span class="screenshots-trigger-sub" id="et-img-trigger-sub">Click to open</span>
-          </div>
-          <div class="screenshots-trigger-thumbs" id="et-img-trigger-thumbs"></div>
+          <span id="et-img-trigger-title">Add</span>
         </button>
       </div>
-      <div class="field" style="margin-bottom:0">
-        <label>Notes (optional)</label>
-        <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="height:100%;min-height:90px"></textarea>
-      </div>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Notes (optional)</label>
+      <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:90px"></textarea>
     </div>
     <div class="mactions" style="margin-top:16px">
       <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
@@ -1500,13 +1484,11 @@ function renderImagePreview(prefix){
       </div>`).join('');
     }
   }
-  // Compact trigger in the form
+  // Compact icon button in the form - just shows a count badge when images exist
   const title=document.getElementById(prefix+'-img-trigger-title');
-  const sub=document.getElementById(prefix+'-img-trigger-sub');
-  const thumbs=document.getElementById(prefix+'-img-trigger-thumbs');
-  if(title)title.textContent=arr.length?`${arr.length} screenshot${arr.length>1?'s':''}`:'Add screenshots';
-  if(sub)sub.textContent=arr.length?'Click to view or add more':'Click to open';
-  if(thumbs)thumbs.innerHTML=arr.slice(0,3).map(src=>`<img src="${src}"/>`).join('');
+  if(title)title.textContent=arr.length?String(arr.length):'Add';
+  const btn=document.getElementById(prefix+'-img-btn');
+  if(btn)btn.title=arr.length?`${arr.length} screenshot${arr.length>1?'s':''} — click to view`:'Add screenshots';
 }
 
 function removeTradeImage(prefix,idx){
