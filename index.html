@@ -933,12 +933,15 @@ function onPeriodChange(){
 function renderDashboardWithTrades(trades,label){
   // dash-sub removed
   const s=statsOf(trades);
+  // Calendar always shows the FULL current month, independent of the selected period
+  const calMonthKey=currentDashKey||curMonthKey();
+  const calMonthTrades=getTradesForKey(calMonthKey);
   if(!s){
     ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
-    renderCalendar(curMonthKey(),[]);
+    renderCalendar(calMonthKey,calMonthTrades);
     if(eqChart){eqChart.destroy();eqChart=null}return;
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
@@ -957,7 +960,7 @@ function renderDashboardWithTrades(trades,label){
   drawGauge(s.wins,s.be,s.losses);
 
   renderSessionStats(trades);
-  renderCalendar(currentDashKey||curMonthKey(),trades);
+  renderCalendar(calMonthKey,calMonthTrades);
   drawMiniCharts(trades);
   drawCharts(trades);
 }
