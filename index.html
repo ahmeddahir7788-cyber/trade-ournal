@@ -224,6 +224,21 @@ nav button:hover i{color:var(--text)}
 .img-lightbox.open{display:flex}
 .img-lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
 .img-lightbox-close{position:absolute;top:18px;right:24px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* Screenshots manager (full-page-style modal) */
+.screenshots-modal-box{max-width:640px;max-height:85vh;overflow-y:auto}
+.img-preview-grid-large{gap:12px}
+.img-preview-grid-large .img-thumb{width:120px;height:120px;border-radius:10px}
+.img-preview-grid-large .img-thumb .img-remove{width:24px;height:24px;font-size:15px;top:5px;right:5px}
+/* Compact trigger shown inline in Add/Edit Trade forms */
+.screenshots-trigger{border:1.5px dashed var(--border2);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s,background .15s;height:90px;width:100%;text-align:left}
+.screenshots-trigger:hover{border-color:var(--blue);background:var(--surface2)}
+.screenshots-trigger i{font-size:22px;color:var(--text3);flex-shrink:0}
+.screenshots-trigger-text{display:flex;flex-direction:column;gap:2px}
+.screenshots-trigger-title{font-size:13px;font-weight:600;color:var(--text)}
+.screenshots-trigger-sub{font-size:11px;color:var(--text3)}
+.screenshots-trigger-thumbs{display:flex;margin-left:auto;flex-shrink:0}
+.screenshots-trigger-thumbs img{width:30px;height:30px;border-radius:6px;object-fit:cover;border:1.5px solid var(--card);margin-left:-10px}
+.screenshots-trigger-thumbs img:first-child{margin-left:0}
 .save-msg{font-size:12px;color:var(--green);display:none}
 .err-msg{font-size:12px;color:var(--red);display:none}
 
@@ -505,12 +520,14 @@ table.tt tr:last-child td{border-bottom:none}
           <div class="field" style="margin-bottom:6px">
             <label>Screenshots (optional)</label>
           </div>
-          <input type="file" id="f-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'f')"/>
-          <div class="img-upload-zone" id="f-img-zone" tabindex="0">
+          <button type="button" class="screenshots-trigger" onclick="openScreenshotsManager('f')">
             <i class="ti ti-photo-plus"></i>
-            <p>Click here, then <strong>Ctrl+V</strong> to paste<br/>or <a href="javascript:void(0)" onclick="event.stopPropagation();document.getElementById('f-img-input').click()">browse files</a></p>
-          </div>
-          <div class="img-preview-grid" id="f-img-preview"></div>
+            <div class="screenshots-trigger-text">
+              <span class="screenshots-trigger-title" id="f-img-trigger-title">Add screenshots</span>
+              <span class="screenshots-trigger-sub" id="f-img-trigger-sub">Click to open</span>
+            </div>
+            <div class="screenshots-trigger-thumbs" id="f-img-trigger-thumbs"></div>
+          </button>
         </div>
         <div class="field" style="margin-bottom:0">
           <label>Notes (optional)</label>
@@ -702,12 +719,14 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="field" style="margin-bottom:6px">
           <label>Screenshots (optional)</label>
         </div>
-        <input type="file" id="et-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,'et')"/>
-        <div class="img-upload-zone" id="et-img-zone" tabindex="0">
+        <button type="button" class="screenshots-trigger" onclick="openScreenshotsManager('et')">
           <i class="ti ti-photo-plus"></i>
-          <p>Click here, then <strong>Ctrl+V</strong> to paste<br/>or <a href="javascript:void(0)" onclick="event.stopPropagation();document.getElementById('et-img-input').click()">browse files</a></p>
-        </div>
-        <div class="img-preview-grid" id="et-img-preview"></div>
+          <div class="screenshots-trigger-text">
+            <span class="screenshots-trigger-title" id="et-img-trigger-title">Add screenshots</span>
+            <span class="screenshots-trigger-sub" id="et-img-trigger-sub">Click to open</span>
+          </div>
+          <div class="screenshots-trigger-thumbs" id="et-img-trigger-thumbs"></div>
+        </button>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>Notes (optional)</label>
@@ -717,6 +736,25 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="mactions" style="margin-top:16px">
       <button class="mc" onclick="closeOverlay('edit-trade-modal')">Cancel</button>
       <button class="mp" onclick="saveEditTrade()"><i class="ti ti-device-floppy"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREENSHOTS MANAGER (full-page style modal) -->
+<div class="overlay" id="screenshots-modal">
+  <div class="modal screenshots-modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 style="margin:0">Trade Screenshots</h2>
+      <button onclick="closeScreenshotsManager()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:24px;line-height:1">×</button>
+    </div>
+    <input type="file" id="sm-img-input" accept="image/*" multiple style="display:none" onchange="handleTradeImages(event,window.smPrefix)"/>
+    <div class="img-upload-zone" id="sm-img-zone" tabindex="0" style="min-height:140px">
+      <i class="ti ti-photo-plus" style="font-size:28px"></i>
+      <p style="font-size:13px">Click here, then <strong>Ctrl+V</strong> to paste a screenshot<br/>or <a href="javascript:void(0)" onclick="event.stopPropagation();document.getElementById('sm-img-input').click()">browse files from your computer</a></p>
+    </div>
+    <div class="img-preview-grid img-preview-grid-large" id="sm-img-preview"></div>
+    <div class="mactions" style="margin-top:18px">
+      <button class="mp" onclick="closeScreenshotsManager()">Done</button>
     </div>
   </div>
 </div>
@@ -1384,6 +1422,7 @@ function initLogPage(){
   document.getElementById('f-sess').value='';
   document.getElementById('f-dir').value='';
   document.getElementById('f-out').value='';
+  renderImagePreview('f');
   updateLogHint();
 }
 function updateLogHint(){
@@ -1447,14 +1486,27 @@ function handleTradePaste(event,prefix){
   });
 }
 
+// Renders the big grid inside the Screenshots manager modal (if open for this prefix)
+// AND keeps the compact trigger button in the form (thumbnail strip + label) in sync.
 function renderImagePreview(prefix){
   const arr=prefix==='f'?fImages:etImages;
-  const wrap=document.getElementById(prefix+'-img-preview');
-  if(!wrap)return;
-  wrap.innerHTML=arr.map((src,i)=>`<div class="img-thumb">
-    <img src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/>
-    <button class="img-remove" onclick="removeTradeImage('${prefix}',${i})" title="Remove">×</button>
-  </div>`).join('');
+  // Manager modal grid (only meaningful if it's currently open for this prefix)
+  if(window.smPrefix===prefix){
+    const smWrap=document.getElementById('sm-img-preview');
+    if(smWrap){
+      smWrap.innerHTML=arr.map((src,i)=>`<div class="img-thumb">
+        <img src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/>
+        <button class="img-remove" onclick="removeTradeImage('${prefix}',${i})" title="Remove">×</button>
+      </div>`).join('');
+    }
+  }
+  // Compact trigger in the form
+  const title=document.getElementById(prefix+'-img-trigger-title');
+  const sub=document.getElementById(prefix+'-img-trigger-sub');
+  const thumbs=document.getElementById(prefix+'-img-trigger-thumbs');
+  if(title)title.textContent=arr.length?`${arr.length} screenshot${arr.length>1?'s':''}`:'Add screenshots';
+  if(sub)sub.textContent=arr.length?'Click to view or add more':'Click to open';
+  if(thumbs)thumbs.innerHTML=arr.slice(0,3).map(src=>`<img src="${src}"/>`).join('');
 }
 
 function removeTradeImage(prefix,idx){
@@ -1470,6 +1522,18 @@ function openLightbox(src){
 function closeLightbox(){
   document.getElementById('img-lightbox').classList.remove('open');
   document.getElementById('img-lightbox-img').src='';
+}
+
+// ── Screenshots Manager (full-page-style modal) ──────────────────
+function openScreenshotsManager(prefix){
+  window.smPrefix=prefix;
+  renderImagePreview(prefix); // populate the manager grid now that smPrefix is set
+  document.getElementById('screenshots-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('sm-img-zone').focus(),50);
+}
+function closeScreenshotsManager(){
+  document.getElementById('screenshots-modal').classList.remove('open');
+  window.smPrefix=null;
 }
 
 function saveTrade(){
@@ -1868,13 +1932,12 @@ document.getElementById('dash-period-sel').style.display='';
 document.getElementById('dash-year-sel').style.display='';
 document.getElementById('dash-month-sel').style.display='';
 
-// Global paste fallback: if a screenshot zone is focused, route pasted clipboard images into it
+// Global paste fallback: while the Screenshots manager is open and its zone is focused, route pasted clipboard images into it
 document.addEventListener('paste',function(e){
   const active=document.activeElement;
-  if(!active||!active.classList||!active.classList.contains('img-upload-zone'))return;
-  const prefix=active.id==='f-img-zone'?'f':active.id==='et-img-zone'?'et':null;
-  if(!prefix)return;
-  handleTradePaste(e,prefix);
+  if(!active||active.id!=='sm-img-zone')return;
+  if(!window.smPrefix)return;
+  handleTradePaste(e,window.smPrefix);
 });
 </script>
 </body>
