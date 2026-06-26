@@ -197,8 +197,8 @@ nav button:hover i{color:var(--text)}
 
 /* FORM */
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.side-by-side-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:600px){.side-by-side-2{grid-template-columns:1fr}}
+.notes-field{max-width:50%}
+@media(max-width:600px){.notes-field{max-width:100%}}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--text2);font-weight:500}
 .field input,.field select,.field textarea{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
@@ -230,15 +230,11 @@ nav button:hover i{color:var(--text)}
 .img-preview-grid-large .img-thumb{width:120px;height:120px;border-radius:10px}
 .img-preview-grid-large .img-thumb .img-remove{width:24px;height:24px;font-size:15px;top:5px;right:5px}
 /* Compact trigger shown inline in Add/Edit Trade forms */
-.screenshots-trigger{border:1.5px dashed var(--border2);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s,background .15s;height:90px;width:100%;text-align:left}
-.screenshots-trigger:hover{border-color:var(--blue);background:var(--surface2)}
-.screenshots-trigger i{font-size:22px;color:var(--text3);flex-shrink:0}
-.screenshots-trigger-text{display:flex;flex-direction:column;gap:2px}
-.screenshots-trigger-title{font-size:13px;font-weight:600;color:var(--text)}
-.screenshots-trigger-sub{font-size:11px;color:var(--text3)}
-.screenshots-trigger-thumbs{display:flex;margin-left:auto;flex-shrink:0}
-.screenshots-trigger-thumbs img{width:30px;height:30px;border-radius:6px;object-fit:cover;border:1.5px solid var(--card);margin-left:-10px}
-.screenshots-trigger-thumbs img:first-child{margin-left:0}
+/* Compact screenshots icon button - matches the size of a normal field input (e.g. Risk/Reward) */
+.screenshots-icon-btn{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;transition:border-color .15s,background .15s}
+.screenshots-icon-btn:hover{border-color:var(--blue);background:var(--border)}
+.screenshots-icon-btn i{font-size:16px;color:var(--text3)}
+.screenshots-icon-btn span{font-size:13px;font-weight:500}
 .save-msg{font-size:12px;color:var(--green);display:none}
 .err-msg{font-size:12px;color:var(--red);display:none}
 
@@ -522,7 +518,7 @@ table.tt tr:last-child td{border-bottom:none}
           </button>
         </div>
       </div>
-      <div class="field" style="margin-bottom:16px">
+      <div class="field notes-field" style="margin-bottom:16px">
         <label>Notes (optional)</label>
         <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:90px"></textarea>
       </div>
@@ -713,7 +709,7 @@ table.tt tr:last-child td{border-bottom:none}
         </button>
       </div>
     </div>
-    <div class="field" style="margin-bottom:16px">
+    <div class="field notes-field" style="margin-bottom:16px">
       <label>Notes (optional)</label>
       <textarea id="et-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:90px"></textarea>
     </div>
