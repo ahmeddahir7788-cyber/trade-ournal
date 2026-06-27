@@ -45,6 +45,21 @@ nav button:hover i{color:var(--text)}
 .content{max-width:980px;margin:0 auto;padding:1.5rem 1.5rem}
 .page{display:none}.page.active{display:block}
 .ph{margin-bottom:1.5rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* MOBILE: sidebar becomes an off-canvas drawer instead of a permanent fixed column */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+.sidebar-backdrop.open{display:block}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;width:240px;min-width:240px}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar.collapsed{width:240px;min-width:240px} /* collapse state is irrelevant on mobile; drawer is full width */
+  .sidebar.collapsed .logo-text,.sidebar.collapsed .nav-label,.sidebar.collapsed .sb-bottom-label{opacity:1;width:auto}
+  .app-body{margin-left:0}
+  .app-body.collapsed{margin-left:0}
+  .top-bar{padding:0 1rem}
+  .content{padding:1rem .85rem}
+  .top-bar-right{flex-wrap:wrap;gap:6px;justify-content:flex-end}
+}
 .ph-left h1{font-size:20px;font-weight:600;margin-bottom:4px}
 .ph-left p{font-size:13px;color:var(--text2)}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -370,7 +385,7 @@ table.tt tr:last-child td{border-bottom:none}
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.modal{background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rlg);padding:1.5rem;width:90%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .modal h2{font-size:16px;font-weight:600;margin-bottom:1.25rem}
 .mactions{display:flex;gap:8px;justify-content:flex-end}
 .mactions button{padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;border:none}
@@ -400,6 +415,7 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
   </div>
 </aside>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
 <div class="app-body" id="app-body">
 <div class="top-bar" id="top-bar">
@@ -1029,16 +1045,42 @@ function refreshCurrentDashboardView(){
 }
 
 // ── Sidebar ───────────────────────────────────────────────────
+function isMobileViewport(){return window.innerWidth<=768}
+
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
   const body=document.getElementById('app-body');
+  const backdrop=document.getElementById('sidebar-backdrop');
+  const iconTop=document.getElementById('sb-icon-top');
+  if(isMobileViewport()){
+    const open=sb.classList.toggle('mobile-open');
+    if(backdrop)backdrop.classList.toggle('open',open);
+    if(iconTop)iconTop.className=open?'ti ti-x':'ti ti-menu-2';
+    return;
+  }
   const collapsed=sb.classList.toggle('collapsed');
   body.classList.toggle('collapsed',collapsed);
-  const iconTop=document.getElementById('sb-icon-top');
   if(iconTop)iconTop.className=collapsed?'ti ti-layout-sidebar-left-expand':'ti ti-layout-sidebar-left-collapse';
   localStorage.setItem('tj_v10_sb',collapsed?'1':'0');
 }
+
+// Close the mobile drawer automatically after navigating to a page (better UX than leaving it open)
+function closeMobileSidebar(){
+  if(!isMobileViewport())return;
+  const sb=document.getElementById('sidebar');
+  const backdrop=document.getElementById('sidebar-backdrop');
+  const iconTop=document.getElementById('sb-icon-top');
+  sb.classList.remove('mobile-open');
+  if(backdrop)backdrop.classList.remove('open');
+  if(iconTop)iconTop.className='ti ti-menu-2';
+}
+
 function initSidebar(){
+  if(isMobileViewport()){
+    const iconTop=document.getElementById('sb-icon-top');
+    if(iconTop)iconTop.className='ti ti-menu-2';
+    return; // drawer starts closed on mobile regardless of any saved desktop-collapsed preference
+  }
   if(localStorage.getItem('tj_v10_sb')==='1'){
     document.getElementById('sidebar').classList.add('collapsed');
     document.getElementById('app-body').classList.add('collapsed');
@@ -1061,6 +1103,7 @@ function go(id,btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
+  closeMobileSidebar();
   // Update top bar label
   const pg=PAGE_LABELS[id]||{icon:'ti-circle',label:id};
   const tb=document.getElementById('top-bar-section');
@@ -2496,6 +2539,17 @@ document.addEventListener('paste',function(e){
   if(!active||active.id!=='sm-img-zone')return;
   if(!window.smPrefix)return;
   handleTradePaste(e,window.smPrefix);
+});
+
+// Keep sidebar state sane when resizing across the mobile/desktop breakpoint (e.g. rotating a tablet)
+let lastWasMobile=isMobileViewport();
+window.addEventListener('resize',function(){
+  const nowMobile=isMobileViewport();
+  if(nowMobile!==lastWasMobile){
+    lastWasMobile=nowMobile;
+    closeMobileSidebar();
+    initSidebar();
+  }
 });
 </script>
 </body>
