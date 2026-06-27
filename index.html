@@ -342,6 +342,31 @@ table.tt tr:last-child td{border-bottom:none}
 .pb-trade-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:8px 10px;background:var(--surface2);border-radius:var(--r);cursor:pointer}
 .pb-trade-row:hover{background:var(--border)}
 
+/* REPORTS */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.report-grid{grid-template-columns:1fr}}
+.rep-bar-row{margin-bottom:12px}
+.rep-bar-row:last-child{margin-bottom:0}
+.rep-bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;font-size:13px}
+.rep-bar-name{font-weight:600;color:var(--text)}
+.rep-bar-sub{font-size:11px;color:var(--text3)}
+.rep-bar-bg{height:7px;background:var(--border);border-radius:100px;overflow:hidden}
+.rep-bar-fill{height:100%;border-radius:100px;background:var(--blue)}
+.rep-streak-box{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:1.5rem 0}
+.rep-streak-num{font-size:42px;font-weight:800;line-height:1}
+.rep-streak-lbl{font-size:13px;color:var(--text3);margin-top:6px}
+.rep-streak-sub{display:flex;gap:18px;margin-top:16px}
+.rep-streak-sub div{text-align:center}
+.rep-streak-sub .v{font-size:18px;font-weight:700}
+.rep-streak-sub .l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.rep-ls-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rep-ls-box{text-align:center;padding:14px;background:var(--surface2);border-radius:var(--r)}
+.rep-ls-box .ls-icon{font-size:22px;margin-bottom:6px}
+.rep-ls-box .ls-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+.rep-ls-box .ls-wr{font-size:24px;font-weight:800}
+.rep-ls-box .ls-row{display:flex;justify-content:space-around;margin-top:10px;font-size:12px;color:var(--text2)}
+.rep-ls-box .ls-row span{font-weight:700;color:var(--text)}
+
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
@@ -369,6 +394,7 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="go('trades',this)"><i class="ti ti-list"></i><span class="nav-label">Trades</span></button>
     <button onclick="go('accounts',this)"><i class="ti ti-building-bank"></i><span class="nav-label">Accounts</span></button>
     <button onclick="go('playbooks',this)"><i class="ti ti-notebook"></i><span class="nav-label">Playbooks</span></button>
+    <button onclick="go('reports',this)"><i class="ti ti-chart-pie"></i><span class="nav-label">Reports</span></button>
   </nav>
   <div class="sb-bottom">
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
@@ -623,6 +649,47 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="btn-blue" onclick="openPlaybookModal()"><i class="ti ti-plus"></i> Add playbook</button>
     </div>
     <div id="pb-cards" class="pf-cards"></div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="page-reports" class="page">
+    <div class="pf-filter-row" style="margin-bottom:1.25rem">
+      <div class="row">
+        <div class="field" style="margin-bottom:0"><label style="font-size:11px">From</label><input type="date" id="rep-from" class="sel" onchange="renderReports()"/></div>
+        <div class="field" style="margin-bottom:0"><label style="font-size:11px">To</label><input type="date" id="rep-to" class="sel" onchange="renderReports()"/></div>
+      </div>
+      <button class="btn-ghost" onclick="resetReportRange()"><i class="ti ti-refresh"></i> All time</button>
+    </div>
+    <div id="rep-empty" class="empty" style="display:none"><i class="ti ti-chart-pie"></i>No trades in this date range.</div>
+    <div id="rep-content">
+      <div class="report-grid">
+        <!-- Most Traded Pairs -->
+        <div class="card" style="margin-bottom:0">
+          <h3>Most Traded Pairs</h3>
+          <div id="rep-pairs"></div>
+        </div>
+        <!-- Best Trading Days (day of week) -->
+        <div class="card" style="margin-bottom:0">
+          <h3>Best Trading Days</h3>
+          <div id="rep-days"></div>
+        </div>
+        <!-- Current Streak -->
+        <div class="card" style="margin-bottom:0">
+          <h3>Current Streak</h3>
+          <div id="rep-streak"></div>
+        </div>
+        <!-- Best Sessions -->
+        <div class="card" style="margin-bottom:0">
+          <h3>Best Sessions</h3>
+          <div id="rep-sessions"></div>
+        </div>
+        <!-- Long vs Short -->
+        <div class="card" style="margin-bottom:0;grid-column:1/-1">
+          <h3>Long vs Short</h3>
+          <div id="rep-longshort"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -986,7 +1053,8 @@ const PAGE_LABELS={
   log:{icon:'ti-plus',label:'Log Trade'},
   trades:{icon:'ti-list',label:'Trades'},
   accounts:{icon:'ti-building-bank',label:'Accounts'},
-  playbooks:{icon:'ti-notebook',label:'Playbooks'}
+  playbooks:{icon:'ti-notebook',label:'Playbooks'},
+  reports:{icon:'ti-chart-pie',label:'Reports'}
 };
 function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1022,6 +1090,7 @@ function go(id,btn){
   if(id==='trades'){initTradeYearSel();renderMonthCards();}
   if(id==='accounts')renderAccounts();
   if(id==='playbooks')renderPlaybooks();
+  if(id==='reports')initReportsPage();
 }
 
 // ── Dashboard selectors ───────────────────────────────────────
@@ -2110,6 +2179,189 @@ function readChecklistResults(prefix){
   if(!list)return[];
   return Array.from(list.querySelectorAll('input[type="checkbox"]')).map(cb=>cb.checked);
 }
+
+// ── Reports ───────────────────────────────────────────────────
+function allTradesSorted(){
+  return Object.values(db.trades).flat().sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+}
+
+function initReportsPage(){
+  const fromEl=document.getElementById('rep-from');
+  const toEl=document.getElementById('rep-to');
+  // Only set defaults the first time the page is opened (don't clobber a range the user already picked)
+  if(!fromEl.value&&!toEl.value){
+    const all=allTradesSorted();
+    if(all.length){
+      fromEl.value=all[0].date;
+      toEl.value=all[all.length-1].date;
+    }
+  }
+  renderReports();
+}
+
+function resetReportRange(){
+  const all=allTradesSorted();
+  document.getElementById('rep-from').value=all.length?all[0].date:'';
+  document.getElementById('rep-to').value=all.length?all[all.length-1].date:'';
+  renderReports();
+}
+
+function renderReports(){
+  const fromV=document.getElementById('rep-from').value;
+  const toV=document.getElementById('rep-to').value;
+  let trades=allTradesSorted();
+  if(fromV)trades=trades.filter(t=>t.date>=fromV);
+  if(toV)trades=trades.filter(t=>t.date<=toV);
+
+  const empty=document.getElementById('rep-empty');
+  const content=document.getElementById('rep-content');
+  if(!trades.length){
+    empty.style.display='';
+    content.style.display='none';
+    return;
+  }
+  empty.style.display='none';
+  content.style.display='';
+
+  renderRepPairs(trades);
+  renderRepDays(trades);
+  renderRepStreak(trades);
+  renderRepSessions(trades);
+  renderRepLongShort(trades);
+}
+
+function renderRepPairs(trades){
+  const wrap=document.getElementById('rep-pairs');
+  const byPair={};
+  trades.forEach(t=>{
+    if(!byPair[t.symbol])byPair[t.symbol]={n:0,wins:0,be:0,pnl:0};
+    byPair[t.symbol].n++;
+    if(t.outcome==='Win'||t.outcome==='Partial')byPair[t.symbol].wins++;
+    if(t.outcome==='Break Even')byPair[t.symbol].be++;
+    byPair[t.symbol].pnl+=(t.pnl||0);
+  });
+  const sorted=Object.entries(byPair).sort((a,b)=>b[1].n-a[1].n).slice(0,6);
+  const maxN=sorted.length?sorted[0][1].n:1;
+  wrap.innerHTML=sorted.map(([sym,d])=>{
+    const decisive=d.n-d.be;
+    const wr=decisive>0?Math.round(d.wins/decisive*100):0;
+    return`<div class="rep-bar-row">
+      <div class="rep-bar-top">
+        <span class="rep-bar-name">${PAIRS[sym]||sym}</span>
+        <span class="rep-bar-sub">${d.n} trade${d.n>1?'s':''} · ${wr}% WR · <span style="color:${d.pnl>=0?'var(--green)':'var(--red)'}">${d.pnl>=0?'+':''}$${Math.abs(Math.round(d.pnl)).toLocaleString()}</span></span>
+      </div>
+      <div class="rep-bar-bg"><div class="rep-bar-fill" style="width:${Math.round(d.n/maxN*100)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderRepDays(trades){
+  const wrap=document.getElementById('rep-days');
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const byDow=Array.from({length:7},()=>({n:0,wins:0,be:0,pnl:0}));
+  trades.forEach(t=>{
+    const dow=new Date(t.date+'T00:00:00').getDay();
+    byDow[dow].n++;
+    if(t.outcome==='Win'||t.outcome==='Partial')byDow[dow].wins++;
+    if(t.outcome==='Break Even')byDow[dow].be++;
+    byDow[dow].pnl+=(t.pnl||0);
+  });
+  const active=byDow.map((d,i)=>({...d,i})).filter(d=>d.n>0).sort((a,b)=>b.pnl-a.pnl);
+  if(!active.length){wrap.innerHTML='<div style="font-size:13px;color:var(--text3)">No data.</div>';return;}
+  const maxAbs=Math.max(...active.map(d=>Math.abs(d.pnl)),1);
+  wrap.innerHTML=active.map(d=>{
+    const decisive=d.n-d.be;
+    const wr=decisive>0?Math.round(d.wins/decisive*100):0;
+    const pct=Math.round(Math.abs(d.pnl)/maxAbs*100);
+    return`<div class="rep-bar-row">
+      <div class="rep-bar-top">
+        <span class="rep-bar-name">${dayNames[d.i]}</span>
+        <span class="rep-bar-sub">${d.n} trade${d.n>1?'s':''} · ${wr}% WR · <span style="color:${d.pnl>=0?'var(--green)':'var(--red)'}">${d.pnl>=0?'+':''}$${Math.abs(Math.round(d.pnl)).toLocaleString()}</span></span>
+      </div>
+      <div class="rep-bar-bg"><div class="rep-bar-fill" style="width:${pct}%;background:${d.pnl>=0?'var(--green)':'var(--red)'}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderRepStreak(trades){
+  const wrap=document.getElementById('rep-streak');
+  const decisive=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial'||t.outcome==='Loss');
+  if(!decisive.length){wrap.innerHTML='<div style="font-size:13px;color:var(--text3)">No decisive trades yet.</div>';return;}
+  let curStreak=0,curType='',longestWin=0,longestLoss=0,tmpW=0,tmpL=0;
+  decisive.forEach(t=>{
+    const isWin=t.outcome==='Win'||t.outcome==='Partial';
+    if(isWin){
+      tmpW++;tmpL=0;
+      if(curType==='win')curStreak++;else{curType='win';curStreak=1;}
+      longestWin=Math.max(longestWin,tmpW);
+    } else {
+      tmpL++;tmpW=0;
+      if(curType==='loss')curStreak++;else{curType='loss';curStreak=1;}
+      longestLoss=Math.max(longestLoss,tmpL);
+    }
+  });
+  const color=curType==='win'?'var(--green)':'var(--red)';
+  const label=curType==='win'?'Win streak':'Loss streak';
+  wrap.innerHTML=`<div class="rep-streak-box">
+    <div class="rep-streak-num" style="color:${color}">${curStreak}</div>
+    <div class="rep-streak-lbl">${label}</div>
+    <div class="rep-streak-sub">
+      <div><div class="v" style="color:var(--green)">${longestWin}</div><div class="l">Best Win Streak</div></div>
+      <div><div class="v" style="color:var(--red)">${longestLoss}</div><div class="l">Worst Loss Streak</div></div>
+    </div>
+  </div>`;
+}
+
+function renderRepSessions(trades){
+  const wrap=document.getElementById('rep-sessions');
+  const sessions=['London','NewYork','Asia'].map(sess=>{
+    const st=trades.filter(t=>t.session===sess);
+    const n=st.length;
+    const wins=st.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+    const be=st.filter(t=>t.outcome==='Break Even').length;
+    const decisive=n-be;
+    const wr=decisive>0?Math.round(wins/decisive*100):0;
+    const pnl=st.reduce((s,t)=>s+(t.pnl||0),0);
+    return{sess,n,wr,pnl};
+  }).filter(s=>s.n>0).sort((a,b)=>b.wr-a.wr);
+  if(!sessions.length){wrap.innerHTML='<div style="font-size:13px;color:var(--text3)">No data.</div>';return;}
+  wrap.innerHTML=sessions.map(s=>`<div class="rep-bar-row">
+    <div class="rep-bar-top">
+      <span class="rep-bar-name">${SESS_LABELS[s.sess]||s.sess}</span>
+      <span class="rep-bar-sub">${s.n} trade${s.n>1?'s':''} · <span style="color:${s.pnl>=0?'var(--green)':'var(--red)'}">${s.pnl>=0?'+':''}$${Math.abs(Math.round(s.pnl)).toLocaleString()}</span></span>
+    </div>
+    <div class="rep-bar-bg"><div class="rep-bar-fill" style="width:${s.wr}%;background:${s.wr>=60?'var(--green)':s.wr>=40?'var(--gold)':'var(--red)'}"></div></div>
+  </div>`).join('');
+}
+
+function renderRepLongShort(trades){
+  const wrap=document.getElementById('rep-longshort');
+  const build=dir=>{
+    const st=trades.filter(t=>t.direction===dir);
+    const n=st.length;
+    const wins=st.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+    const be=st.filter(t=>t.outcome==='Break Even').length;
+    const losses=st.filter(t=>t.outcome==='Loss').length;
+    const decisive=n-be;
+    const wr=decisive>0?Math.round(wins/decisive*100):0;
+    const pnl=st.reduce((s,t)=>s+(t.pnl||0),0);
+    return{n,wins,losses,wr,pnl};
+  };
+  const long=build('Long'),short=build('Short');
+  const box=(title,icon,d)=>`<div class="rep-ls-box">
+    <div class="ls-icon"><i class="ti ${icon}" style="color:${d.n?(d.wr>=50?'var(--green)':'var(--red)'):'var(--text3)'}"></i></div>
+    <div class="ls-title">${title}</div>
+    <div class="ls-wr" style="color:${d.n?(d.wr>=50?'var(--green)':'var(--red)'):'var(--text3)'}">${d.n?d.wr+'%':'—'}</div>
+    <div class="ls-row">
+      <div>Trades <span>${d.n}</span></div>
+      <div>W <span style="color:var(--green)">${d.wins}</span></div>
+      <div>L <span style="color:var(--red)">${d.losses}</span></div>
+      <div>P&amp;L <span style="color:${d.pnl>=0?'var(--green)':'var(--red)'}">${d.n?(d.pnl>=0?'+':'')+'$'+Math.abs(Math.round(d.pnl)).toLocaleString():'—'}</span></div>
+    </div>
+  </div>`;
+  wrap.innerHTML=`<div class="rep-ls-wrap">${box('Long','ti-arrow-up-right',long)}${box('Short','ti-arrow-down-right',short)}</div>`;
+}
+
 
 
 // ── Edit Trade ────────────────────────────────────────────────
