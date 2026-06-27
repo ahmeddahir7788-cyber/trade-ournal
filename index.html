@@ -639,15 +639,9 @@ table.tt tr:last-child td{border-bottom:none}
       <button onclick="closeOverlay('day-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1;padding:4px">×</button>
     </div>
     <!-- Day trades list -->
-    <div id="day-modal-trades" style="margin-bottom:1rem"></div>
-    <!-- Day notes -->
-    <div class="field" style="margin-bottom:1rem">
-      <label style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block">📝 Daily Notes</label>
-      <textarea id="day-modal-notes" placeholder="How was the market today? What did you do well? What could you improve?" style="width:100%;min-height:100px;font-family:'Inter',sans-serif;font-size:13px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;resize:vertical;line-height:1.5"></textarea>
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:8px">
-      <button class="mc mactions" onclick="closeOverlay('day-modal')" style="padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;background:var(--surface2);color:var(--text2)">Close</button>
-      <button class="mp mactions" onclick="saveDayNotes()" style="padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:var(--blue);color:#fff">Save Notes</button>
+    <div id="day-modal-trades"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+      <button class="mc mactions" onclick="closeOverlay('day-modal')" style="padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;background:var(--surface2);color:var(--text2)">Close</button>
     </div>
   </div>
 </div>
@@ -1881,20 +1875,7 @@ function openDayJournal(dateStr){
     sub.textContent='No trades this day';
     tradesWrap.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades logged for this day.</div>`;
   }
-  // Load saved notes
-  const notes=db.dayNotes||{};
-  document.getElementById('day-modal-notes').value=notes[dateStr]||'';
   document.getElementById('day-modal').classList.add('open');
-}
-
-function saveDayNotes(){
-  if(!currentDayKey)return;
-  if(!db.dayNotes)db.dayNotes={};
-  const val=document.getElementById('day-modal-notes').value.trim();
-  if(val)db.dayNotes[currentDayKey]=val;
-  else delete db.dayNotes[currentDayKey];
-  persist();
-  closeOverlay('day-modal');
 }
 
 // ── Init ──────────────────────────────────────────────────────
