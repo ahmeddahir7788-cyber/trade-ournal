@@ -322,6 +322,26 @@ table.tt tr:last-child td{border-bottom:none}
 .pf-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .pf-form-grid .field.full{grid-column:1/-1}
 
+/* PLAYBOOKS */
+.pb-card-desc{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pb-stat-row{display:flex;justify-content:space-between;text-align:center;background:var(--surface2);border-radius:var(--r);padding:10px 4px;margin-bottom:12px}
+.pb-stat{flex:1}
+.pb-stat-val{font-size:16px;font-weight:700}
+.pb-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.pb-criteria-count{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px}
+/* Criteria row builder inside Add/Edit Playbook modal */
+.pb-criteria-row{display:flex;align-items:center;gap:8px}
+.pb-criteria-num{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0}
+.pb-criteria-row input{flex:1}
+.pb-criteria-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:2px 6px;flex-shrink:0}
+.pb-criteria-remove:hover{color:var(--red)}
+/* Checklist rows shown in Playbook detail and inside Add/Edit Trade */
+.pb-check-row{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 10px;background:var(--surface2);border-radius:var(--r)}
+.pb-check-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.pb-check-row label{flex:1;cursor:pointer;color:var(--text2)}
+.pb-trade-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:8px 10px;background:var(--surface2);border-radius:var(--r);cursor:pointer}
+.pb-trade-row:hover{background:var(--border)}
+
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
@@ -348,6 +368,7 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="go('log',this)"><i class="ti ti-plus"></i><span class="nav-label">Add Trade</span></button>
     <button onclick="go('trades',this)"><i class="ti ti-list"></i><span class="nav-label">Trades</span></button>
     <button onclick="go('accounts',this)"><i class="ti ti-building-bank"></i><span class="nav-label">Accounts</span></button>
+    <button onclick="go('playbooks',this)"><i class="ti ti-notebook"></i><span class="nav-label">Playbooks</span></button>
   </nav>
   <div class="sb-bottom">
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
@@ -516,6 +537,15 @@ table.tt tr:last-child td{border-bottom:none}
             <span id="f-img-trigger-title">Add</span>
           </button>
         </div>
+        <div class="field"><label>Playbook (optional)</label>
+          <select id="f-playbook" onchange="onTradePlaybookChange('f')">
+            <option value="">No playbook</option>
+          </select>
+        </div>
+      </div>
+      <div id="f-checklist-wrap" style="display:none;margin-bottom:16px">
+        <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
+        <div id="f-checklist-list" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
       <div class="field notes-field" style="margin-bottom:16px">
         <label>Notes (optional)</label>
@@ -586,6 +616,15 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="pf-cards" class="pf-cards"></div>
   </div>
 
+  <!-- PLAYBOOKS -->
+  <div id="page-playbooks" class="page">
+    <div class="pf-filter-row" style="margin-bottom:1.25rem">
+      <div></div>
+      <button class="btn-blue" onclick="openPlaybookModal()"><i class="ti ti-plus"></i> Add playbook</button>
+    </div>
+    <div id="pb-cards" class="pf-cards"></div>
+  </div>
+
 </div>
 </div>
 
@@ -625,6 +664,61 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="mc" onclick="closeOverlay('pf-del-modal')">Cancel</button>
       <button class="md" onclick="confirmPFDelete()">Delete</button>
     </div>
+  </div>
+</div>
+
+<!-- PLAYBOOK MODAL -->
+<div class="overlay" id="playbook-modal">
+  <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 id="playbook-modal-title" style="margin-bottom:0">Add playbook</h2>
+      <button onclick="closeOverlay('playbook-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Name</label>
+      <input type="text" id="pb-name" placeholder="e.g. ICT Breakout, London Reversal..."/>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Description</label>
+      <textarea id="pb-desc" placeholder="What is this setup? When do you take it?" style="min-height:64px"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:8px">
+      <label>Criteria / Checklist</label>
+    </div>
+    <div id="pb-criteria-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+    <button type="button" class="btn-ghost" onclick="addCriteriaRow()" style="margin-bottom:18px"><i class="ti ti-plus"></i> Add criteria</button>
+    <div class="mactions">
+      <button class="mc" onclick="closeOverlay('playbook-modal')">Cancel</button>
+      <button class="mp" id="pb-save-btn" onclick="savePlaybook()">Create playbook</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE PLAYBOOK MODAL -->
+<div class="overlay" id="playbook-del-modal">
+  <div class="modal">
+    <h2>Delete this playbook?</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Trades that used this playbook will keep their data, but will no longer be linked to it.</p>
+    <div class="mactions">
+      <button class="mc" onclick="closeOverlay('playbook-del-modal')">Cancel</button>
+      <button class="md" onclick="confirmPlaybookDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYBOOK DETAIL MODAL -->
+<div class="overlay" id="playbook-detail-modal">
+  <div class="modal" style="max-width:560px;max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <h2 id="pbd-title" style="margin-bottom:0">Playbook</h2>
+      <button onclick="closeOverlay('playbook-detail-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
+    </div>
+    <p id="pbd-desc" style="font-size:13px;color:var(--text2);margin-bottom:1rem"></p>
+    <div class="metric-grid" id="pbd-stats" style="margin-bottom:1.25rem"></div>
+    <div class="field" style="margin-bottom:8px"><label>Criteria</label></div>
+    <div id="pbd-criteria" style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem"></div>
+    <div class="field" style="margin-bottom:8px"><label>Trades using this playbook</label></div>
+    <div id="pbd-trades" style="display:flex;flex-direction:column;gap:6px"></div>
   </div>
 </div>
 
@@ -699,6 +793,15 @@ table.tt tr:last-child td{border-bottom:none}
           <span id="et-img-trigger-title">Add</span>
         </button>
       </div>
+      <div class="field"><label>Playbook (optional)</label>
+        <select id="et-playbook" onchange="onTradePlaybookChange('et')">
+          <option value="">No playbook</option>
+        </select>
+      </div>
+    </div>
+    <div id="et-checklist-wrap" style="display:none;margin-bottom:16px">
+      <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
+      <div id="et-checklist-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
     <div class="field notes-field" style="margin-bottom:16px">
       <label>Notes (optional)</label>
@@ -760,12 +863,14 @@ const PF_STEPS={'1-step':['Phase 1','Funded','Payout'],'2-step':['Phase 1','Phas
 
 // ── State ─────────────────────────────────────────────────────
 // db.trades: { "2026-06": [{id,date,symbol,session,direction,outcome,pnl,rr},...], ... }
-let db={trades:{},propfirms:[]};
+let db={trades:{},propfirms:[],playbooks:[]};
 let eqChart=null;
 let currentDashKey=null;
 let currentDetailKey=null;
 let pendingDelTradeId=null, pendingDelKey=null;
 let pfEditId=null,pfDeleteId=null;
+let pbCriteriaCount=0; // number of criteria rows currently in the Add/Edit Playbook modal
+let pbEditId=null,pbDeleteId=null,pbDetailId=null;
 let fImages=[]; // staged images for Add Trade form
 let etImages=[]; // staged images for Edit Trade form
 let displayMode='dollar'; // 'dollar' | 'percent'
@@ -819,6 +924,7 @@ function loadDB(){
   if(!db.trades)db.trades={};
   if(!db.propfirms)db.propfirms=[];
   if(!db.dayNotes)db.dayNotes={};
+  if(!db.playbooks)db.playbooks=[];
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
   // Clean phantom trades (trades with missing required fields)
   Object.keys(db.trades).forEach(k=>{
@@ -879,7 +985,8 @@ const PAGE_LABELS={
   dashboard:{icon:'ti-layout-dashboard',label:'Dashboard'},
   log:{icon:'ti-plus',label:'Log Trade'},
   trades:{icon:'ti-list',label:'Trades'},
-  accounts:{icon:'ti-building-bank',label:'Accounts'}
+  accounts:{icon:'ti-building-bank',label:'Accounts'},
+  playbooks:{icon:'ti-notebook',label:'Playbooks'}
 };
 function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -914,6 +1021,7 @@ function go(id,btn){
   if(id==='log')initLogPage();
   if(id==='trades'){initTradeYearSel();renderMonthCards();}
   if(id==='accounts')renderAccounts();
+  if(id==='playbooks')renderPlaybooks();
 }
 
 // ── Dashboard selectors ───────────────────────────────────────
@@ -1394,6 +1502,8 @@ function initLogPage(){
   document.getElementById('f-dir').value='';
   document.getElementById('f-out').value='';
   renderImagePreview('f');
+  populatePlaybookDropdown('f');
+  renderTradeChecklist('f');
   updateLogHint();
 }
 function updateLogHint(){
@@ -1529,6 +1639,8 @@ function saveTrade(){
   const rawPnl=Math.abs(parseFloat(pnlEl.value));
   const outcome=outEl.value;
   const finalPnl=outcome==='Loss'?-rawPnl:rawPnl;
+  const pbSel=document.getElementById('f-playbook');
+  const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
@@ -1538,7 +1650,9 @@ function saveTrade(){
     pnl:finalPnl,
     rr:parseFloat(rrEl.value),
     images:fImages.slice(),
-    notes:document.getElementById('f-notes').value.trim()
+    notes:document.getElementById('f-notes').value.trim(),
+    playbookId,
+    checklistResults:playbookId?readChecklistResults('f'):[]
   });
   db.trades[key].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   const ok=persist();
@@ -1552,6 +1666,8 @@ function saveTrade(){
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
   fImages=[];renderImagePreview('f');
   document.getElementById('f-notes').value='';
+  if(pbSel)pbSel.value='';
+  renderTradeChecklist('f');
   updateLogHint();
   if(currentDashKey===key)refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
@@ -1774,6 +1890,228 @@ function renderAccounts(){
 
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
 
+// ── Playbooks ─────────────────────────────────────────────────
+function addCriteriaRow(text){
+  pbCriteriaCount++;
+  const num=pbCriteriaCount;
+  const wrap=document.getElementById('pb-criteria-list');
+  const row=document.createElement('div');
+  row.className='pb-criteria-row';
+  row.id='pb-crit-row-'+num;
+  row.innerHTML=`<div class="pb-criteria-num">${num}</div>
+    <input type="text" id="pb-crit-${num}" placeholder="e.g. Price above 200 EMA" value="${(text||'').replace(/"/g,'&quot;')}"/>
+    <button type="button" class="pb-criteria-remove" onclick="removeCriteriaRow(${num})" title="Remove">×</button>`;
+  wrap.appendChild(row);
+}
+
+function removeCriteriaRow(num){
+  const row=document.getElementById('pb-crit-row-'+num);
+  if(row)row.remove();
+  renumberCriteriaRows();
+}
+
+function renumberCriteriaRows(){
+  const wrap=document.getElementById('pb-criteria-list');
+  const rows=Array.from(wrap.children);
+  rows.forEach((row,i)=>{
+    row.querySelector('.pb-criteria-num').textContent=i+1;
+  });
+  pbCriteriaCount=rows.length;
+}
+
+function openPlaybookModal(id){
+  pbEditId=id||null;
+  document.getElementById('playbook-modal-title').textContent=id?'Edit playbook':'Add playbook';
+  document.getElementById('pb-save-btn').textContent=id?'Save changes':'Create playbook';
+  document.getElementById('pb-criteria-list').innerHTML='';
+  pbCriteriaCount=0;
+  if(id){
+    const pb=db.playbooks.find(p=>p.id===id);if(!pb)return;
+    document.getElementById('pb-name').value=pb.name||'';
+    document.getElementById('pb-desc').value=pb.description||'';
+    (pb.criteria||[]).forEach(c=>addCriteriaRow(c));
+    if(!pb.criteria||!pb.criteria.length)addCriteriaRow();
+  } else {
+    document.getElementById('pb-name').value='';
+    document.getElementById('pb-desc').value='';
+    addCriteriaRow();
+    addCriteriaRow();
+  }
+  document.getElementById('playbook-modal').classList.add('open');
+}
+
+function savePlaybook(){
+  const name=document.getElementById('pb-name').value.trim();
+  if(!name){alert('Please enter a playbook name.');return;}
+  const desc=document.getElementById('pb-desc').value.trim();
+  const wrap=document.getElementById('pb-criteria-list');
+  const criteria=Array.from(wrap.children)
+    .map(row=>row.querySelector('input').value.trim())
+    .filter(v=>v);
+  const pb={
+    id:pbEditId||Date.now(),
+    name,
+    description:desc,
+    criteria
+  };
+  if(pbEditId)db.playbooks=db.playbooks.map(p=>p.id===pbEditId?pb:p);
+  else db.playbooks.push(pb);
+  persist();
+  closeOverlay('playbook-modal');
+  renderPlaybooks();
+  pbEditId=null;
+}
+
+function askPlaybookDelete(id){pbDeleteId=id;document.getElementById('playbook-del-modal').classList.add('open');}
+function confirmPlaybookDelete(){
+  if(!pbDeleteId)return;
+  db.playbooks=db.playbooks.filter(p=>p.id!==pbDeleteId);
+  pbDeleteId=null;
+  persist();
+  closeOverlay('playbook-del-modal');
+  renderPlaybooks();
+}
+
+// Gather every trade across all months that references a given playbook id
+function tradesForPlaybook(pbId){
+  return Object.values(db.trades).flat().filter(t=>t.playbookId===pbId);
+}
+
+function renderPlaybooks(){
+  const wrap=document.getElementById('pb-cards');
+  if(!wrap)return;
+  if(!db.playbooks.length){
+    wrap.innerHTML='<div class="empty"><i class="ti ti-notebook"></i>No playbooks yet. Add your first trading setup!</div>';
+    return;
+  }
+  wrap.innerHTML=db.playbooks.map(pb=>{
+    const trades=tradesForPlaybook(pb.id);
+    const n=trades.length;
+    const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+    const losses=trades.filter(t=>t.outcome==='Loss').length;
+    const be=trades.filter(t=>t.outcome==='Break Even').length;
+    const decisive=n-be;
+    const wr=decisive>0?Math.round(wins/decisive*100):0;
+    const pnl=trades.reduce((s,t)=>s+(t.pnl||0),0);
+    return`<div class="pf-card">
+      <div class="pf-card-top">
+        <div><div class="pf-firm-name">${pb.name}</div></div>
+      </div>
+      <div class="pb-card-desc">${pb.description||'No description'}</div>
+      <div class="pb-stat-row">
+        <div class="pb-stat"><div class="pb-stat-val blue">${n}</div><div class="pb-stat-lbl">Trades</div></div>
+        <div class="pb-stat"><div class="pb-stat-val" style="color:${wr>=50?'var(--green)':'var(--red)'}">${n?wr+'%':'—'}</div><div class="pb-stat-lbl">Win Rate</div></div>
+        <div class="pb-stat"><div class="pb-stat-val" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${n?(pnl>=0?'+':'')+'$'+Math.abs(Math.round(pnl)).toLocaleString():'—'}</div><div class="pb-stat-lbl">Net P&amp;L</div></div>
+      </div>
+      <div class="pb-criteria-count"><i class="ti ti-list-check"></i> ${(pb.criteria||[]).length} criteria</div>
+      <div class="pf-card-actions">
+        <button class="pf-btn" onclick="openPlaybookDetail(${pb.id})"><i class="ti ti-eye"></i> View</button>
+        <button class="pf-btn" onclick="openPlaybookModal(${pb.id})"><i class="ti ti-pencil"></i> Edit</button>
+        <button class="pf-btn del" onclick="askPlaybookDelete(${pb.id})"><i class="ti ti-trash"></i> Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPlaybookDetail(id){
+  const pb=db.playbooks.find(p=>p.id===id);if(!pb)return;
+  pbDetailId=id;
+  document.getElementById('pbd-title').textContent=pb.name;
+  document.getElementById('pbd-desc').textContent=pb.description||'No description';
+  const trades=tradesForPlaybook(id).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id).reverse();
+  const n=trades.length;
+  const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+  const be=trades.filter(t=>t.outcome==='Break Even').length;
+  const decisive=n-be;
+  const wr=decisive>0?Math.round(wins/decisive*100):0;
+  const pnl=trades.reduce((s,t)=>s+(t.pnl||0),0);
+  document.getElementById('pbd-stats').innerHTML=`
+    <div class="metric"><div class="lbl">Trades</div><div class="val blue">${n}</div></div>
+    <div class="metric"><div class="lbl">Win Rate</div><div class="val" style="color:${wr>=50?'var(--green)':'var(--red)'}">${n?wr+'%':'—'}</div></div>
+    <div class="metric"><div class="lbl">Net P&amp;L</div><div class="val" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${n?(pnl>=0?'+':'')+'$'+Math.abs(Math.round(pnl)).toLocaleString():'—'}</div></div>
+  `;
+  const criteria=pb.criteria||[];
+  document.getElementById('pbd-criteria').innerHTML=criteria.length
+    ?criteria.map((c,i)=>{
+      // Show how often each criteria was followed across trades that used this playbook
+      const followedCount=trades.filter(t=>t.checklistResults&&t.checklistResults[i]).length;
+      const pct=n?Math.round(followedCount/n*100):0;
+      return`<div class="pb-check-row" style="cursor:default">
+        <span style="width:20px;height:20px;border-radius:50%;background:var(--surface);border:.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${i+1}</span>
+        <label style="flex:1;cursor:default">${c}</label>
+        <span style="font-size:11px;color:var(--text3)">${n?pct+'% of trades':''}</span>
+      </div>`;
+    }).join('')
+    :'<div style="font-size:13px;color:var(--text3)">No criteria defined.</div>';
+  const tradesWrap=document.getElementById('pbd-trades');
+  tradesWrap.innerHTML=n
+    ?trades.map(t=>`<div class="pb-trade-row" onclick="closeOverlay('playbook-detail-modal');openEditTrade('${t.date.slice(0,7)}',${t.id})">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600">${PAIRS[t.symbol]||t.symbol}</span>
+          <span class="badge ${t.direction.toLowerCase()}">${t.direction}</span>
+          <span class="badge ${t.outcome==='Win'?'win':t.outcome==='Partial'?'partial':t.outcome==='Loss'?'loss':'be'}">${t.outcome}</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700;color:${(t.pnl||0)>=0?'var(--green)':'var(--red)'}">${(t.pnl||0)>=0?'+':''}$${Math.abs(t.pnl||0).toFixed(2)}</div>
+          <div style="font-size:10px;color:var(--text3)">${t.date}</div>
+        </div>
+      </div>`).join('')
+    :'<div style="font-size:13px;color:var(--text3)">No trades have used this playbook yet.</div>';
+  document.getElementById('playbook-detail-modal').classList.add('open');
+}
+
+// ── Playbook dropdown + checklist inside Add/Edit Trade ─────────
+function populatePlaybookDropdown(prefix){
+  const sel=document.getElementById(prefix+'-playbook');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">No playbook</option>'+
+    db.playbooks.map(pb=>`<option value="${pb.id}">${pb.name}</option>`).join('');
+  if(current&&db.playbooks.some(pb=>String(pb.id)===String(current)))sel.value=current;
+}
+
+// Renders the checklist for whichever playbook is currently selected.
+// existingResults: array of booleans (from the trade being edited) to restore checked state.
+function renderTradeChecklist(prefix,existingResults){
+  const sel=document.getElementById(prefix+'-playbook');
+  const wrap=document.getElementById(prefix+'-checklist-wrap');
+  const list=document.getElementById(prefix+'-checklist-list');
+  if(!sel||!wrap||!list)return;
+  const pbId=sel.value;
+  if(!pbId){
+    wrap.style.display='none';
+    list.innerHTML='';
+    return;
+  }
+  const pb=db.playbooks.find(p=>String(p.id)===String(pbId));
+  const criteria=pb&&pb.criteria?pb.criteria:[];
+  if(!criteria.length){
+    wrap.style.display='none';
+    list.innerHTML='';
+    return;
+  }
+  wrap.style.display='';
+  list.innerHTML=criteria.map((c,i)=>{
+    const checked=existingResults&&existingResults[i]?'checked':'';
+    return`<div class="pb-check-row">
+      <input type="checkbox" id="${prefix}-check-${i}" ${checked}/>
+      <label for="${prefix}-check-${i}">${c}</label>
+    </div>`;
+  }).join('');
+}
+
+function onTradePlaybookChange(prefix){
+  renderTradeChecklist(prefix);
+}
+
+// Reads the current checklist checkboxes back into a plain array of booleans
+function readChecklistResults(prefix){
+  const list=document.getElementById(prefix+'-checklist-list');
+  if(!list)return[];
+  return Array.from(list.querySelectorAll('input[type="checkbox"]')).map(cb=>cb.checked);
+}
+
+
 // ── Edit Trade ────────────────────────────────────────────────
 let editTradeKey=null, editTradeId=null;
 
@@ -1792,6 +2130,9 @@ function openEditTrade(key,id){
   etImages=(t.images||[]).slice();
   renderImagePreview('et');
   document.getElementById('et-notes').value=t.notes||'';
+  populatePlaybookDropdown('et');
+  document.getElementById('et-playbook').value=t.playbookId||'';
+  renderTradeChecklist('et',t.checklistResults);
   document.getElementById('edit-trade-modal').classList.add('open');
 }
 
@@ -1799,6 +2140,8 @@ function saveEditTrade(){
   if(!editTradeKey||!editTradeId)return;
   const newDate=document.getElementById('et-date').value;
   const newKey=dateToKey(newDate);
+  const pbSel=document.getElementById('et-playbook');
+  const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
   const updated={
     id:editTradeId,
     date:newDate,
@@ -1809,7 +2152,9 @@ function saveEditTrade(){
     pnl:(()=>{const v=Math.abs(parseFloat(document.getElementById('et-pnl').value)||0);const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
     rr:parseFloat(document.getElementById('et-rr').value)||null,
     images:etImages.slice(),
-    notes:document.getElementById('et-notes').value.trim()
+    notes:document.getElementById('et-notes').value.trim(),
+    playbookId,
+    checklistResults:playbookId?readChecklistResults('et'):[]
   };
   // Remove from old key
   db.trades[editTradeKey]=db.trades[editTradeKey].filter(t=>t.id!==editTradeId);
