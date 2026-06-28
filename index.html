@@ -15,7 +15,7 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s}
 
 /* SIDEBAR */
-.sidebar{width:230px;min-width:230px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
+.sidebar{width:270px;min-width:270px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
 .sidebar.collapsed{width:56px;min-width:56px}
 .sb-top{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:62px;border-bottom:.5px solid var(--border);flex-shrink:0}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;white-space:nowrap;color:var(--text)}
@@ -40,7 +40,7 @@ nav button:hover i{color:var(--text)}
 .sidebar.collapsed .sb-bottom-label{opacity:0;width:0}
 
 /* MAIN */
-.app-body{margin-left:230px;flex:1;min-height:100vh;transition:margin-left .25s}
+.app-body{margin-left:270px;flex:1;min-height:100vh;transition:margin-left .25s}
 .app-body.collapsed{margin-left:56px}
 .content{max-width:980px;margin:0 auto;padding:1.5rem 1.5rem;transition:max-width .25s}
 .app-body.collapsed .content{max-width:1180px}
