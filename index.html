@@ -145,7 +145,7 @@ nav button:hover i{color:var(--text)}
 /* Calendar header row with inline monthly stats and month navigation */
 .cal-header-row{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-title-nav{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.cal-nav-btn{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:15px}
+.cal-nav-btn{background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;width:24px;height:24px;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:13px;line-height:1}
 .cal-nav-btn:hover{background:var(--border);color:var(--text)}
 .cal-header-row h3{flex-shrink:0;min-width:120px}
 .cal-header-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
@@ -159,7 +159,6 @@ nav button:hover i{color:var(--text)}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:6px 0 8px;font-weight:500}
 .cal-day{border-radius:10px;padding:9px;height:88px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
-.cal-day-note-icon{position:absolute;bottom:5px;left:6px;font-size:11px;opacity:.55}
 .cal-day.empty{background:transparent;height:88px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--surface2)}
@@ -1500,7 +1499,6 @@ function renderCalendar(key,trades){
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trades">${dayWr}%</div>
-        <i class="ti ti-notebook cal-day-note-icon" title="Open day journal"></i>
       </div>`;
     } else {
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
