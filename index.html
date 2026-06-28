@@ -142,22 +142,24 @@ nav button:hover i{color:var(--text)}
 
 /* CALENDAR */
 .cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start}
-/* Calendar month stats row */
-/* Calendar header row with inline monthly stats */
+/* Calendar header row with inline monthly stats and month navigation */
 .cal-header-row{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
-.cal-header-row h3{flex-shrink:0}
-.cal-header-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}
+.cal-title-nav{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cal-nav-btn{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:15px}
+.cal-nav-btn:hover{background:var(--border);color:var(--text)}
+.cal-header-row h3{flex-shrink:0;min-width:120px}
+.cal-header-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
 .cms-label{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
 .cms-chip{font-size:13px;font-weight:600;padding:5px 14px;border-radius:100px;background:rgba(29,158,117,0.12);color:var(--green);white-space:nowrap}
 .cms-chip.cms-neg{background:rgba(216,90,48,0.12);color:var(--red)}
 .cms-chip-purple{background:rgba(167,139,250,0.15);color:var(--purple)}
-.cal-header-row .dm-toggle{margin-left:auto;flex-shrink:0}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:6px 0 8px;font-weight:500}
 .cal-day{border-radius:10px;padding:9px;height:88px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
+.cal-day-note-icon{position:absolute;bottom:5px;left:6px;font-size:11px;opacity:.55}
 .cal-day.empty{background:transparent;height:88px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--surface2)}
@@ -447,6 +449,10 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
+    <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
+      <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
+      <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
+    </div>
   </div>
 </div>
 <div class="content">
@@ -531,15 +537,15 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div class="card" style="margin-top:12px">
       <div class="cal-header-row">
-        <h3 id="cal-title" style="margin:0">Calendar</h3>
+        <div class="cal-title-nav">
+          <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+          <h3 id="cal-title" style="margin:0">Calendar</h3>
+          <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+        </div>
         <div class="cal-header-stats">
           <span class="cms-label">Monthly stats:</span>
           <span class="cms-chip" id="cms-pnl-chip">$0</span>
           <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
-        </div>
-        <div class="dm-toggle">
-          <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
-          <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
         </div>
       </div>
       <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
@@ -1060,6 +1066,30 @@ function refreshCurrentDashboardView(){
   }
 }
 
+// Step the calendar's month forward (1) or backward (-1) using the arrow buttons in its header
+function navMonth(direction){
+  const key=currentDashKey||curMonthKey();
+  const[y,m]=key.split('-').map(Number);
+  let newY=y,newM=m+direction;
+  if(newM<1){newM=12;newY--;}
+  else if(newM>12){newM=1;newY++;}
+  const newKey=mkKey(newY,newM);
+  currentDashKey=newKey;
+  // Keep the Monthly dropdowns in sync in case the user switches back to Monthly view
+  const ySel=document.getElementById('dash-year-sel');
+  const mSel=document.getElementById('dash-month-sel');
+  if(ySel){
+    if(!Array.from(ySel.options).some(o=>o.value===String(newY))){
+      const opt=document.createElement('option');
+      opt.value=newY;opt.textContent=newY;
+      ySel.appendChild(opt);
+    }
+    ySel.value=newY;
+  }
+  if(mSel)mSel.value=newM;
+  refreshCurrentDashboardView();
+}
+
 // ── Sidebar ───────────────────────────────────────────────────
 function isMobileViewport(){return window.innerWidth<=768}
 
@@ -1134,10 +1164,12 @@ function go(id,btn){
   const pSel=document.getElementById('dash-period-sel');
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
+  const dmWrap=document.getElementById('dm-toggle-topbar');
   if(id==='dashboard'){
     if(pSel)pSel.style.display='';
     if(ySel)ySel.style.display='';
     if(mSel)mSel.style.display='';
+    if(dmWrap)dmWrap.style.display='';
     const dmDollar=document.getElementById('dm-btn-dollar');
     const dmPct=document.getElementById('dm-btn-pct');
     if(dmDollar)dmDollar.classList.toggle('active',displayMode==='dollar');
@@ -1146,6 +1178,7 @@ function go(id,btn){
     if(pSel)pSel.style.display='none';
     if(ySel)ySel.style.display='none';
     if(mSel)mSel.style.display='none';
+    if(dmWrap)dmWrap.style.display='none';
   }
   if(id==='dashboard'){
     initDashSelectors();
@@ -1218,11 +1251,31 @@ function renderDashboardWithTrades(trades,label){
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');
+  if(pe){
+    if(displayMode==='percent'){
+      const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);
+      pe.textContent=rrPct(rrSum);
+    } else {
+      pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
+    }
+    pe.className='stat-card-val';
+  }
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
-  const aw2=document.getElementById('m-avgwin');if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
-  const al2=document.getElementById('m-avgloss');if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+  const winRRs2=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
+  const lossRRs2=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
+  const avgWinRR2=winRRs2.length?winRRs2.reduce((a,b)=>a+b,0)/winRRs2.length:0;
+  const avgLossRR2=lossRRs2.length?lossRRs2.reduce((a,b)=>a+b,0)/lossRRs2.length:0;
+  const aw2=document.getElementById('m-avgwin');
+  const al2=document.getElementById('m-avgloss');
+  if(displayMode==='percent'){
+    if(aw2)aw2.textContent=winRRs2.length?'+'+Math.abs(Math.round(avgWinRR2*100)/100)+'R':'—';
+    if(al2)al2.textContent=lossRRs2.length?'-'+Math.abs(Math.round(avgLossRR2*100)/100)+'R':'—';
+  } else {
+    if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
+    if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+  }
   const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
   const rlb=document.getElementById('avgwl-red');if(rlb)rlb.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg2*100)+'%';
@@ -1315,11 +1368,31 @@ function renderDashboard(key){
   }
   document.getElementById('m-total').textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');if(pe){pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();pe.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');
+  if(pe){
+    if(displayMode==='percent'){
+      const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);
+      pe.textContent=rrPct(rrSum);
+    } else {
+      pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
+    }
+    pe.className='stat-card-val';
+  }
   const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
-  const aw=document.getElementById('m-avgwin');if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
-  const al=document.getElementById('m-avgloss');if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
+  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
+  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
+  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
+  const aw=document.getElementById('m-avgwin');
+  const al=document.getElementById('m-avgloss');
+  if(displayMode==='percent'){
+    if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
+    if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
+  } else {
+    if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
+    if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+  }
   // Avg win/loss bar
   const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
@@ -1427,6 +1500,7 @@ function renderCalendar(key,trades){
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trades">${dayWr}%</div>
+        <i class="ti ti-notebook cal-day-note-icon" title="Open day journal"></i>
       </div>`;
     } else {
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
@@ -1529,6 +1603,9 @@ function renderSessionStats(trades){
     // Share of total trades across active sessions
 
     const p=st.reduce((s,t)=>s+(t.pnl||0),0);
+    const rrSum=st.reduce((s,t)=>s+(t.rr||0),0);
+    const pStr=displayMode==='percent'?rrPct(rrSum):(p>=0?'+':'')+'$'+Math.abs(Math.round(p)).toLocaleString();
+    const pColor=displayMode==='percent'?(rrSum>=0?'var(--green)':'var(--red)'):(p>=0?'var(--green)':'var(--red)');
     const wc=wr>=60?'var(--green)':wr>=40?'var(--gold)':'var(--red)';
     return`<div class="sess-card">
       <div class="sess-top"><span class="sess ${sess}">${SESS_LABELS[sess]}</span><span class="sess-wr" style="color:${wc}">${wr}%</span></div>
@@ -1537,7 +1614,7 @@ function renderSessionStats(trades){
         <div class="sess-detail">Trades <span>${n}</span></div>
         <div class="sess-detail">W <span style="color:var(--green)">${wins}</span></div>
         <div class="sess-detail">L <span style="color:var(--red)">${losses}</span></div>
-        <div class="sess-detail">P&L <span style="color:${p>=0?'var(--green)':'var(--red)'}">${(p>=0?'+':'')+'$'+Math.abs(Math.round(p)).toLocaleString()}</span></div>
+        <div class="sess-detail">P&L <span style="color:${pColor}">${pStr}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -2576,6 +2653,7 @@ document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='p
 document.getElementById('dash-period-sel').style.display='';
 document.getElementById('dash-year-sel').style.display='';
 document.getElementById('dash-month-sel').style.display='';
+document.getElementById('dm-toggle-topbar').style.display='';
 
 // Global paste fallback: while the Screenshots manager is open and its zone is focused, route pasted clipboard images into it
 document.addEventListener('paste',function(e){
