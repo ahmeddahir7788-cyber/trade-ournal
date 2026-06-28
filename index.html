@@ -141,14 +141,14 @@ nav button:hover i{color:var(--text)}
 .stat-val{font-size:13px;font-weight:700;width:24px;text-align:right;flex-shrink:0}
 
 /* CALENDAR */
-.cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start;max-width:820px}
+.cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start;max-width:1000px}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:6px 0 8px;font-weight:500}
-.cal-day{border-radius:10px;padding:8px;height:76px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
-.cal-day.empty{background:transparent;height:76px;visibility:hidden;border:none}
+.cal-day{border-radius:10px;padding:9px;height:84px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
+.cal-day.empty{background:transparent;height:84px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--surface2)}
 .cal-day-clickable{cursor:pointer}
@@ -169,7 +169,7 @@ nav button:hover i{color:var(--text)}
 /* Weekly summary */
 .weekly-summary{display:flex;flex-direction:column;gap:0}
 .weekly-summary-title{font-size:12px;font-weight:600;color:var(--text3);padding-bottom:8px;margin-bottom:2px;border-bottom:.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
-.week-card{padding:14px 8px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:76px}
+.week-card{padding:14px 8px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:84px}
 .week-card-top{margin-bottom:4px}
 .week-name{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.03em}
 
@@ -1439,7 +1439,7 @@ function renderCalendar(key,trades){
     const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:76px;margin-bottom:${isLastRow?0:6}px">
+    wHtml+=`<div class="week-card" style="height:84px;margin-bottom:${isLastRow?0:6}px">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||(w+1)}</span></div>
       ${wTradeCount>0
         ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
