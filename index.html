@@ -143,10 +143,15 @@ nav button:hover i{color:var(--text)}
 /* CALENDAR */
 .cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start}
 /* Calendar month stats row */
-.cal-month-stats{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
-.cms-pill{background:var(--surface2);border-radius:var(--r);padding:9px 16px;flex:1;min-width:110px;text-align:center}
-.cms-pill .cms-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.cms-pill .cms-val{font-size:16px;font-weight:700}
+/* Calendar header row with inline monthly stats */
+.cal-header-row{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
+.cal-header-row h3{flex-shrink:0}
+.cal-header-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}
+.cms-label{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
+.cms-chip{font-size:13px;font-weight:600;padding:5px 14px;border-radius:100px;background:rgba(29,158,117,0.12);color:var(--green);white-space:nowrap}
+.cms-chip.cms-neg{background:rgba(216,90,48,0.12);color:var(--red)}
+.cms-chip-purple{background:rgba(167,139,250,0.15);color:var(--purple)}
+.cal-header-row .dm-toggle{margin-left:auto;flex-shrink:0}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
@@ -525,14 +530,18 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
     <div class="card" style="margin-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="cal-header-row">
         <h3 id="cal-title" style="margin:0">Calendar</h3>
+        <div class="cal-header-stats">
+          <span class="cms-label">Monthly stats:</span>
+          <span class="cms-chip" id="cms-pnl-chip">$0</span>
+          <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
+        </div>
         <div class="dm-toggle">
           <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
           <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
         </div>
       </div>
-      <div id="cal-month-stats" class="cal-month-stats"></div>
       <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
     </div>
   </div>
@@ -1360,21 +1369,26 @@ function renderCalendar(key,trades){
   // Update calendar title with month name
   const calTitle=document.getElementById('cal-title');
   if(calTitle)calTitle.textContent=MONTHS_FULL[m-1]+' '+y;
-  // Monthly stats row
-  const statsWrap=document.getElementById('cal-month-stats');
-  if(statsWrap){
+  // Monthly stats chips (inline in the header)
+  const pnlChip=document.getElementById('cms-pnl-chip');
+  const daysChip=document.getElementById('cms-days-chip');
+  if(pnlChip&&daysChip){
     const s=statsOf(trades);
     if(!s){
-      statsWrap.innerHTML='';
+      pnlChip.textContent=displayMode==='percent'?'0R':'$0';
+      pnlChip.className='cms-chip';
+      daysChip.textContent='0 days';
     } else {
-      const pnlStr=displayMode==='percent'?rrPct(trades.reduce((sum,t)=>sum+(t.rr||0),0)):(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
-      statsWrap.innerHTML=`
-        <div class="cms-pill"><div class="cms-lbl">Trades</div><div class="cms-val" style="color:var(--blue)">${s.n}</div></div>
-        <div class="cms-pill"><div class="cms-lbl">Win Rate</div><div class="cms-val" style="color:${s.wr>=50?'var(--green)':'var(--red)'}">${s.wr}%</div></div>
-        <div class="cms-pill"><div class="cms-lbl">P&amp;L</div><div class="cms-val" style="color:${s.tot>=0?'var(--green)':'var(--red)'}">${pnlStr}</div></div>
-        <div class="cms-pill"><div class="cms-lbl">Avg RR</div><div class="cms-val">${s.avgRR?s.avgRR+'R':'—'}</div></div>
-        <div class="cms-pill"><div class="cms-lbl">Total R</div><div class="cms-val" style="color:var(--purple)">${s.totalR?s.totalR+'R':'—'}</div></div>
-      `;
+      const tradingDays=new Set(trades.map(t=>t.date)).size;
+      if(displayMode==='percent'){
+        const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);
+        pnlChip.textContent=rrPct(rrSum);
+        pnlChip.className='cms-chip'+(rrSum<0?' cms-neg':'');
+      } else {
+        pnlChip.textContent=(s.tot>=0?'+':'-')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
+        pnlChip.className='cms-chip'+(s.tot<0?' cms-neg':'');
+      }
+      daysChip.textContent=tradingDays+' day'+(tradingDays>1?'s':'');
     }
   }
   const byDate={};
