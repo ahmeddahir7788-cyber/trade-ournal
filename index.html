@@ -142,6 +142,11 @@ nav button:hover i{color:var(--text)}
 
 /* CALENDAR */
 .cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start}
+/* Calendar month stats row */
+.cal-month-stats{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.cms-pill{background:var(--surface2);border-radius:var(--r);padding:9px 16px;flex:1;min-width:110px;text-align:center}
+.cms-pill .cms-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.cms-pill .cms-val{font-size:16px;font-weight:700}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
@@ -527,6 +532,7 @@ table.tt tr:last-child td{border-bottom:none}
           <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
         </div>
       </div>
+      <div id="cal-month-stats" class="cal-month-stats"></div>
       <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
     </div>
   </div>
@@ -1354,6 +1360,23 @@ function renderCalendar(key,trades){
   // Update calendar title with month name
   const calTitle=document.getElementById('cal-title');
   if(calTitle)calTitle.textContent=MONTHS_FULL[m-1]+' '+y;
+  // Monthly stats row
+  const statsWrap=document.getElementById('cal-month-stats');
+  if(statsWrap){
+    const s=statsOf(trades);
+    if(!s){
+      statsWrap.innerHTML='';
+    } else {
+      const pnlStr=displayMode==='percent'?rrPct(trades.reduce((sum,t)=>sum+(t.rr||0),0)):(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
+      statsWrap.innerHTML=`
+        <div class="cms-pill"><div class="cms-lbl">Trades</div><div class="cms-val" style="color:var(--blue)">${s.n}</div></div>
+        <div class="cms-pill"><div class="cms-lbl">Win Rate</div><div class="cms-val" style="color:${s.wr>=50?'var(--green)':'var(--red)'}">${s.wr}%</div></div>
+        <div class="cms-pill"><div class="cms-lbl">P&amp;L</div><div class="cms-val" style="color:${s.tot>=0?'var(--green)':'var(--red)'}">${pnlStr}</div></div>
+        <div class="cms-pill"><div class="cms-lbl">Avg RR</div><div class="cms-val">${s.avgRR?s.avgRR+'R':'—'}</div></div>
+        <div class="cms-pill"><div class="cms-lbl">Total R</div><div class="cms-val" style="color:var(--purple)">${s.totalR?s.totalR+'R':'—'}</div></div>
+      `;
+    }
+  }
   const byDate={};
   trades.forEach(t=>{
     if(!byDate[t.date])byDate[t.date]={pnl:0,rr:0,count:0};
