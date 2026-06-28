@@ -1063,6 +1063,12 @@ function toggleSidebar(){
   body.classList.toggle('collapsed',collapsed);
   if(iconTop)iconTop.className=collapsed?'ti ti-layout-sidebar-left-expand':'ti ti-layout-sidebar-left-collapse';
   localStorage.setItem('tj_v10_sb',collapsed?'1':'0');
+  // The content area's width animates (CSS transition) after this class toggle.
+  // Re-render the dashboard once that settles so the calendar grid and charts
+  // recalculate against the new width instead of staying stale/misaligned.
+  if(document.getElementById('page-dashboard').classList.contains('active')){
+    setTimeout(refreshCurrentDashboardView,260);
+  }
 }
 
 // Close the mobile drawer automatically after navigating to a page (better UX than leaving it open)
