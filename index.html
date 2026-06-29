@@ -96,7 +96,6 @@ nav button:hover i{color:var(--text)}
 /* Avg win/loss bar */
 .avgwl-bar-wrap{display:flex;flex-direction:column;gap:6px}
 .avgwl-bar{display:flex;height:8px;border-radius:100px;overflow:hidden;width:100%;position:relative}
-.avgwl-divider{position:absolute;left:50%;top:-2px;width:2px;height:12px;background:var(--bg);z-index:1;border-radius:2px}
 .avgwl-labels{display:flex;justify-content:space-between;margin-top:2px}
 .avgwl-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
 /* Mini bar chart for total trades */
@@ -501,12 +500,9 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="stat-card">
         <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
         <div class="stat-card-lbl">Profit Factor</div>
-        <div class="stat-card-val" id="m-pf">—</div>
-        <div class="pf-sub-row">
-          <span class="pf-sub-lbl">Avg RR</span><span class="pf-sub-val" id="m-avgrrx">—</span>
-        </div>
-        <div class="pf-sub-row">
-          <span class="pf-sub-lbl">Total R</span><span class="pf-sub-val" style="color:var(--purple)" id="m-totalr">—</span>
+        <div class="stat-card-bottom" style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
+          <div class="stat-card-val" id="m-pf">—</div>
+          <canvas id="pf-donut" width="56" height="56" style="flex-shrink:0"></canvas>
         </div>
       </div>
       <!-- Avg Win / Loss -->
@@ -518,7 +514,6 @@ table.tt tr:last-child td{border-bottom:none}
           <div class="avgwl-bar-wrap">
             <div class="avgwl-bar">
               <div id="avgwl-green" style="height:100%;background:var(--green);width:50%"></div>
-              <div class="avgwl-divider"></div>
               <div id="avgwl-red" style="height:100%;background:var(--red);width:50%"></div>
             </div>
             <div style="display:flex;justify-content:space-between;margin-top:10px">
@@ -1241,10 +1236,11 @@ function renderDashboardWithTrades(trades,label){
   const calMonthKey=currentDashKey||curMonthKey();
   const calMonthTrades=getTradesForKey(calMonthKey);
   if(!s){
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
+    ['m-wr','m-pnl','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
+    drawProfitFactorDonut(0,0);
     renderCalendar(calMonthKey,calMonthTrades);
     if(eqChart){eqChart.destroy();eqChart=null}return;
   }
@@ -1261,8 +1257,7 @@ function renderDashboardWithTrades(trades,label){
     pe.className='stat-card-val';
   }
   const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
-  const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
-  const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
+  drawProfitFactorDonut(s.grossWin||0,s.grossLoss||0);
   const winRRs2=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
   const lossRRs2=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
   const avgWinRR2=winRRs2.length?winRRs2.reduce((a,b)=>a+b,0)/winRRs2.length:0;
@@ -1360,8 +1355,9 @@ function renderDashboard(key){
   if(!s){
     // dash-sub removed
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['m-wr','m-pnl','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
     drawGauge(0,0,0);
+    drawProfitFactorDonut(0,0);
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
@@ -1382,8 +1378,7 @@ function renderDashboard(key){
     pe.className='stat-card-val';
   }
   const mpfEl2=document.getElementById('m-pf');if(mpfEl2)mpfEl2.textContent=s.pf!=null?s.pf:'—';
-  const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
-  document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
+  drawProfitFactorDonut(s.grossWin||0,s.grossLoss||0);
   const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
   const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
   const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
@@ -1437,7 +1432,7 @@ function statsOf(trades){
   const avgWin=wins+partials>0?(grossWin/(wins+partials)).toFixed(0):0;
   const avgLoss=losses>0?(grossLoss/losses).toFixed(0):0;
   const avgWinLossRatio=(avgLoss&&parseFloat(avgLoss)>0)?(parseFloat(avgWin)/parseFloat(avgLoss)).toFixed(2):null;
-  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss,avgWinLossRatio};
+  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss,avgWinLossRatio,grossWin,grossLoss};
 }
 
 // ── Calendar ──────────────────────────────────────────────────
@@ -1584,6 +1579,41 @@ function drawGauge(wins,be,losses){
   if(gEl)gEl.style.width=Math.round(wins/total*100)+'%';
   if(bEl)bEl.style.width=Math.round(be/total*100)+'%';
   if(rEl)rEl.style.width=Math.round(losses/total*100)+'%';
+}
+
+function drawProfitFactorDonut(grossWin,grossLoss){
+  const canvas=document.getElementById('pf-donut');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=56,H=56;
+  canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const total=grossWin+grossLoss;
+  const cx=W/2,cy=H/2,r=24,lineW=8;
+  if(total<=0){
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.lineWidth=lineW;
+    ctx.strokeStyle='rgba(255,255,255,0.1)';
+    ctx.stroke();
+    return;
+  }
+  const winFrac=grossWin/total;
+  const start=-Math.PI/2;
+  const winEnd=start+winFrac*Math.PI*2;
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,start,winEnd);
+  ctx.lineWidth=lineW;
+  ctx.strokeStyle='#1D9E75';
+  ctx.lineCap='butt';
+  ctx.stroke();
+  if(winFrac<1){
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,winEnd,start+Math.PI*2);
+    ctx.lineWidth=lineW;
+    ctx.strokeStyle='#D85A30';
+    ctx.stroke();
+  }
 }
 
 
