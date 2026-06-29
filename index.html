@@ -81,11 +81,11 @@ nav button:hover i{color:var(--text)}
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
-.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:14px 16px 12px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden;min-height:0}
-.stat-card-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
-.stat-card-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.stat-card-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:auto;color:var(--text)}
-.stat-card-bottom{margin-top:12px}
+.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:11px 13px 10px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden;min-height:0}
+.stat-card-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:7px}
+.stat-card-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.stat-card-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:auto;color:var(--text)}
+.stat-card-bottom{margin-top:8px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
 .gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
@@ -95,19 +95,17 @@ nav button:hover i{color:var(--text)}
 .gc.red{background:rgba(216,90,48,0.15);color:var(--red)}
 /* Avg win/loss bar */
 .avgwl-bar-wrap{display:flex;flex-direction:column;gap:6px}
-.avgwl-bar{display:flex;height:10px;border-radius:100px;overflow:hidden;width:100%;position:relative}
+.avgwl-bar{display:flex;height:8px;border-radius:100px;overflow:hidden;width:100%;position:relative}
 .avgwl-divider{position:absolute;left:50%;top:-2px;width:2px;height:12px;background:var(--bg);z-index:1;border-radius:2px}
 .avgwl-labels{display:flex;justify-content:space-between;margin-top:2px}
 .avgwl-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
 /* Mini bar chart for total trades */
-.mini-bars{display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:8px}
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:30px;margin-top:6px}
 .mini-bar{flex:1;border-radius:3px 3px 0 0;min-width:6px;transition:height .3s}
-/* RR stats list */
-.rr-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-.rr-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:.5px solid var(--border)}
-.rr-row:last-child{border-bottom:none;padding-bottom:0}
-.rr-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
-.rr-val{font-size:16px;font-weight:700}
+/* Profit Factor card's secondary stat rows */
+.pf-sub-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-top:4px}
+.pf-sub-lbl{color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.pf-sub-val{font-weight:700;color:var(--text)}
 .metric{background:var(--card);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:0 1px 4px var(--shadow)}
 .metric .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .metric .val{font-size:22px;font-weight:600}
@@ -476,7 +474,7 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="stat-card">
         <div class="stat-card-icon" style="background:rgba(55,138,221,0.2)"><i class="ti ti-trending-up" style="color:#378ADD"></i></div>
         <div class="stat-card-lbl">Win Rate</div>
-        <div class="stat-card-val" id="m-wr" style="color:var(--text);font-weight:800;font-size:28px">—</div>
+        <div class="stat-card-val" id="m-wr" style="color:var(--text);font-weight:800">—</div>
         <div class="stat-card-bottom" style="margin-top:10px">
           <div class="avgwl-bar" id="wr-bar" style="margin-bottom:10px">
             <div id="wr-green" style="height:100%;background:#1D9E75;width:33%"></div>
@@ -494,9 +492,9 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="stat-card">
         <div class="stat-card-icon" style="background:rgba(29,158,117,0.2)"><i class="ti ti-currency-dollar" style="color:var(--green)"></i></div>
         <div class="stat-card-lbl">Net P&amp;L</div>
-        <div class="stat-card-val" id="m-pnl" style="font-size:28px">$0</div>
+        <div class="stat-card-val" id="m-pnl">$0</div>
         <div class="stat-card-bottom">
-          <canvas id="mini-eq" width="160" height="50" style="width:100%"></canvas>
+          <canvas id="mini-eq" width="160" height="38" style="width:100%"></canvas>
         </div>
       </div>
       <!-- Avg Win / Loss -->
@@ -511,21 +509,22 @@ table.tt tr:last-child td{border-bottom:none}
               <div id="avgwl-red" style="height:100%;background:var(--red);width:50%"></div>
             </div>
             <div style="display:flex;justify-content:space-between;margin-top:10px">
-              <div><div class="stat-card-val green" style="font-size:20px" id="m-avgwin">—</div><div class="avgwl-lbl">Avg Win</div></div>
-              <div style="text-align:right"><div class="stat-card-val red" style="font-size:20px" id="m-avgloss">—</div><div class="avgwl-lbl">Avg Loss</div></div>
+              <div><div class="stat-card-val green" style="font-size:17px" id="m-avgwin">—</div><div class="avgwl-lbl">Avg Win</div></div>
+              <div style="text-align:right"><div class="stat-card-val red" style="font-size:17px" id="m-avgloss">—</div><div class="avgwl-lbl">Avg Loss</div></div>
             </div>
           </div>
         </div>
       </div>
-      <!-- RR Stats -->
+      <!-- Profit Factor -->
       <div class="stat-card">
-        <div class="stat-card-icon" style="background:rgba(139,92,246,0.2)"><span style="color:#a78bfa;font-size:18px;font-weight:800">R</span></div>
-        <div class="stat-card-lbl">RR Stats</div>
-        <div class="stat-card-bottom" style="margin-top:4px">
-          <div class="rr-list">
-            <div class="rr-row"><span class="rr-lbl">Avg RR</span><span class="rr-val" id="m-avgrrx">—</span></div>
-            <div class="rr-row"><span class="rr-lbl">Total R</span><span class="rr-val purple" id="m-totalr">—</span></div>
-          </div>
+        <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
+        <div class="stat-card-lbl">Profit Factor</div>
+        <div class="stat-card-val" id="m-pf">—</div>
+        <div class="pf-sub-row">
+          <span class="pf-sub-lbl">Avg RR</span><span class="pf-sub-val" id="m-avgrrx">—</span>
+        </div>
+        <div class="pf-sub-row">
+          <span class="pf-sub-lbl">Total R</span><span class="pf-sub-val" style="color:var(--purple)" id="m-totalr">—</span>
         </div>
       </div>
     </div>
@@ -1241,7 +1240,7 @@ function renderDashboardWithTrades(trades,label){
   const calMonthKey=currentDashKey||curMonthKey();
   const calMonthTrades=getTradesForKey(calMonthKey);
   if(!s){
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
@@ -1260,6 +1259,7 @@ function renderDashboardWithTrades(trades,label){
     }
     pe.className='stat-card-val';
   }
+  const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
   const mrrEl=document.getElementById('m-avgrrx');if(mrrEl)mrrEl.textContent=s.avgRR?s.avgRR+'R':'—';
   const mtrEl=document.getElementById('m-totalr');if(mtrEl)mtrEl.textContent=s.totalR?s.totalR+'R':'—';
   const winRRs2=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
@@ -1356,7 +1356,7 @@ function renderDashboard(key){
   if(!s){
     // dash-sub removed
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
     drawGauge(0,0,0);
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
@@ -1377,6 +1377,7 @@ function renderDashboard(key){
     }
     pe.className='stat-card-val';
   }
+  const mpfEl2=document.getElementById('m-pf');if(mpfEl2)mpfEl2.textContent=s.pf!=null?s.pf:'—';
   const rrel=document.getElementById('m-avgrrx');if(rrel)rrel.textContent=s.avgRR?s.avgRR+'R':'—';
   document.getElementById('m-totalr').textContent=s.totalR?s.totalR+'R':'—';
   const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
@@ -1635,15 +1636,15 @@ function drawMiniCharts(trades){
   // Mini equity line in Net P&L card
   const miniEq=document.getElementById('mini-eq');
   if(miniEq&&trades.length){
-    miniEq.width=160;miniEq.height=50;
+    miniEq.width=160;miniEq.height=38;
     const ctx=miniEq.getContext('2d');
-    ctx.clearRect(0,0,160,50);
+    ctx.clearRect(0,0,160,38);
     let cum=0;
     const pts=[0,...trades.map(t=>{cum+=(t.pnl||0);return Math.round(cum);})];
     const minV=Math.min(...pts);
     const maxV=Math.max(...pts);
     const range=maxV-minV||1;
-    const W=160,H=50;
+    const W=160,H=38;
     const xs=pts.map((_,i)=>i/(pts.length-1||1)*W);
     const ys=pts.map(v=>H-4-((v-minV)/range)*(H-10));
     const isPos=pts[pts.length-1]>=0;
