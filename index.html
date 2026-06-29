@@ -500,9 +500,9 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="stat-card">
         <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
         <div class="stat-card-lbl">Profit Factor</div>
-        <div class="stat-card-bottom" style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
-          <div class="stat-card-val" id="m-pf">—</div>
-          <canvas id="pf-donut" width="56" height="56" style="flex-shrink:0"></canvas>
+        <div class="stat-card-val" id="m-pf">—</div>
+        <div class="stat-card-bottom">
+          <canvas id="mini-pf" width="160" height="38" style="width:100%"></canvas>
         </div>
       </div>
       <!-- Avg Win / Loss -->
@@ -1240,7 +1240,7 @@ function renderDashboardWithTrades(trades,label){
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
-    drawProfitFactorDonut(0,0);
+    drawProfitFactorBar(0,0);
     renderCalendar(calMonthKey,calMonthTrades);
     if(eqChart){eqChart.destroy();eqChart=null}return;
   }
@@ -1257,7 +1257,7 @@ function renderDashboardWithTrades(trades,label){
     pe.className='stat-card-val';
   }
   const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
-  drawProfitFactorDonut(s.grossWin||0,s.grossLoss||0);
+  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
   const winRRs2=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
   const lossRRs2=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
   const avgWinRR2=winRRs2.length?winRRs2.reduce((a,b)=>a+b,0)/winRRs2.length:0;
@@ -1268,7 +1268,7 @@ function renderDashboardWithTrades(trades,label){
   if(displayMode==='percent'){
     if(aw2)aw2.textContent=winRRs2.length?'+'+Math.abs(Math.round(avgWinRR2*100)/100)+'R':'—';
     if(al2)al2.textContent=lossRRs2.length?'-'+Math.abs(Math.round(avgLossRR2*100)/100)+'R':'—';
-    if(ratioEl2)ratioEl2.textContent=(lossRRs2.length&&avgLossRR2>0)?(Math.abs(avgWinRR2)/Math.abs(avgLossRR2)).toFixed(2):'—';
+    if(ratioEl2)ratioEl2.textContent=(lossRRs2.length&&Math.abs(avgLossRR2)>0)?(Math.abs(avgWinRR2)/Math.abs(avgLossRR2)).toFixed(2):'—';
   } else {
     if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
     if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
@@ -1357,7 +1357,7 @@ function renderDashboard(key){
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
     ['m-wr','m-pnl','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
     drawGauge(0,0,0);
-    drawProfitFactorDonut(0,0);
+    drawProfitFactorBar(0,0);
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
@@ -1378,7 +1378,7 @@ function renderDashboard(key){
     pe.className='stat-card-val';
   }
   const mpfEl2=document.getElementById('m-pf');if(mpfEl2)mpfEl2.textContent=s.pf!=null?s.pf:'—';
-  drawProfitFactorDonut(s.grossWin||0,s.grossLoss||0);
+  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
   const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
   const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
   const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
@@ -1389,7 +1389,7 @@ function renderDashboard(key){
   if(displayMode==='percent'){
     if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
     if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
-    if(ratioEl)ratioEl.textContent=(lossRRs.length&&avgLossRR>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
+    if(ratioEl)ratioEl.textContent=(lossRRs.length&&Math.abs(avgLossRR)>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
   } else {
     if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
     if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
@@ -1581,39 +1581,19 @@ function drawGauge(wins,be,losses){
   if(rEl)rEl.style.width=Math.round(losses/total*100)+'%';
 }
 
-function drawProfitFactorDonut(grossWin,grossLoss){
-  const canvas=document.getElementById('pf-donut');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=56,H=56;
-  canvas.width=W;canvas.height=H;
-  ctx.clearRect(0,0,W,H);
+function drawProfitFactorBar(grossWin,grossLoss){
   const total=grossWin+grossLoss;
-  const cx=W/2,cy=H/2,r=24,lineW=8;
+  const gEl=document.getElementById('pf-bar-green');
+  const rEl=document.getElementById('pf-bar-red');
+  if(!gEl||!rEl)return;
   if(total<=0){
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.lineWidth=lineW;
-    ctx.strokeStyle='rgba(255,255,255,0.1)';
-    ctx.stroke();
+    gEl.style.width='50%';
+    rEl.style.width='50%';
     return;
   }
-  const winFrac=grossWin/total;
-  const start=-Math.PI/2;
-  const winEnd=start+winFrac*Math.PI*2;
-  ctx.beginPath();
-  ctx.arc(cx,cy,r,start,winEnd);
-  ctx.lineWidth=lineW;
-  ctx.strokeStyle='#1D9E75';
-  ctx.lineCap='butt';
-  ctx.stroke();
-  if(winFrac<1){
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,winEnd,start+Math.PI*2);
-    ctx.lineWidth=lineW;
-    ctx.strokeStyle='#D85A30';
-    ctx.stroke();
-  }
+  const winPct=Math.round(grossWin/total*100);
+  gEl.style.width=winPct+'%';
+  rEl.style.width=(100-winPct)+'%';
 }
 
 
@@ -1703,6 +1683,40 @@ function drawMiniCharts(trades){
     const lx=xs[xs.length-1],ly=ys[ys.length-1];
     ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
     ctx.fillStyle=lineColor;ctx.fill();
+  }
+  // Mini profit-factor line in Profit Factor card (running PF after each trade)
+  const miniPf=document.getElementById('mini-pf');
+  if(miniPf&&trades.length){
+    miniPf.width=160;miniPf.height=38;
+    const ctx2=miniPf.getContext('2d');
+    ctx2.clearRect(0,0,160,38);
+    let gw=0,gl=0;
+    const pfPts=trades.map(t=>{
+      if((t.pnl||0)>0)gw+=t.pnl;
+      else if((t.pnl||0)<0)gl+=Math.abs(t.pnl);
+      return gl>0?gw/gl:(gw>0?5:0); // cap visually when no losses yet
+    });
+    const minV2=Math.min(...pfPts,0);
+    const maxV2=Math.max(...pfPts,1);
+    const range2=maxV2-minV2||1;
+    const W2=160,H2=38;
+    const xs2=pfPts.map((_,i)=>i/(pfPts.length-1||1)*W2);
+    const ys2=pfPts.map(v=>H2-4-((v-minV2)/range2)*(H2-10));
+    const isGood=pfPts[pfPts.length-1]>=1;
+    const lineColor2=isGood?'#1D9E75':'#D85A30';
+    const fillColor2=isGood?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)';
+    ctx2.beginPath();
+    ctx2.moveTo(xs2[0],H2);
+    xs2.forEach((x,i)=>ctx2.lineTo(x,ys2[i]));
+    ctx2.lineTo(W2,H2);ctx2.closePath();
+    ctx2.fillStyle=fillColor2;ctx2.fill();
+    ctx2.beginPath();
+    ctx2.moveTo(xs2[0],ys2[0]);
+    xs2.forEach((x,i)=>{if(i>0)ctx2.lineTo(x,ys2[i]);});
+    ctx2.strokeStyle=lineColor2;ctx2.lineWidth=2;ctx2.lineJoin='round';ctx2.stroke();
+    const lx2=xs2[xs2.length-1],ly2=ys2[ys2.length-1];
+    ctx2.beginPath();ctx2.arc(lx2,ly2,4,0,Math.PI*2);
+    ctx2.fillStyle=lineColor2;ctx2.fill();
   }
 }
 
