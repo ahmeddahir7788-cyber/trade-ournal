@@ -497,10 +497,23 @@ table.tt tr:last-child td{border-bottom:none}
           <canvas id="mini-eq" width="160" height="38" style="width:100%"></canvas>
         </div>
       </div>
+      <!-- Profit Factor -->
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
+        <div class="stat-card-lbl">Profit Factor</div>
+        <div class="stat-card-val" id="m-pf">—</div>
+        <div class="pf-sub-row">
+          <span class="pf-sub-lbl">Avg RR</span><span class="pf-sub-val" id="m-avgrrx">—</span>
+        </div>
+        <div class="pf-sub-row">
+          <span class="pf-sub-lbl">Total R</span><span class="pf-sub-val" style="color:var(--purple)" id="m-totalr">—</span>
+        </div>
+      </div>
       <!-- Avg Win / Loss -->
       <div class="stat-card">
         <div class="stat-card-icon" style="background:rgba(167,139,250,0.2)"><i class="ti ti-scale" style="color:var(--purple)"></i></div>
         <div class="stat-card-lbl">Avg Win / Loss</div>
+        <div class="stat-card-val" id="m-avgwl-ratio">—</div>
         <div class="stat-card-bottom" style="margin-top:8px">
           <div class="avgwl-bar-wrap">
             <div class="avgwl-bar">
@@ -513,18 +526,6 @@ table.tt tr:last-child td{border-bottom:none}
               <div style="text-align:right"><div class="stat-card-val red" style="font-size:17px" id="m-avgloss">—</div><div class="avgwl-lbl">Avg Loss</div></div>
             </div>
           </div>
-        </div>
-      </div>
-      <!-- Profit Factor -->
-      <div class="stat-card">
-        <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
-        <div class="stat-card-lbl">Profit Factor</div>
-        <div class="stat-card-val" id="m-pf">—</div>
-        <div class="pf-sub-row">
-          <span class="pf-sub-lbl">Avg RR</span><span class="pf-sub-val" id="m-avgrrx">—</span>
-        </div>
-        <div class="pf-sub-row">
-          <span class="pf-sub-lbl">Total R</span><span class="pf-sub-val" style="color:var(--purple)" id="m-totalr">—</span>
         </div>
       </div>
     </div>
@@ -1240,7 +1241,7 @@ function renderDashboardWithTrades(trades,label){
   const calMonthKey=currentDashKey||curMonthKey();
   const calMonthTrades=getTradesForKey(calMonthKey);
   if(!s){
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
     drawGauge(0,0,0);
@@ -1268,12 +1269,15 @@ function renderDashboardWithTrades(trades,label){
   const avgLossRR2=lossRRs2.length?lossRRs2.reduce((a,b)=>a+b,0)/lossRRs2.length:0;
   const aw2=document.getElementById('m-avgwin');
   const al2=document.getElementById('m-avgloss');
+  const ratioEl2=document.getElementById('m-avgwl-ratio');
   if(displayMode==='percent'){
     if(aw2)aw2.textContent=winRRs2.length?'+'+Math.abs(Math.round(avgWinRR2*100)/100)+'R':'—';
     if(al2)al2.textContent=lossRRs2.length?'-'+Math.abs(Math.round(avgLossRR2*100)/100)+'R':'—';
+    if(ratioEl2)ratioEl2.textContent=(lossRRs2.length&&avgLossRR2>0)?(Math.abs(avgWinRR2)/Math.abs(avgLossRR2)).toFixed(2):'—';
   } else {
     if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
     if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+    if(ratioEl2)ratioEl2.textContent=s.avgWinLossRatio||'—';
   }
   const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
   const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
@@ -1356,7 +1360,7 @@ function renderDashboard(key){
   if(!s){
     // dash-sub removed
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['m-wr','m-pnl','m-avgrrx','m-totalr','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
     drawGauge(0,0,0);
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
@@ -1386,12 +1390,15 @@ function renderDashboard(key){
   const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
   const aw=document.getElementById('m-avgwin');
   const al=document.getElementById('m-avgloss');
+  const ratioEl=document.getElementById('m-avgwl-ratio');
   if(displayMode==='percent'){
     if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
     if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
+    if(ratioEl)ratioEl.textContent=(lossRRs.length&&avgLossRR>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
   } else {
     if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
     if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
+    if(ratioEl)ratioEl.textContent=s.avgWinLossRatio||'—';
   }
   // Avg win/loss bar
   const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
@@ -1429,7 +1436,8 @@ function statsOf(trades){
   const dayWr=days.length?Math.round(profitDays/days.length*100):0;
   const avgWin=wins+partials>0?(grossWin/(wins+partials)).toFixed(0):0;
   const avgLoss=losses>0?(grossLoss/losses).toFixed(0):0;
-  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss};
+  const avgWinLossRatio=(avgLoss&&parseFloat(avgLoss)>0)?(parseFloat(avgWin)/parseFloat(avgLoss)).toFixed(2):null;
+  return{n,wins,partials,losses,be,tot,avgRR,totalR,wr,pf,dayWr,days:days.length,avgWin,avgLoss,avgWinLossRatio};
 }
 
 // ── Calendar ──────────────────────────────────────────────────
