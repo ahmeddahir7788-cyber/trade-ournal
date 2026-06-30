@@ -391,6 +391,13 @@ table.tt tr:last-child td{border-bottom:none}
 .rep-ls-box .ls-row{display:flex;justify-content:space-around;margin-top:10px;font-size:12px;color:var(--text2)}
 .rep-ls-box .ls-row span{font-weight:700;color:var(--text)}
 
+/* RECENT TRADES */
+.rt-item{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .12s}
+.rt-item:last-child{border-bottom:none}
+.rt-item:hover{background:var(--surface2)}
+.rt-symbol{font-size:13px;font-weight:700;color:var(--text)}
+.rt-date{font-size:11px;color:var(--text3);margin-top:2px}
+.rt-pnl{font-size:13px;font-weight:700;flex-shrink:0;margin-left:8px}
 /* NOTEBOOK */
 .nb-list-item{display:flex;align-items:flex-start;gap:8px;padding:10px 10px;border-radius:8px;cursor:pointer;transition:background .12s;margin-bottom:2px}
 .nb-list-item:hover{background:var(--surface2)}
@@ -553,20 +560,26 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0"><h3>Session Performance</h3><div id="session-stats"></div></div>
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
-    <div class="card" style="margin-top:12px">
-      <div class="cal-header-row">
-        <div class="cal-title-nav">
-          <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
-          <h3 id="cal-title" style="margin:0">Calendar</h3>
-          <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+    <div class="side-by-side" style="grid-template-columns:70% 1fr;align-items:flex-start;margin-top:12px">
+      <div class="card" style="margin-bottom:0">
+        <div class="cal-header-row">
+          <div class="cal-title-nav">
+            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+            <h3 id="cal-title" style="margin:0">Calendar</h3>
+            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+          </div>
+          <div class="cal-header-stats">
+            <span class="cms-label">Monthly stats:</span>
+            <span class="cms-chip" id="cms-pnl-chip">$0</span>
+            <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
+          </div>
         </div>
-        <div class="cal-header-stats">
-          <span class="cms-label">Monthly stats:</span>
-          <span class="cms-chip" id="cms-pnl-chip">$0</span>
-          <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
-        </div>
+        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
-      <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
+      <div class="card" style="margin-bottom:0">
+        <h3>Recent Trades</h3>
+        <div id="recent-trades-list"></div>
+      </div>
     </div>
   </div>
 
@@ -1375,6 +1388,7 @@ function renderDashboardWithTrades(trades,label){
     const meq0=document.getElementById('mini-eq');if(meq0){const ctx0=meq0.getContext('2d');ctx0.clearRect(0,0,meq0.width,meq0.height);}
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     renderCalendar(calMonthKey,calMonthTrades);
+    renderRecentTrades();
     if(eqChart){eqChart.destroy();eqChart=null;}return;
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
@@ -1417,6 +1431,7 @@ function renderDashboardWithTrades(trades,label){
 
   renderSessionStats(trades);
   renderCalendar(calMonthKey,calMonthTrades);
+  renderRecentTrades();
   drawMiniCharts(trades);
   drawCharts(trades);
 }
@@ -1508,6 +1523,7 @@ function renderDashboard(key){
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
+    renderRecentTrades();
     if(eqChart){eqChart.destroy();eqChart=null;}
     return;
   }
@@ -1553,8 +1569,37 @@ function renderDashboard(key){
 
   renderCalendar(key,trades);
   renderSessionStats(trades);
+  renderRecentTrades();
   drawMiniCharts(trades);
   drawCharts(trades);
+}
+
+function renderRecentTrades(allMonthTrades){
+  const wrap=document.getElementById('recent-trades-list');
+  if(!wrap)return;
+  // Use ALL trades across all months/accounts for "recent", sorted by date desc
+  const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  const recent=all.slice(0,8);
+  if(!recent.length){
+    wrap.innerHTML='<div style="padding:1rem 4px;text-align:center;color:var(--text3);font-size:12px">No trades yet.</div>';
+    return;
+  }
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  wrap.innerHTML=recent.map(t=>{
+    const[y,m,d]=t.date.split('-');
+    const dateStr=mn[parseInt(m)-1]+' '+parseInt(d)+', '+y;
+    const pnl=t.pnl||0;
+    const pnlColor=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text3)';
+    const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
+    const sym=PAIRS[t.symbol]||t.symbol||'—';
+    return `<div class="rt-item" onclick="openDayJournal('${t.date}')">
+      <div>
+        <div class="rt-symbol">${sym}</div>
+        <div class="rt-date">${dateStr}</div>
+      </div>
+      <div class="rt-pnl" style="color:${pnlColor}">${pnlStr}</div>
+    </div>`;
+  }).join('');
 }
 
 function statsOf(trades){
