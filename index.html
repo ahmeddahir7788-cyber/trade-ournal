@@ -437,11 +437,12 @@ table.tt tr:last-child td{border-bottom:none}
     <select class="sel" id="dash-period-sel" onchange="onPeriodChange()" style="font-weight:500;display:none">
           <option value="week">Weekly</option>
           <option value="month">Monthly</option>
-          <option value="alltime">All Time</option>
           <option value="Q1">Q1</option>
           <option value="Q2">Q2</option>
           <option value="Q3">Q3</option>
           <option value="Q4">Q4</option>
+          <option value="yearly">Yearly</option>
+          <option value="alltime">All Time</option>
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
@@ -1070,9 +1071,8 @@ function refreshCurrentDashboardView(){
   const pSel=document.getElementById('dash-period-sel');
   const period=pSel?pSel.value:'month';
   if(period==='week'){
-    // Keep the already-selected week, just re-render with new display mode
     onDashWeekChange();
-  } else if(period&&period!=='month'){
+  } else if(period==='yearly'||period==='alltime'||(period&&period.startsWith('Q'))){
     onPeriodChange();
   } else if(currentDashKey){
     renderDashboard(currentDashKey);
@@ -1245,6 +1245,15 @@ function onPeriodChange(){
     ySel.style.display='';
     mSel.style.display='';
     onDashMonthChange();
+  } else if(period==='yearly'){
+    if(wSel)wSel.style.display='none';
+    mSel.style.display='none';
+    ySel.style.display='';
+    const yr=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
+    const yearTrades=Object.values(db.trades).flat().filter(t=>t.date&&t.date.startsWith(String(yr))).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+    const tb=document.getElementById('top-bar-section');
+    if(tb)tb.textContent='Dashboard';
+    renderDashboardWithTrades(yearTrades,'Year '+yr);
   } else if(period==='alltime'){
     if(wSel)wSel.style.display='none';
     ySel.style.display='none';
@@ -1383,7 +1392,7 @@ function onDashYearChange(){
   const pSel=document.getElementById('dash-period-sel');
   const period=pSel?pSel.value:'month';
   const wSel2=document.getElementById('dash-week-sel');if(wSel2)wSel2.style.display='none';
-  if(period!=='month'){
+  if(period==='yearly'||period!=='month'){
     onPeriodChange();
     return;
   }
