@@ -1740,7 +1740,29 @@ function drawCharts(trades){
     grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(29,158,117,0.05)');
     grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(216,90,48,0.05)');
     grad.addColorStop(1,'rgba(216,90,48,0.2)');
+    // Crosshair plugin — vertical line that follows cursor
+    const crosshairPlugin={
+      id:'crosshair',
+      afterDraw:function(chart){
+        if(chart.tooltip._active&&chart.tooltip._active.length){
+          const ctx=chart.ctx;
+          const x=chart.tooltip._active[0].element.x;
+          const topY=chart.scales.y.top;
+          const bottomY=chart.scales.y.bottom;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x,topY);
+          ctx.lineTo(x,bottomY);
+          ctx.lineWidth=1;
+          ctx.strokeStyle=dark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.15)';
+          ctx.setLineDash([4,4]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    };
     eqChart=new Chart(c1,{
+      plugins:[crosshairPlugin],
       type:'line',
       data:{
         labels,
