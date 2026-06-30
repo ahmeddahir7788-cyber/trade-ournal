@@ -1068,7 +1068,11 @@ function toggleTheme(){
 
 function refreshCurrentDashboardView(){
   const pSel=document.getElementById('dash-period-sel');
-  if(pSel&&pSel.value&&pSel.value!=='month'){
+  const period=pSel?pSel.value:'month';
+  if(period==='week'){
+    // Keep the already-selected week, just re-render with new display mode
+    onDashWeekChange();
+  } else if(period&&period!=='month'){
     onPeriodChange();
   } else if(currentDashKey){
     renderDashboard(currentDashKey);
