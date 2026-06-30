@@ -572,7 +572,7 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;max-height:600px">
         <h3>Recent Trades</h3>
-        <div id="recent-trades-list" style="overflow-y:auto;flex:1"></div>
+        <div id="recent-trades-list"></div>
       </div>
     </div>
   </div>
@@ -1095,7 +1095,11 @@ function setDisplayMode(mode){
   localStorage.setItem('tj_v10_dispmode',mode);
   document.getElementById('dm-btn-dollar').classList.toggle('active',mode==='dollar');
   document.getElementById('dm-btn-pct').classList.toggle('active',mode==='percent');
-  refreshCurrentDashboardView();
+  try{
+    refreshCurrentDashboardView();
+  }catch(e){
+    console.error('refreshCurrentDashboardView failed:',e);
+  }
 }
 
 function loadDB(){
@@ -1134,7 +1138,8 @@ function toggleTheme(){
 function refreshCurrentDashboardView(){
   const pSel=document.getElementById('dash-period-sel');
   const period=pSel?pSel.value:'month';
-  if(period==='week'){
+  const wSel=document.getElementById('dash-week-sel');
+  if(period==='week'&&wSel&&wSel.value){
     onDashWeekChange();
   } else if(period==='yearly'||period==='alltime'||(period&&period.startsWith('Q'))){
     onPeriodChange();
@@ -1573,7 +1578,7 @@ function renderRecentTrades(allMonthTrades){
   if(!wrap)return;
   // Use ALL trades across all months/accounts for "recent", sorted by date desc
   const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  const recent=all;
+  const recent=all.slice(0,15);
   if(!recent.length){
     wrap.innerHTML='<div style="padding:1rem 4px;text-align:center;color:var(--text3);font-size:12px">No trades yet.</div>';
     return;
@@ -3090,6 +3095,8 @@ applyTheme();
 initSidebar();
 document.getElementById('f-date').value=today();
 currentDashKey=curMonthKey();
+const initialPeriodSel=document.getElementById('dash-period-sel');
+if(initialPeriodSel)initialPeriodSel.value='month';
 initDashSelectors();
 renderDashboard(currentDashKey);
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
