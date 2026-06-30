@@ -1743,7 +1743,7 @@ function renderCalendar(key,trades){
     const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:88px;margin-bottom:${isLastRow?0:6}px">
+    wHtml+=`<div class="week-card" style="height:76px;margin-bottom:${isLastRow?0:6}px">
       <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||(w+1)}</span></div>
       ${wTradeCount>0
         ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
