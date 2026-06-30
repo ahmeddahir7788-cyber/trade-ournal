@@ -138,7 +138,7 @@ nav button:hover i{color:var(--text)}
 .stat-val{font-size:13px;font-weight:700;width:24px;text-align:right;flex-shrink:0}
 
 /* CALENDAR */
-.cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:14px;align-items:start}
+.cal-outer{display:grid;grid-template-columns:9fr 1fr;gap:10px;align-items:start}
 /* Calendar header row with inline monthly stats and month navigation */
 .cal-header-row{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-title-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -152,34 +152,36 @@ nav button:hover i{color:var(--text)}
 .cms-chip-purple{background:rgba(167,139,250,0.15);color:var(--purple)}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .cal-day.empty{visibility:hidden}
-.cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:8px 4px;font-weight:600;background:var(--surface2);border:.5px solid var(--border);border-radius:8px;letter-spacing:.04em;text-transform:uppercase}
-.cal-day{border-radius:10px;padding:8px;height:86px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
-.cal-day.empty{background:transparent;height:86px;visibility:hidden;border:none}
+.cal-day-name{font-size:12px;color:var(--text2);text-align:center;padding:10px 4px;font-weight:700;background:var(--surface2);border:.5px solid var(--border);border-radius:8px;letter-spacing:.03em}
+.cal-day{border-radius:10px;padding:10px 8px 8px;height:110px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
+.cal-day.empty{background:transparent;height:110px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
-.cal-day.no-trade{background:var(--surface2)}
+.cal-day.no-trade{background:var(--surface2);opacity:.7}
 .cal-day-clickable{cursor:pointer}
-.cal-day-clickable:hover{filter:brightness(1.1);transform:scale(1.02);transition:all .1s}
-.cal-day.profit{background:rgba(29,158,117,0.22);border-color:rgba(29,158,117,0.45)}
-.cal-day.loss{background:rgba(216,90,48,0.22);border-color:rgba(216,90,48,0.45)}
-.cal-day.breakeven{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.35)}
+.cal-day-clickable:hover{filter:brightness(1.12);transition:filter .1s}
+.cal-day.profit{background:rgba(16,100,70,0.85);border-color:rgba(29,158,117,0.5)}
+.cal-day.loss{background:rgba(120,30,20,0.75);border-color:rgba(216,90,48,0.5)}
+.cal-day.breakeven{background:rgba(80,60,160,0.55);border-color:rgba(167,139,250,0.5)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
-.cal-day-top{position:absolute;top:5px;right:9px}
-.cal-day-num{font-size:11px;font-weight:700;color:var(--text3)}
-.cal-day.profit .cal-day-num,.cal-day.loss .cal-day-num,.cal-day.breakeven .cal-day-num{color:rgba(255,255,255,0.85)}
-[data-theme="light"] .cal-day.profit .cal-day-num,[data-theme="light"] .cal-day.loss .cal-day-num,[data-theme="light"] .cal-day.breakeven .cal-day-num{color:var(--text)}
-.cal-day-pnl{font-size:14px;font-weight:800;line-height:1.2;margin-top:6px}
-.cal-day.profit .cal-day-pnl{color:var(--green)}
-.cal-day.loss .cal-day-pnl{color:var(--red)}
-.cal-day.breakeven .cal-day-pnl{color:var(--purple)}
-.cal-day-trades{font-size:11px;font-weight:600;color:var(--text2);margin-top:4px}
+.cal-day-top{position:absolute;top:7px;right:10px}
+.cal-day-num{font-size:12px;font-weight:700;color:rgba(255,255,255,0.5)}
+.cal-day.no-trade .cal-day-num{color:var(--text3)}
+.cal-day-pnl{font-size:15px;font-weight:800;line-height:1.2;color:#fff}
+.cal-day.profit .cal-day-pnl{color:#4ecca8}
+.cal-day.loss .cal-day-pnl{color:#ff7a6b}
+.cal-day.breakeven .cal-day-pnl{color:#c4b5fd}
+.cal-day-trade-count{font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);margin-top:3px}
+.cal-day-trades{font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);margin-top:2px}
+.cal-day.no-trade .cal-day-trade-count,.cal-day.no-trade .cal-day-trades{color:var(--text3)}
 /* Weekly summary */
 .weekly-summary{display:flex;flex-direction:column;gap:0}
 .weekly-summary-title{font-size:12px;font-weight:600;color:var(--text3);padding-bottom:8px;margin-bottom:2px;border-bottom:.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
-.week-card{padding:14px 8px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:88px}
-.week-card-top{margin-bottom:4px}
-.week-name{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.03em}
+.week-card{padding:10px 8px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;gap:4px}
+.week-card-top{margin-bottom:2px}
+.week-name{font-size:12px;font-weight:700;color:var(--text2)}
+.week-days-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(100,80,220,0.25);color:#a78bfa;font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;margin-top:4px}
 
 .week-stats{display:none}
 .week-pnl{font-weight:600}
@@ -1710,11 +1712,13 @@ function renderCalendar(key,trades){
       const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
       const dayWins=dayTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
-      const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
+      const dayWr=dayDecisive>0?(dayWins/dayDecisive*100).toFixed(1):0;
+      const tradeWord=dayTrades.length===1?'trade':'trades';
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
         ${shotIcon}
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
+        <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
         <div class="cal-day-trades">${dayWr}%</div>
       </div>`;
     } else {
@@ -1771,12 +1775,13 @@ function renderCalendar(key,trades){
     const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:86px;margin-bottom:${isLastRow?0:6}px">
+    wHtml+=`<div class="week-card" style="height:110px;margin-bottom:${isLastRow?0:5}px">
       <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
       ${wTradeCount>0
-        ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
-           <div class="cal-day-trades">${wWr}%</div>`
-        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div><div class="cal-day-trades">0%</div>`}
+        ?`<div style="font-size:18px;font-weight:800;color:${wMetric>=0?'#4ecca8':'#ff7a6b'}">${wPnlStr}</div>
+           <div class="week-days-pill"><i class="ti ti-calendar" style="font-size:10px"></i>${wDays} ${wDays===1?'day':'days'}</div>`
+        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div>
+           <div class="week-days-pill" style="opacity:.4">0 days</div>`}
     </div>`;
     wIdx++;
   }
