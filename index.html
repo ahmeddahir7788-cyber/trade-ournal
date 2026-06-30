@@ -164,7 +164,7 @@ nav button:hover i{color:var(--text)}
 .cal-day.loss{background:rgba(216,90,48,0.22);border-color:rgba(216,90,48,0.45)}
 .cal-day.breakeven{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.35)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
-.cal-day-top{position:absolute;top:8px;right:10px}
+.cal-day-top{position:absolute;top:5px;right:9px}
 .cal-day-num{font-size:11px;font-weight:700;color:var(--text3)}
 .cal-day.profit .cal-day-num,.cal-day.loss .cal-day-num,.cal-day.breakeven .cal-day-num{color:rgba(255,255,255,0.85)}
 [data-theme="light"] .cal-day.profit .cal-day-num,[data-theme="light"] .cal-day.loss .cal-day-num,[data-theme="light"] .cal-day.breakeven .cal-day-num{color:var(--text)}
@@ -1580,17 +1580,12 @@ function renderRecentTrades(allMonthTrades){
   }
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   wrap.innerHTML=recent.map(t=>{
-    const[y,m,d]=t.date.split('-');
-    const dateStr=mn[parseInt(m)-1]+' '+parseInt(d)+', '+y;
     const pnl=t.pnl||0;
     const pnlColor=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text3)';
     const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
     const sym=PAIRS[t.symbol]||t.symbol||'—';
     return `<div class="rt-item" onclick="openDayJournal('${t.date}')">
-      <div>
-        <div class="rt-symbol">${sym}</div>
-        <div class="rt-date">${dateStr}</div>
-      </div>
+      <div class="rt-symbol">${sym}</div>
       <div class="rt-pnl" style="color:${pnlColor}">${pnlStr}</div>
     </div>`;
   }).join('');
@@ -1744,11 +1739,10 @@ function renderCalendar(key,trades){
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
     wHtml+=`<div class="week-card" style="height:86px;margin-bottom:${isLastRow?0:6}px">
-      <div class="week-card-top"><span class="week-name">Week ${weekNames[wIdx]||(w+1)}</span></div>
+      <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
       ${wTradeCount>0
-        ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
-           <div class="cal-day-trades">${wWr}%</div>`
-        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div><div class="cal-day-trades">0%</div>`}
+        ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>`
+        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div>`}
     </div>`;
     wIdx++;
   }
