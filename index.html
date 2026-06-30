@@ -554,26 +554,20 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0"><h3>Session Performance</h3><div id="session-stats"></div></div>
       <div class="card" style="margin-bottom:0"><h3>Equity Curve</h3><div class="chart-wrap" style="height:240px"><canvas id="equity-chart"></canvas></div></div>
     </div>
-    <div class="side-by-side" style="grid-template-columns:80% 1fr;align-items:stretch;margin-top:12px">
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <div class="cal-header-row">
-          <div class="cal-title-nav">
-            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
-            <h3 id="cal-title" style="margin:0">Calendar</h3>
-            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
-          </div>
-          <div class="cal-header-stats">
-            <span class="cms-label">Monthly stats:</span>
-            <span class="cms-chip" id="cms-pnl-chip">$0</span>
-            <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
-          </div>
+    <div class="card" style="margin-top:12px">
+      <div class="cal-header-row">
+        <div class="cal-title-nav">
+          <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+          <h3 id="cal-title" style="margin:0">Calendar</h3>
+          <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
         </div>
-        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
+        <div class="cal-header-stats">
+          <span class="cms-label">Monthly stats:</span>
+          <span class="cms-chip" id="cms-pnl-chip">$0</span>
+          <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
+        </div>
       </div>
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;max-height:600px">
-        <h3>Recent Trades</h3>
-        <div id="recent-trades-list"></div>
-      </div>
+      <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
     </div>
   </div>
 
