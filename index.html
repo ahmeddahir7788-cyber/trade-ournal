@@ -445,6 +445,7 @@ table.tt tr:last-child td{border-bottom:none}
     </select>
     <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
     <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
+    <select class="sel" id="dash-week-sel" onchange="onDashWeekChange()" style="display:none"></select>
     <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
       <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
@@ -1186,6 +1187,7 @@ function go(id,btn){
     if(pSel)pSel.style.display='none';
     if(ySel)ySel.style.display='none';
     if(mSel)mSel.style.display='none';
+    const wSelH=document.getElementById('dash-week-sel');if(wSelH)wSelH.style.display='none';
     if(dmWrap)dmWrap.style.display='none';
   }
   if(id==='dashboard'){
@@ -1205,25 +1207,42 @@ function onPeriodChange(){
   const year=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
   const ySel=document.getElementById('dash-year-sel');
   const mSel=document.getElementById('dash-month-sel');
+  const wSel=document.getElementById('dash-week-sel');
   if(period==='week'){
-    // Current week Mon-Sun
     ySel.style.display='none';
     mSel.style.display='none';
-    const now=new Date();
-    const day=now.getDay();
-    const mon=new Date(now);mon.setDate(now.getDate()-(day===0?6:day-1));
-    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-    const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const allTrades=Object.values(db.trades).flat().filter(t=>t.date>=fmt(mon)&&t.date<=fmt(sun)).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-    const tb=document.getElementById('top-bar-section');
-    if(tb)tb.textContent='Dashboard';
-    renderDashboardWithTrades(allTrades,'This Week');
+    if(wSel){
+      // Build list of all Mon–Sun weeks that have trades, plus current week
+      const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const allDates=Object.values(db.trades).flat().map(t=>t.date).filter(Boolean);
+      const weekStarts=new Set();
+      // Always include current week
+      const now=new Date();
+      const todayDay=now.getDay();
+      const curMon=new Date(now);curMon.setDate(now.getDate()-(todayDay===0?6:todayDay-1));
+      weekStarts.add(fmt(curMon));
+      allDates.forEach(dateStr=>{
+        const d=new Date(dateStr);
+        const day=d.getDay();
+        const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
+        weekStarts.add(fmt(mon));
+      });
+      const sorted=[...weekStarts].sort((a,b)=>b.localeCompare(a));
+      const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const fmtLabel=s=>{const[y,mo,d]=s.split('-');const sun=new Date(s);sun.setDate(sun.getDate()+6);return mn[parseInt(mo)-1]+' '+parseInt(d)+' – '+mn[sun.getMonth()]+' '+sun.getDate()+', '+y;};
+      wSel.innerHTML=sorted.map(s=>`<option value="${s}">${fmtLabel(s)}</option>`).join('');
+      // Default to current week
+      wSel.value=fmt(curMon);
+      wSel.style.display='';
+    }
+    onDashWeekChange();
   } else if(period==='month'){
+    if(wSel)wSel.style.display='none';
     ySel.style.display='';
     mSel.style.display='';
     onDashMonthChange();
   } else if(period==='alltime'){
-    
+    if(wSel)wSel.style.display='none';
     ySel.style.display='none';
     mSel.style.display='none';
     const allTrades=Object.values(db.trades).flat().sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
@@ -1231,6 +1250,7 @@ function onPeriodChange(){
     if(tb)tb.textContent='Dashboard';
     renderDashboardWithTrades(allTrades,'All Time');
   } else {
+    if(wSel)wSel.style.display='none';
     mSel.style.display='none';
     ySel.style.display='';
     const qNum=parseInt(period[1]);
@@ -1238,9 +1258,26 @@ function onPeriodChange(){
     for(let i=0;i<3;i++)months.push(mkKey(year,(qNum-1)*3+i+1));
     const trades=months.flatMap(k=>getTradesForKey(k)).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
     const tb=document.getElementById('top-bar-section');
-    if(tb)tb.innerHTML=`<i class="ti ti-layout-dashboard"></i> Dashboard`;
+    if(tb)tb.textContent='Dashboard';
     renderDashboardWithTrades(trades,period+' '+year);
   }
+}
+
+function onDashWeekChange(){
+  const wSel=document.getElementById('dash-week-sel');
+  if(!wSel)return;
+  const monStr=wSel.value;
+  if(!monStr)return;
+  const sun=new Date(monStr);sun.setDate(sun.getDate()+6);
+  const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const sunStr=fmt(sun);
+  const trades=Object.values(db.trades).flat().filter(t=>t.date>=monStr&&t.date<=sunStr).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const[y,mo,d]=monStr.split('-');
+  const label=mn[parseInt(mo)-1]+' '+parseInt(d)+' – '+mn[sun.getMonth()]+' '+sun.getDate();
+  const tb=document.getElementById('top-bar-section');
+  if(tb)tb.textContent='Dashboard';
+  renderDashboardWithTrades(trades,label);
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -1330,8 +1367,8 @@ function populateDashMonthSel(year,selMonth){
 function onDashYearChange(){
   const pSel=document.getElementById('dash-period-sel');
   const period=pSel?pSel.value:'month';
+  const wSel2=document.getElementById('dash-week-sel');if(wSel2)wSel2.style.display='none';
   if(period!=='month'){
-    // Year changed while a quarter is selected - recompute that quarter for new year
     onPeriodChange();
     return;
   }
