@@ -82,9 +82,9 @@ nav button:hover i{color:var(--text)}
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem;align-items:stretch}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
-.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:14px 13px 12px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden;min-height:0}
-.stat-card-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-.stat-card-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:auto;color:var(--text)}
+.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
+.stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.02em}
+.stat-card-val{font-size:26px;font-weight:800;line-height:1.1;color:var(--text)}
 .stat-card-bottom{margin-top:8px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
@@ -481,73 +481,95 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="stat-cards">
       <!-- Total Trades -->
       <div class="stat-card">
-        <div class="stat-card-lbl">Total Trades</div>
-        <div class="stat-card-val blue" id="m-total">0</div>
-        <div class="stat-card-bottom">
-          <div class="mini-bars" id="mini-bars"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <i class="ti ti-trending-up" style="font-size:15px;color:var(--green)"></i>
+              <span class="stat-card-lbl" style="margin-bottom:0">Total Trades</span>
+            </div>
+            <div class="stat-card-val blue" id="m-total">0</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">All trades logged</div>
+          </div>
+          <div class="mini-bars" id="mini-bars" style="width:60px;flex-shrink:0"></div>
         </div>
       </div>
+
       <!-- Win Rate -->
       <div class="stat-card">
-        <div class="stat-card-lbl">Win Rate</div>
-        <div class="stat-card-val" id="m-wr" style="color:var(--text);font-weight:800">—</div>
-        <div class="stat-card-bottom" style="margin-top:10px">
-          <div class="avgwl-bar" id="wr-bar" style="margin-bottom:10px">
-            <div id="wr-green" style="height:100%;background:#1D9E75;width:33%"></div>
-            <div id="wr-blue" style="height:100%;background:#378ADD;width:34%"></div>
-            <div id="wr-red" style="height:100%;background:#D85A30;width:33%"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <i class="ti ti-chart-bar" style="font-size:15px;color:var(--blue)"></i>
+              <span class="stat-card-lbl" style="margin-bottom:0">Win Rate</span>
+            </div>
+            <div class="stat-card-val" id="m-wr" style="color:var(--text);font-weight:800">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Win / BE / Loss</div>
           </div>
-          <div style="display:flex;justify-content:space-between">
-            <span class="gc green" id="g-wins">0</span>
-            <span class="gc blue" id="g-be">0</span>
-            <span class="gc red" id="g-losses">0</span>
+          <div style="flex-shrink:0;text-align:right">
+            <div style="display:flex;gap:5px;justify-content:flex-end;margin-bottom:6px">
+              <span class="gc green" id="g-wins" style="min-width:22px;text-align:center">0</span>
+              <span class="gc blue" id="g-be" style="min-width:22px;text-align:center">0</span>
+              <span class="gc red" id="g-losses" style="min-width:22px;text-align:center">0</span>
+            </div>
+            <div style="display:flex;height:8px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
+              <div id="wr-green" style="height:100%;background:#1D9E75;width:33%;transition:width .4s"></div>
+              <div id="wr-blue" style="height:100%;background:#378ADD;width:34%;transition:width .4s"></div>
+              <div id="wr-red" style="height:100%;background:#D85A30;width:33%;transition:width .4s"></div>
+            </div>
           </div>
         </div>
       </div>
+
       <!-- Net P&L -->
       <div class="stat-card">
-        <div class="stat-card-lbl">Net P&amp;L</div>
-        <div class="stat-card-val" id="m-pnl">$0</div>
-        <div class="stat-card-bottom">
-          <canvas id="mini-eq" width="160" height="38" style="width:100%"></canvas>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <i class="ti ti-currency-dollar" style="font-size:15px;color:var(--green)"></i>
+              <span class="stat-card-lbl" style="margin-bottom:0">Net P&amp;L</span>
+            </div>
+            <div class="stat-card-val" id="m-pnl">$0</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">All time</div>
+          </div>
+          <canvas id="mini-eq" width="80" height="44" style="width:80px;flex-shrink:0"></canvas>
         </div>
       </div>
+
       <!-- Profit Factor -->
       <div class="stat-card">
-        <div class="stat-card-lbl">Profit Factor</div>
-        <div class="stat-card-val" id="m-pf">—</div>
-        <div class="stat-card-bottom" id="mini-pf-wrap" style="margin-top:6px">
-          <!-- PF gauge: gross win vs gross loss bar -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-            <span style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em">Gross Win</span>
-            <span style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em">Gross Loss</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <i class="ti ti-target-arrow" style="font-size:15px;color:var(--gold)"></i>
+              <span class="stat-card-lbl" style="margin-bottom:0">Profit Factor</span>
+            </div>
+            <div class="stat-card-val" id="m-pf">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Gross profit / Gross loss</div>
           </div>
-          <div style="display:flex;height:10px;border-radius:100px;overflow:hidden;background:var(--border);width:100%">
-            <div id="pf-bar-green" style="height:100%;background:linear-gradient(90deg,#1D9E75,#2bc98f);border-radius:100px 0 0 100px;transition:width .4s;width:50%"></div>
-            <div id="pf-bar-red" style="height:100%;background:linear-gradient(90deg,#D85A30,#f07050);border-radius:0 100px 100px 0;transition:width .4s;width:50%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:5px">
-            <span style="font-size:10px;font-weight:700;color:var(--green)" id="pf-gw-lbl">$0</span>
-            <span style="font-size:10px;font-weight:700;color:var(--red)" id="pf-gl-lbl">$0</span>
+          <div style="flex-shrink:0">
+            <canvas id="pf-donut" width="56" height="56"></canvas>
           </div>
         </div>
       </div>
+
       <!-- Avg Win / Loss -->
       <div class="stat-card">
-        <div class="stat-card-lbl">Avg Win / Loss</div>
-        <div class="stat-card-val" id="m-avgwl-ratio">—</div>
-        <div class="stat-card-bottom" style="margin-top:6px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-            <span style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em">Avg Win</span>
-            <span style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em">Avg Loss</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <i class="ti ti-scale" style="font-size:15px;color:var(--purple)"></i>
+              <span class="stat-card-lbl" style="margin-bottom:0">Avg Win / Loss</span>
+            </div>
+            <div class="stat-card-val" id="m-avgwl-ratio">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Avg win/loss ratio</div>
           </div>
-          <div style="display:flex;height:10px;border-radius:100px;overflow:hidden;background:var(--border);width:100%">
-            <div id="avgwl-green" style="height:100%;background:linear-gradient(90deg,#1D9E75,#2bc98f);border-radius:100px 0 0 100px;transition:width .4s;width:50%"></div>
-            <div id="avgwl-red" style="height:100%;background:linear-gradient(90deg,#D85A30,#f07050);border-radius:0 100px 100px 0;transition:width .4s;width:50%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:5px">
-            <span style="font-size:10px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
-            <span style="font-size:10px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <span style="font-size:11px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
+            <div style="display:flex;height:8px;border-radius:100px;overflow:hidden;background:var(--border);width:70px">
+              <div id="avgwl-green" style="height:100%;background:linear-gradient(90deg,#1D9E75,#2bc98f);transition:width .4s;width:50%"></div>
+              <div id="avgwl-red" style="height:100%;background:linear-gradient(90deg,#D85A30,#f07050);transition:width .4s;width:50%"></div>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
           </div>
         </div>
       </div>
@@ -1400,10 +1422,8 @@ function renderDashboardWithTrades(trades,label){
     ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
     drawGauge(0,0,0);
     drawProfitFactorBar(0,0);
-    const pfgw2=document.getElementById('pf-gw-lbl');if(pfgw2)pfgw2.textContent='$0';
-    const pfgl2=document.getElementById('pf-gl-lbl');if(pfgl2)pfgl2.textContent='$0';
-    const pfg2=document.getElementById('pf-bar-green');if(pfg2)pfg2.style.width='50%';
-    const pfr2=document.getElementById('pf-bar-red');if(pfr2)pfr2.style.width='50%';
+    const pfDonut2=document.getElementById('pf-donut');
+    if(pfDonut2){const ctx3=pfDonut2.getContext('2d');ctx3.clearRect(0,0,56,56);}
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='50%';
@@ -1532,10 +1552,8 @@ function renderDashboard(key){
     drawGauge(0,0,0);
     // Reset profit factor bar + labels
     drawProfitFactorBar(0,0);
-    const pfgw=document.getElementById('pf-gw-lbl');if(pfgw)pfgw.textContent='$0';
-    const pfgl=document.getElementById('pf-gl-lbl');if(pfgl)pfgl.textContent='$0';
-    const pfg=document.getElementById('pf-bar-green');if(pfg)pfg.style.width='50%';
-    const pfr=document.getElementById('pf-bar-red');if(pfr)pfr.style.width='50%';
+    const pfDonut=document.getElementById('pf-donut');
+    if(pfDonut){const ctx2=pfDonut.getContext('2d');ctx2.clearRect(0,0,56,56);}
     // Reset avg win/loss bar + labels
     const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
     const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
@@ -1800,10 +1818,8 @@ function drawGauge(wins,be,losses){
 }
 
 function drawProfitFactorBar(grossWin,grossLoss){
-  const total=grossWin+grossLoss;
-  const gEl=document.getElementById('pf-bar-green');
-  const rEl=document.getElementById('pf-bar-red');
-  if(!gEl||!rEl)return;
+  // pf-bar elements replaced by donut; this is now a no-op
+  return;
   if(total<=0){
     gEl.style.width='50%';
     rEl.style.width='50%';
@@ -1902,23 +1918,29 @@ function drawMiniCharts(trades){
     ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
     ctx.fillStyle=lineColor;ctx.fill();
   }
-  // Profit Factor gauge bar (gross win vs gross loss)
+  // Profit Factor donut chart
   {
-    const pfGreen=document.getElementById('pf-bar-green');
-    const pfRed=document.getElementById('pf-bar-red');
-    const pfGwLbl=document.getElementById('pf-gw-lbl');
-    const pfGlLbl=document.getElementById('pf-gl-lbl');
-    if(pfGreen&&pfRed){
+    const donutC=document.getElementById('pf-donut');
+    if(donutC){
+      const ctx=donutC.getContext('2d');
       const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
       const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
       const total=grossWin+grossLoss;
-      if(total>0){const winPct=Math.round(grossWin/total*100);pfGreen.style.width=winPct+'%';pfRed.style.width=(100-winPct)+'%';}
-      else{pfGreen.style.width='50%';pfRed.style.width='50%';}
-      if(pfGwLbl)pfGwLbl.textContent='$'+Math.round(grossWin).toLocaleString();
-      if(pfGlLbl)pfGlLbl.textContent='$'+Math.round(grossLoss).toLocaleString();
+      const winAngle=total>0?(grossWin/total)*Math.PI*2:Math.PI;
+      const lossAngle=total>0?(grossLoss/total)*Math.PI*2:Math.PI;
+      const cx=28,cy=28,r=22,ri=13;
+      ctx.clearRect(0,0,56,56);
+      ctx.beginPath();ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+winAngle);
+      ctx.closePath();ctx.fillStyle='#1D9E75';ctx.fill();
+      ctx.beginPath();ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,-Math.PI/2+winAngle,-Math.PI/2+winAngle+lossAngle);
+      ctx.closePath();ctx.fillStyle='#D85A30';ctx.fill();
+      const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+      ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);
+      ctx.fillStyle=isDark?'#1a1d2e':'#ffffff';ctx.fill();
     }
   }
-  // [legacy mini-pf canvas — removed, replaced by gauge above]
 }
 
 function drawCharts(trades){
