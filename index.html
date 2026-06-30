@@ -1741,8 +1741,9 @@ function renderCalendar(key,trades){
     wHtml+=`<div class="week-card" style="height:86px;margin-bottom:${isLastRow?0:6}px">
       <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
       ${wTradeCount>0
-        ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>`
-        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div>`}
+        ?`<div style="font-size:16px;font-weight:800;color:${wMetric>=0?'var(--green)':'var(--red)'}">${wPnlStr}</div>
+           <div class="cal-day-trades">${wWr}%</div>`
+        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div><div class="cal-day-trades">0%</div>`}
     </div>`;
     wIdx++;
   }
