@@ -501,8 +501,20 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="stat-card-icon" style="background:rgba(245,158,11,0.18)"><i class="ti ti-target-arrow" style="color:var(--gold)"></i></div>
         <div class="stat-card-lbl">Profit Factor</div>
         <div class="stat-card-val" id="m-pf">—</div>
-        <div class="stat-card-bottom">
-          <canvas id="mini-pf" width="160" height="38" style="width:100%"></canvas>
+        <div class="stat-card-bottom" id="mini-pf-wrap" style="margin-top:6px">
+          <!-- PF gauge: gross win vs gross loss bar -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em">Gross Win</span>
+            <span style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em">Gross Loss</span>
+          </div>
+          <div style="display:flex;height:10px;border-radius:100px;overflow:hidden;background:var(--border);width:100%">
+            <div id="pf-bar-green" style="height:100%;background:linear-gradient(90deg,#1D9E75,#2bc98f);border-radius:100px 0 0 100px;transition:width .4s;width:50%"></div>
+            <div id="pf-bar-red" style="height:100%;background:linear-gradient(90deg,#D85A30,#f07050);border-radius:0 100px 100px 0;transition:width .4s;width:50%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px">
+            <span style="font-size:10px;font-weight:700;color:var(--green)" id="pf-gw-lbl">$0</span>
+            <span style="font-size:10px;font-weight:700;color:var(--red)" id="pf-gl-lbl">$0</span>
+          </div>
         </div>
       </div>
       <!-- Avg Win / Loss -->
@@ -1684,40 +1696,23 @@ function drawMiniCharts(trades){
     ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
     ctx.fillStyle=lineColor;ctx.fill();
   }
-  // Mini profit-factor line in Profit Factor card (running PF after each trade)
-  const miniPf=document.getElementById('mini-pf');
-  if(miniPf&&trades.length){
-    miniPf.width=160;miniPf.height=38;
-    const ctx2=miniPf.getContext('2d');
-    ctx2.clearRect(0,0,160,38);
-    let gw=0,gl=0;
-    const pfPts=trades.map(t=>{
-      if((t.pnl||0)>0)gw+=t.pnl;
-      else if((t.pnl||0)<0)gl+=Math.abs(t.pnl);
-      return gl>0?gw/gl:(gw>0?5:0); // cap visually when no losses yet
-    });
-    const minV2=Math.min(...pfPts,0);
-    const maxV2=Math.max(...pfPts,1);
-    const range2=maxV2-minV2||1;
-    const W2=160,H2=38;
-    const xs2=pfPts.map((_,i)=>i/(pfPts.length-1||1)*W2);
-    const ys2=pfPts.map(v=>H2-4-((v-minV2)/range2)*(H2-10));
-    const isGood=pfPts[pfPts.length-1]>=1;
-    const lineColor2=isGood?'#1D9E75':'#D85A30';
-    const fillColor2=isGood?'rgba(29,158,117,0.15)':'rgba(216,90,48,0.15)';
-    ctx2.beginPath();
-    ctx2.moveTo(xs2[0],H2);
-    xs2.forEach((x,i)=>ctx2.lineTo(x,ys2[i]));
-    ctx2.lineTo(W2,H2);ctx2.closePath();
-    ctx2.fillStyle=fillColor2;ctx2.fill();
-    ctx2.beginPath();
-    ctx2.moveTo(xs2[0],ys2[0]);
-    xs2.forEach((x,i)=>{if(i>0)ctx2.lineTo(x,ys2[i]);});
-    ctx2.strokeStyle=lineColor2;ctx2.lineWidth=2;ctx2.lineJoin='round';ctx2.stroke();
-    const lx2=xs2[xs2.length-1],ly2=ys2[ys2.length-1];
-    ctx2.beginPath();ctx2.arc(lx2,ly2,4,0,Math.PI*2);
-    ctx2.fillStyle=lineColor2;ctx2.fill();
+  // Profit Factor gauge bar (gross win vs gross loss)
+  {
+    const pfGreen=document.getElementById('pf-bar-green');
+    const pfRed=document.getElementById('pf-bar-red');
+    const pfGwLbl=document.getElementById('pf-gw-lbl');
+    const pfGlLbl=document.getElementById('pf-gl-lbl');
+    if(pfGreen&&pfRed){
+      const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
+      const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
+      const total=grossWin+grossLoss;
+      if(total>0){const winPct=Math.round(grossWin/total*100);pfGreen.style.width=winPct+'%';pfRed.style.width=(100-winPct)+'%';}
+      else{pfGreen.style.width='50%';pfRed.style.width='50%';}
+      if(pfGwLbl)pfGwLbl.textContent='$'+Math.round(grossWin).toLocaleString();
+      if(pfGlLbl)pfGlLbl.textContent='$'+Math.round(grossLoss).toLocaleString();
+    }
   }
+  // [legacy mini-pf canvas — removed, replaced by gauge above]
 }
 
 function drawCharts(trades){
