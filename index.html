@@ -392,18 +392,13 @@ table.tt tr:last-child td{border-bottom:none}
 .rep-ls-box .ls-row span{font-weight:700;color:var(--text)}
 
 /* NOTEBOOK */
-.nb-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1rem 1.1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s}
-.nb-card:hover{border-color:var(--border2)}
-.nb-card-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
-.nb-card-body{font-size:12px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-.nb-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
-.nb-card-date{font-size:10px;color:var(--text3)}
-.nb-card-tags{display:flex;gap:4px;flex-wrap:wrap}
-.nb-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(55,138,221,0.15);color:var(--blue)}
-.nb-card-actions{display:flex;gap:6px;opacity:0;transition:opacity .15s}
-.nb-card:hover .nb-card-actions{opacity:1}
-.nb-action-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 4px;border-radius:5px}
-.nb-action-btn:hover{color:var(--text);background:var(--surface2)}
+.nb-list-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--blue);font-size:13px;font-weight:500;transition:background .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-list-item:hover{background:var(--surface2)}
+.nb-list-item.active{background:var(--surface2)}
+.nb-list-item i{flex-shrink:0;font-size:14px}
+.nb-shot-thumb{position:relative;width:84px;height:84px;border-radius:8px;overflow:hidden;border:.5px solid var(--border2);flex-shrink:0}
+.nb-shot-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.nb-shot-remove{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);border:none;color:#fff;width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;line-height:1}
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
@@ -758,50 +753,43 @@ table.tt tr:last-child td{border-bottom:none}
   <div id="page-notebook" class="page">
     <div class="ph">
       <div class="ph-left"><h1>Notebook</h1><p>Your trading notes &amp; ideas</p></div>
-      <button class="btn-blue" onclick="openNoteModal()"><i class="ti ti-plus"></i> New Note</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center">
-      <input id="nb-search" type="text" placeholder="Search notes…" oninput="renderNotes()" style="font-family:Inter,sans-serif;font-size:13px;padding:8px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;flex:1;min-width:180px"/>
-      <select id="nb-tag-filter" class="sel" onchange="renderNotes()"><option value="">All tags</option></select>
-    </div>
-    <div id="nb-empty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--text3)">
-      <i class="ti ti-pencil" style="font-size:36px;margin-bottom:12px;display:block"></i>
-      <div style="font-size:15px;font-weight:600;margin-bottom:6px">No notes yet</div>
-      <div style="font-size:13px">Tap "New Note" to write your first note</div>
-    </div>
-    <div id="nb-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
-  </div>
-
-</div>
-</div>
-
-<!-- NOTEBOOK MODAL -->
-<div class="overlay" id="nb-modal">
-  <div class="modal" style="max-width:560px;width:95%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-      <h2 id="nb-modal-title" style="margin-bottom:0">New Note</h2>
-      <button onclick="closeOverlay('nb-modal')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="field" style="margin-bottom:12px"><label>Title</label><input type="text" id="nb-title" placeholder="Note title…"/></div>
-    <div class="field" style="margin-bottom:12px"><label>Content</label><textarea id="nb-content" style="min-height:160px;line-height:1.6" placeholder="Write your thoughts, observations, rules…"></textarea></div>
-    <div class="field" style="margin-bottom:12px"><label>Tags <span style="font-weight:400;color:var(--text3)">(comma separated)</span></label><input type="text" id="nb-tags" placeholder="e.g. mindset, strategy, review"/></div>
-    <div class="field" style="margin-bottom:1.25rem">
-      <label>Card Color</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="nb-color-picker">
-        <button type="button" class="nb-color-swatch" data-color="" onclick="selectNoteColor(this)" title="Default" style="background:var(--card);border:2px solid var(--blue);width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
-        <button type="button" class="nb-color-swatch" data-color="#1a1a1a" onclick="selectNoteColor(this)" title="Black" style="background:#1a1a1a;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
-        <button type="button" class="nb-color-swatch" data-color="#c0392b" onclick="selectNoteColor(this)" title="Red" style="background:#c0392b;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
-        <button type="button" class="nb-color-swatch" data-color="#d4a017" onclick="selectNoteColor(this)" title="Yellow" style="background:#d4a017;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
-        <button type="button" class="nb-color-swatch" data-color="#e07b39" onclick="selectNoteColor(this)" title="Orange" style="background:#e07b39;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
-        <button type="button" class="nb-color-swatch" data-color="#2471a3" onclick="selectNoteColor(this)" title="Blue" style="background:#2471a3;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+    <div style="display:flex;gap:1.25rem;align-items:flex-start">
+      <!-- Sidebar list -->
+      <div style="width:280px;flex-shrink:0">
+        <button class="btn-blue" style="width:100%;justify-content:center;margin-bottom:12px" onclick="createNewNote()"><i class="ti ti-plus"></i> New note</button>
+        <input id="nb-search" type="text" placeholder="Search notes…" oninput="renderNotesList()" style="font-family:Inter,sans-serif;font-size:13px;padding:8px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;width:100%;margin-bottom:10px;box-sizing:border-box"/>
+        <div id="nb-list" style="display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 260px);overflow-y:auto"></div>
+      </div>
+      <!-- Note editor panel -->
+      <div id="nb-editor-wrap" class="card" style="flex:1;margin-bottom:0;min-height:480px">
+        <div id="nb-empty-state" style="display:none;text-align:center;padding:4rem 1rem;color:var(--text3)">
+          <i class="ti ti-pencil" style="font-size:36px;margin-bottom:12px;display:block"></i>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">No notes yet</div>
+          <div style="font-size:13px">Tap "New note" to write your first one</div>
+        </div>
+        <div id="nb-editor">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:10px">
+            <input id="nb-edit-title" type="text" placeholder="Untitled note" oninput="onNoteEdited()" style="font-family:Inter,sans-serif;font-size:22px;font-weight:700;color:var(--text);background:none;border:none;outline:none;flex:1;min-width:0"/>
+            <button onclick="deleteCurrentNote()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0" title="Delete note"><i class="ti ti-trash"></i></button>
+          </div>
+          <textarea id="nb-edit-content" oninput="onNoteEdited()" placeholder="Write your thoughts, observations, rules…" style="width:100%;min-height:280px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px;font-family:Inter,sans-serif;font-size:14px;line-height:1.7;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+          <div style="margin-top:1.25rem">
+            <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:8px">Screenshots</label>
+            <div id="nb-shots" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+            <label for="nb-shot-input" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);font-size:12px;color:var(--text2);cursor:pointer">
+              <i class="ti ti-photo-plus"></i> Add screenshot
+            </label>
+            <input id="nb-shot-input" type="file" accept="image/*" multiple style="display:none" onchange="onNoteScreenshotUpload(event)"/>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="mactions">
-      <button class="mc" onclick="closeOverlay('nb-modal')">Cancel</button>
-      <button class="mp" onclick="saveNote()">Save Note</button>
-    </div>
   </div>
+
 </div>
+</div>
+
 
 <!-- ACCOUNTS MODAL -->
 <div class="overlay" id="pf-modal">
@@ -2872,114 +2860,145 @@ function openDayJournal(dateStr){
 }
 
 // ── Notebook ─────────────────────────────────────────────────
-let editNoteId=null;
+let currentNoteId=null;
+let noteSaveTimer=null;
 
 function initNotebook(){
   if(!db.notes)db.notes=[];
-  renderNotes();
+  renderNotesList();
+  if(!currentNoteId&&db.notes.length){
+    selectNote(db.notes[0].id);
+  } else if(currentNoteId){
+    selectNote(currentNoteId);
+  } else {
+    showNoteEmptyState();
+  }
 }
 
-function renderNotes(){
+function showNoteEmptyState(){
+  const editor=document.getElementById('nb-editor');
+  const empty=document.getElementById('nb-empty-state');
+  if(editor)editor.style.display='none';
+  if(empty)empty.style.display='';
+}
+
+function renderNotesList(){
   if(!db.notes)db.notes=[];
   const search=(document.getElementById('nb-search')?.value||'').toLowerCase();
-  const tagFilter=document.getElementById('nb-tag-filter')?.value||'';
-
-  // Rebuild tag filter options
-  const allTags=[...new Set(db.notes.flatMap(n=>n.tags||[]))].sort();
-  const tf=document.getElementById('nb-tag-filter');
-  if(tf){
-    const cur=tf.value;
-    tf.innerHTML='<option value="">All tags</option>'+allTags.map(t=>`<option value="${t}">${t}</option>`).join('');
-    tf.value=cur;
-  }
-
   let notes=[...db.notes].sort((a,b)=>b.updatedAt-a.updatedAt);
   if(search)notes=notes.filter(n=>(n.title||'').toLowerCase().includes(search)||(n.content||'').toLowerCase().includes(search));
-  if(tagFilter)notes=notes.filter(n=>(n.tags||[]).includes(tagFilter));
-
-  const grid=document.getElementById('nb-grid');
-  const empty=document.getElementById('nb-empty');
+  const list=document.getElementById('nb-list');
+  if(!list)return;
   if(!notes.length){
-    if(grid)grid.innerHTML='';
-    if(empty)empty.style.display='';
+    list.innerHTML='<div style="padding:12px 6px;font-size:12px;color:var(--text3)">No notes found.</div>';
     return;
   }
+  list.innerHTML=notes.map(n=>{
+    const title=(n.title||'Untitled note').trim()||'Untitled note';
+    const isActive=n.id===currentNoteId;
+    return `<div class="nb-list-item${isActive?' active':''}" onclick="selectNote(${n.id})" title="${title.replace(/"/g,'&quot;')}">
+      <i class="ti ti-file-text"></i><span style="overflow:hidden;text-overflow:ellipsis">${title}</span>
+    </div>`;
+  }).join('');
+}
+
+function createNewNote(){
+  if(!db.notes)db.notes=[];
+  const note={id:Date.now(),title:'',content:'',shots:[],createdAt:Date.now(),updatedAt:Date.now()};
+  db.notes.unshift(note);
+  persist();
+  currentNoteId=note.id;
+  renderNotesList();
+  selectNote(note.id);
+  setTimeout(()=>document.getElementById('nb-edit-title')?.focus(),50);
+}
+
+function selectNote(id){
+  const note=(db.notes||[]).find(n=>n.id===id);
+  if(!note)return;
+  currentNoteId=id;
+  const editor=document.getElementById('nb-editor');
+  const empty=document.getElementById('nb-empty-state');
   if(empty)empty.style.display='none';
-  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const fmtDate=ts=>{const d=new Date(ts);return mn[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();};
-  if(grid)grid.innerHTML=notes.map(n=>`
-    <div class="nb-card" onclick="openNoteModal(${n.id})" style="${n.color?'background:'+n.color+';border-color:'+n.color+';':''}" >
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-        <div class="nb-card-title">${n.title||'Untitled'}</div>
-        <div class="nb-card-actions" onclick="event.stopPropagation()">
-          <button class="nb-action-btn" onclick="openNoteModal(${n.id})" title="Edit"><i class="ti ti-pencil"></i></button>
-          <button class="nb-action-btn" onclick="deleteNote(${n.id})" title="Delete" style="color:var(--red)"><i class="ti ti-trash"></i></button>
-        </div>
-      </div>
-      ${n.content?`<div class="nb-card-body">${n.content.replace(/</g,'&lt;')}</div>`:''}
-      <div class="nb-card-footer">
-        <span class="nb-card-date">${fmtDate(n.updatedAt||n.createdAt)}</span>
-        <div class="nb-card-tags">${(n.tags||[]).map(t=>`<span class="nb-tag">${t}</span>`).join('')}</div>
-      </div>
+  if(editor)editor.style.display='';
+  document.getElementById('nb-edit-title').value=note.title||'';
+  document.getElementById('nb-edit-content').value=note.content||'';
+  renderNoteShots(note);
+  renderNotesList();
+}
+
+function onNoteEdited(){
+  if(!currentNoteId)return;
+  clearTimeout(noteSaveTimer);
+  noteSaveTimer=setTimeout(()=>{
+    const note=(db.notes||[]).find(n=>n.id===currentNoteId);
+    if(!note)return;
+    note.title=document.getElementById('nb-edit-title').value;
+    note.content=document.getElementById('nb-edit-content').value;
+    note.updatedAt=Date.now();
+    persist();
+    renderNotesList();
+  },300);
+}
+
+function renderNoteShots(note){
+  const wrap=document.getElementById('nb-shots');
+  if(!wrap)return;
+  const shots=note.shots||[];
+  wrap.innerHTML=shots.map((src,i)=>`
+    <div class="nb-shot-thumb">
+      <img src="${src}"/>
+      <button class="nb-shot-remove" onclick="removeNoteShot(${i})"><i class="ti ti-x"></i></button>
     </div>`).join('');
 }
 
-function openNoteModal(id){
-  editNoteId=id||null;
-  const note=id?(db.notes||[]).find(n=>n.id===id):null;
-  document.getElementById('nb-modal-title').textContent=note?'Edit Note':'New Note';
-  document.getElementById('nb-title').value=note?note.title:'';
-  document.getElementById('nb-content').value=note?note.content:'';
-  document.getElementById('nb-tags').value=note?(note.tags||[]).join(', '):'';
-  // Restore color swatches
-  const swatches=document.querySelectorAll('.nb-color-swatch');
-  const noteColor=note?note.color||'':'';
-  swatches.forEach(s=>{
-    const isSelected=s.dataset.color===noteColor;
-    s.style.border=isSelected?'2px solid var(--blue)':'2px solid transparent';
-    if(isSelected)s.dataset.selected='1';
-    else delete s.dataset.selected;
+function onNoteScreenshotUpload(e){
+  if(!currentNoteId)return;
+  const note=(db.notes||[]).find(n=>n.id===currentNoteId);
+  if(!note)return;
+  if(!note.shots)note.shots=[];
+  const files=[...e.target.files];
+  let remaining=files.length;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      note.shots.push(ev.target.result);
+      remaining--;
+      if(remaining===0){
+        note.updatedAt=Date.now();
+        persist();
+        renderNoteShots(note);
+      }
+    };
+    reader.readAsDataURL(file);
   });
-  document.getElementById('nb-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('nb-title').focus(),100);
+  e.target.value='';
 }
 
-function saveNote(){
-  if(!db.notes)db.notes=[];
-  const title=document.getElementById('nb-title').value.trim();
-  const content=document.getElementById('nb-content').value.trim();
-  const tags=document.getElementById('nb-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const selectedSwatch=document.querySelector('.nb-color-swatch[data-selected="1"]');
-  const color=selectedSwatch?selectedSwatch.dataset.color:'';
-  if(!title&&!content)return;
-  if(editNoteId){
-    const n=db.notes.find(n=>n.id===editNoteId);
-    if(n){n.title=title;n.content=content;n.tags=tags;n.color=color;n.updatedAt=Date.now();}
-  } else {
-    db.notes.push({id:Date.now(),title,content,tags,color,createdAt:Date.now(),updatedAt:Date.now()});
-  }
+function removeNoteShot(idx){
+  const note=(db.notes||[]).find(n=>n.id===currentNoteId);
+  if(!note)return;
+  note.shots.splice(idx,1);
+  note.updatedAt=Date.now();
   persist();
-  closeOverlay('nb-modal');
-  renderNotes();
-  editNoteId=null;
+  renderNoteShots(note);
 }
 
-function selectNoteColor(el){
-  document.querySelectorAll('.nb-color-swatch').forEach(s=>{
-    s.style.border='2px solid transparent';
-    s.removeAttribute('data-selected');
-  });
-  el.style.border='2px solid var(--blue)';
-  el.dataset.selected='1';
-}
-
-function deleteNote(id){
+function deleteCurrentNote(){
+  if(!currentNoteId)return;
   if(!confirm('Delete this note?'))return;
-  db.notes=(db.notes||[]).filter(n=>n.id!==id);
+  db.notes=(db.notes||[]).filter(n=>n.id!==currentNoteId);
   persist();
-  renderNotes();
+  currentNoteId=null;
+  renderNotesList();
+  if(db.notes.length){
+    selectNote(db.notes[0].id);
+  } else {
+    showNoteEmptyState();
+  }
 }
 
+// ── Init ──────────────────────────────────────────────────────
 // ── Init ──────────────────────────────────────────────────────
 loadDB();
 applyTheme();
