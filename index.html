@@ -16,32 +16,42 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s}
 
 /* SIDEBAR */
-.sidebar{width:270px;min-width:270px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
+.sidebar{width:70px;min-width:70px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
+.sidebar:hover{width:230px;min-width:230px}
 .sidebar.collapsed{width:70px;min-width:70px}
 .sb-top{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:62px;border-bottom:.5px solid var(--border);flex-shrink:0}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;white-space:nowrap;color:var(--text)}
 .logo i{color:var(--blue);font-size:20px;flex-shrink:0}
 .logo-text{transition:opacity .2s}
+.sidebar .logo-text{opacity:0;width:0;overflow:hidden;transition:opacity .2s,width .2s}
+.sidebar:hover .logo-text{opacity:1;width:auto}
 .sidebar.collapsed .logo-text{opacity:0;width:0;overflow:hidden}
+.sidebar .sb-top{justify-content:center;padding:0 8px}
+.sidebar:hover .sb-top{justify-content:flex-start;padding:0 16px}
 .sidebar.collapsed .sb-top{justify-content:center;padding:0 8px}
 nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;flex:1}
-nav button{background:none;border:none;padding:11px 14px;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:13px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:400;letter-spacing:0.01em}
+nav button{background:none;border:none;padding:11px 0;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:13px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:400;letter-spacing:0.01em}
+.sidebar:hover nav button{justify-content:flex-start;padding:11px 14px}
 nav button:hover{color:var(--text);background:none}
 nav button.active{color:var(--blue);font-weight:500;background:none}
 nav button.active i{color:var(--blue)}
 nav button i{font-size:19px;flex-shrink:0;color:var(--text3);transition:color .15s}
 nav button:hover i{color:var(--text)}
 .nav-label{transition:opacity .2s;overflow:hidden}
+.sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
+.sidebar:hover .nav-label{opacity:1;width:auto}
 .sidebar.collapsed .nav-label{opacity:0;width:0}
 .sb-bottom{padding:12px 12px;border-top:.5px solid var(--border);display:flex;flex-direction:column;gap:2px}
 .sb-bottom button{background:none;border:none;padding:10px 14px;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:13px;width:100%;white-space:nowrap;font-weight:400}
 .sb-bottom button:hover{color:var(--text);background:none}
 .sb-bottom button i{font-size:19px;flex-shrink:0;color:var(--text3)}
 .sb-bottom-label{transition:opacity .2s;overflow:hidden}
+.sidebar .sb-bottom-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
+.sidebar:hover .sb-bottom-label{opacity:1;width:auto}
 .sidebar.collapsed .sb-bottom-label{opacity:0;width:0}
 
 /* MAIN */
-.app-body{margin-left:270px;flex:1;min-height:100vh;transition:margin-left .25s}
+.app-body{margin-left:70px;flex:1;min-height:100vh;transition:margin-left .25s}
 .app-body.collapsed{margin-left:70px}
 .content{max-width:980px;margin:0 auto;padding:1.5rem 1.5rem;transition:max-width .25s}
 .app-body.collapsed .content{max-width:1180px}
@@ -446,7 +456,6 @@ table.tt tr:last-child td{border-bottom:none}
 <div class="app-body" id="app-body">
 <div class="top-bar" id="top-bar">
   <div class="top-bar-left">
-    <button class="sb-toggle-top" onclick="toggleSidebar()" title="Toggle sidebar"><i class="ti ti-layout-sidebar-left-collapse" id="sb-icon-top"></i></button>
     <span class="top-bar-section" id="top-bar-section">Dashboard</span>
   </div>
   <div class="top-bar-right" id="top-bar-right">
@@ -1258,16 +1267,9 @@ function closeMobileSidebar(){
 
 function initSidebar(){
   if(isMobileViewport()){
-    const iconTop=document.getElementById('sb-icon-top');
-    if(iconTop)iconTop.className='ti ti-menu-2';
-    return; // drawer starts closed on mobile regardless of any saved desktop-collapsed preference
+    return; // mobile uses drawer
   }
-  if(localStorage.getItem('tj_v10_sb')==='1'){
-    document.getElementById('sidebar').classList.add('collapsed');
-    document.getElementById('app-body').classList.add('collapsed');
-    const iconTop=document.getElementById('sb-icon-top');
-    if(iconTop)iconTop.className='ti ti-layout-sidebar-left-expand';
-  }
+  // Sidebar is always icon-only by default (expands on hover via CSS)
 }
 
 // ── Navigation ────────────────────────────────────────────────
