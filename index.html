@@ -1573,7 +1573,7 @@ function renderRecentTrades(allMonthTrades){
   if(!wrap)return;
   // Use ALL trades across all months/accounts for "recent", sorted by date desc
   const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  const recent=all.slice(0,8);
+  const recent=all;
   if(!recent.length){
     wrap.innerHTML='<div style="padding:1rem 4px;text-align:center;color:var(--text3);font-size:12px">No trades yet.</div>';
     return;
@@ -1581,8 +1581,10 @@ function renderRecentTrades(allMonthTrades){
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   wrap.innerHTML=recent.map(t=>{
     const pnl=t.pnl||0;
-    const pnlColor=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text3)';
-    const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
+    const rr=t.rr||0;
+    const metric=displayMode==='percent'?rr:pnl;
+    const pnlColor=metric>0?'var(--green)':metric<0?'var(--red)':'var(--text3)';
+    const pnlStr=displayMode==='percent'?rrPct(rr):(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
     const sym=PAIRS[t.symbol]||t.symbol||'—';
     return `<div class="rt-item" onclick="openDayJournal('${t.date}')">
       <div class="rt-symbol">${sym}</div>
