@@ -2907,16 +2907,13 @@ function renderNotesList(){
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   list.innerHTML=notes.map(n=>{
     const title=(n.title||'Untitled note').trim()||'Untitled note';
-    const preview=(n.content||'').trim().replace(/\n/g,' ').slice(0,60);
     const isActive=n.id===currentNoteId;
-    const barColor=n.color||'#378ADD';
     const d=new Date(n.updatedAt||n.createdAt);
     const dateStr=mn[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
-    return `<div class="nb-list-item${isActive?' active':''}" onclick="selectNote(${n.id})" style="border-left:3px solid ${barColor}">
+    return `<div class="nb-list-item${isActive?' active':''}" onclick="selectNote(${n.id})">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${title}</div>
-        ${preview?`<div style="font-size:11px;color:var(--text3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${preview}</div>`:''}
-        <div style="font-size:10px;color:var(--text3);opacity:.7;margin-top:5px">${dateStr}</div>
+        <div style="font-size:10px;color:var(--text3);opacity:.7;margin-top:4px">${dateStr}</div>
       </div>
     </div>`;
   }).join('');
