@@ -391,6 +391,19 @@ table.tt tr:last-child td{border-bottom:none}
 .rep-ls-box .ls-row{display:flex;justify-content:space-around;margin-top:10px;font-size:12px;color:var(--text2)}
 .rep-ls-box .ls-row span{font-weight:700;color:var(--text)}
 
+/* NOTEBOOK */
+.nb-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1rem 1.1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s}
+.nb-card:hover{border-color:var(--border2)}
+.nb-card-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.nb-card-body{font-size:12px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nb-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.nb-card-date{font-size:10px;color:var(--text3)}
+.nb-card-tags{display:flex;gap:4px;flex-wrap:wrap}
+.nb-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(55,138,221,0.15);color:var(--blue)}
+.nb-card-actions{display:flex;gap:6px;opacity:0;transition:opacity .15s}
+.nb-card:hover .nb-card-actions{opacity:1}
+.nb-action-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 4px;border-radius:5px}
+.nb-action-btn:hover{color:var(--text);background:var(--surface2)}
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
@@ -419,6 +432,7 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="go('accounts',this)"><i class="ti ti-building-bank"></i><span class="nav-label">Accounts</span></button>
     <button onclick="go('playbooks',this)"><i class="ti ti-notebook"></i><span class="nav-label">Playbooks</span></button>
     <button onclick="go('reports',this)"><i class="ti ti-chart-pie"></i><span class="nav-label">Reports</span></button>
+    <button onclick="go('notebook',this)"><i class="ti ti-pencil"></i><span class="nav-label">Notebook</span></button>
   </nav>
   <div class="sb-bottom">
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
@@ -740,7 +754,42 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
   </div>
 
+  <!-- NOTEBOOK -->
+  <div id="page-notebook" class="page">
+    <div class="ph">
+      <div class="ph-left"><h1>Notebook</h1><p>Your trading notes &amp; ideas</p></div>
+      <button class="btn-blue" onclick="openNoteModal()"><i class="ti ti-plus"></i> New Note</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center">
+      <input id="nb-search" type="text" placeholder="Search notes…" oninput="renderNotes()" style="font-family:Inter,sans-serif;font-size:13px;padding:8px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;flex:1;min-width:180px"/>
+      <select id="nb-tag-filter" class="sel" onchange="renderNotes()"><option value="">All tags</option></select>
+    </div>
+    <div id="nb-empty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--text3)">
+      <i class="ti ti-pencil" style="font-size:36px;margin-bottom:12px;display:block"></i>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">No notes yet</div>
+      <div style="font-size:13px">Tap "New Note" to write your first note</div>
+    </div>
+    <div id="nb-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+  </div>
+
 </div>
+</div>
+
+<!-- NOTEBOOK MODAL -->
+<div class="overlay" id="nb-modal">
+  <div class="modal" style="max-width:560px;width:95%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 id="nb-modal-title" style="margin-bottom:0">New Note</h2>
+      <button onclick="closeOverlay('nb-modal')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field" style="margin-bottom:12px"><label>Title</label><input type="text" id="nb-title" placeholder="Note title…"/></div>
+    <div class="field" style="margin-bottom:12px"><label>Content</label><textarea id="nb-content" style="min-height:160px;line-height:1.6" placeholder="Write your thoughts, observations, rules…"></textarea></div>
+    <div class="field" style="margin-bottom:1.25rem"><label>Tags <span style="font-weight:400;color:var(--text3)">(comma separated)</span></label><input type="text" id="nb-tags" placeholder="e.g. mindset, strategy, review"/></div>
+    <div class="mactions">
+      <button class="mc" onclick="closeOverlay('nb-modal')">Cancel</button>
+      <button class="mp" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
 </div>
 
 <!-- ACCOUNTS MODAL -->
@@ -1203,6 +1252,7 @@ function go(id,btn){
   if(id==='accounts')renderAccounts();
   if(id==='playbooks')renderPlaybooks();
   if(id==='reports')initReportsPage();
+  if(id==='notebook')initNotebook();
 }
 
 // ── Dashboard selectors ───────────────────────────────────────
@@ -2808,6 +2858,95 @@ function openDayJournal(dateStr){
     tradesWrap.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades logged for this day.</div>`;
   }
   document.getElementById('day-modal').classList.add('open');
+}
+
+// ── Notebook ─────────────────────────────────────────────────
+let editNoteId=null;
+
+function initNotebook(){
+  if(!db.notes)db.notes=[];
+  renderNotes();
+}
+
+function renderNotes(){
+  if(!db.notes)db.notes=[];
+  const search=(document.getElementById('nb-search')?.value||'').toLowerCase();
+  const tagFilter=document.getElementById('nb-tag-filter')?.value||'';
+
+  // Rebuild tag filter options
+  const allTags=[...new Set(db.notes.flatMap(n=>n.tags||[]))].sort();
+  const tf=document.getElementById('nb-tag-filter');
+  if(tf){
+    const cur=tf.value;
+    tf.innerHTML='<option value="">All tags</option>'+allTags.map(t=>`<option value="${t}">${t}</option>`).join('');
+    tf.value=cur;
+  }
+
+  let notes=[...db.notes].sort((a,b)=>b.updatedAt-a.updatedAt);
+  if(search)notes=notes.filter(n=>(n.title||'').toLowerCase().includes(search)||(n.content||'').toLowerCase().includes(search));
+  if(tagFilter)notes=notes.filter(n=>(n.tags||[]).includes(tagFilter));
+
+  const grid=document.getElementById('nb-grid');
+  const empty=document.getElementById('nb-empty');
+  if(!notes.length){
+    if(grid)grid.innerHTML='';
+    if(empty)empty.style.display='';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmtDate=ts=>{const d=new Date(ts);return mn[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();};
+  if(grid)grid.innerHTML=notes.map(n=>`
+    <div class="nb-card" onclick="openNoteModal(${n.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div class="nb-card-title">${n.title||'Untitled'}</div>
+        <div class="nb-card-actions" onclick="event.stopPropagation()">
+          <button class="nb-action-btn" onclick="openNoteModal(${n.id})" title="Edit"><i class="ti ti-pencil"></i></button>
+          <button class="nb-action-btn" onclick="deleteNote(${n.id})" title="Delete" style="color:var(--red)"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+      ${n.content?`<div class="nb-card-body">${n.content.replace(/</g,'&lt;')}</div>`:''}
+      <div class="nb-card-footer">
+        <span class="nb-card-date">${fmtDate(n.updatedAt||n.createdAt)}</span>
+        <div class="nb-card-tags">${(n.tags||[]).map(t=>`<span class="nb-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openNoteModal(id){
+  editNoteId=id||null;
+  const note=id?(db.notes||[]).find(n=>n.id===id):null;
+  document.getElementById('nb-modal-title').textContent=note?'Edit Note':'New Note';
+  document.getElementById('nb-title').value=note?note.title:'';
+  document.getElementById('nb-content').value=note?note.content:'';
+  document.getElementById('nb-tags').value=note?(note.tags||[]).join(', '):'';
+  document.getElementById('nb-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('nb-title').focus(),100);
+}
+
+function saveNote(){
+  if(!db.notes)db.notes=[];
+  const title=document.getElementById('nb-title').value.trim();
+  const content=document.getElementById('nb-content').value.trim();
+  const tags=document.getElementById('nb-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  if(!title&&!content)return;
+  if(editNoteId){
+    const n=db.notes.find(n=>n.id===editNoteId);
+    if(n){n.title=title;n.content=content;n.tags=tags;n.updatedAt=Date.now();}
+  } else {
+    db.notes.push({id:Date.now(),title,content,tags,createdAt:Date.now(),updatedAt:Date.now()});
+  }
+  persist();
+  closeOverlay('nb-modal');
+  renderNotes();
+  editNoteId=null;
+}
+
+function deleteNote(id){
+  if(!confirm('Delete this note?'))return;
+  db.notes=(db.notes||[]).filter(n=>n.id!==id);
+  persist();
+  renderNotes();
 }
 
 // ── Init ──────────────────────────────────────────────────────
