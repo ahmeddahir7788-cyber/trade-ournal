@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 [data-theme="dark"]{--bg:#020308;--surface:#020308;--surface2:#131522;--card:#0d0f1c;--border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.16);--text:#f0f0f0;--text2:#aaa;--text3:#666;--shadow:rgba(0,0,0,0.55)}
@@ -565,7 +566,7 @@ table.tt tr:last-child td{border-bottom:none}
           <span class="cms-label">Monthly stats:</span>
           <span class="cms-chip" id="cms-pnl-chip">$0</span>
           <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
-          <button class="cal-nav-btn" onclick="openCalScreenshots()" title="Screenshots" style="width:auto;padding:0 10px;gap:6px;display:inline-flex;align-items:center"><i class="ti ti-photo-plus"></i> <span style="font-size:12px;font-weight:600">Screenshot</span></button>
+          <button class="cal-nav-btn" onclick="captureCalendar()" title="Screenshot calendar"><i class="ti ti-camera"></i></button>
         </div>
       </div>
       <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
@@ -2973,6 +2974,31 @@ function removeDayShot(dateStr,idx){
   persist();
   renderDayShots(dateStr);
   if(currentDashKey)refreshCurrentDashboardView();
+}
+
+// ── Calendar Capture ─────────────────────────────────────────
+function captureCalendar(){
+  const card=document.querySelector('#page-dashboard .card:last-of-type');
+  if(!card){alert('Calendar not found.');return;}
+  const btn=card.querySelector('.cal-nav-btn[onclick*="captureCalendar"]');
+  if(btn)btn.style.visibility='hidden';
+  html2canvas(card,{
+    backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--card').trim()||'#13151f',
+    scale:2,
+    useCORS:true,
+    logging:false
+  }).then(canvas=>{
+    if(btn)btn.style.visibility='';
+    const[y,m]=( currentDashKey||curMonthKey() ).split('-');
+    const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const link=document.createElement('a');
+    link.download='calendar-'+mn[parseInt(m)-1]+'-'+y+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }).catch(e=>{
+    if(btn)btn.style.visibility='';
+    alert('Screenshot failed: '+e.message);
+  });
 }
 
 // ── Calendar Screenshots ─────────────────────────────────────
