@@ -1537,7 +1537,7 @@ function renderDashboard(key){
     // Reset mini bars
     const mb=document.getElementById('mini-bars');if(mb)mb.innerHTML='';
     const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');ctx.clearRect(0,0,meq.width,meq.height);}
-    document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
+    const _ss=document.getElementById('session-stats');if(_ss)_ss.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
     renderRecentTrades();
@@ -1912,29 +1912,32 @@ function drawMiniCharts(trades){
 }
 
 function drawCharts(trades){
-  const dark=document.documentElement.getAttribute('data-theme')==='dark';
-  const gc=dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)';
-  const tc=dark?'#666':'#999';
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
+  const tc=dark?'#555':'#aaa';
 
-  // Always start from 0
   let cum=0;
   const ed=trades.map(t=>{cum+=(t.pnl||0);return{x:t.date,y:Math.round(cum)};});
-  const labels=['$0',...ed.map(d=>d.x)];
+  const labels=['start',...ed.map(d=>d.x)];
   const vals=[0,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
   if(c1){
     if(eqChart){eqChart.destroy();eqChart=null;}
-    const chartH=c1.canvas.clientHeight||210;
-    const maxV=Math.max(0,...vals);
-    const minV=Math.min(0,...vals);
-    const range=maxV-minV||1;
-    const zeroRatio=maxV/range;
+    const chartH=c1.canvas.clientHeight||240;
+    const lastVal=vals[vals.length-1]||0;
+    const lineColor=lastVal>=0?'#1D9E75':'#D85A30';
     const grad=c1.createLinearGradient(0,0,0,chartH);
-    grad.addColorStop(0,'rgba(29,158,117,0.25)');
-    grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(29,158,117,0.05)');
-    grad.addColorStop(Math.min(1,Math.max(0,zeroRatio)),'rgba(216,90,48,0.05)');
-    grad.addColorStop(1,'rgba(216,90,48,0.2)');
-    // Crosshair plugin — vertical line that follows cursor
+    if(lastVal>=0){
+      grad.addColorStop(0,'rgba(29,158,117,0.35)');
+      grad.addColorStop(0.6,'rgba(29,158,117,0.08)');
+      grad.addColorStop(1,'rgba(29,158,117,0)');
+    } else {
+      grad.addColorStop(0,'rgba(216,90,48,0.35)');
+      grad.addColorStop(0.6,'rgba(216,90,48,0.08)');
+      grad.addColorStop(1,'rgba(216,90,48,0)');
+    }
+
+    // Crosshair plugin
     const crosshairPlugin={
       id:'crosshair',
       afterDraw:function(chart){
@@ -1948,13 +1951,41 @@ function drawCharts(trades){
           ctx.moveTo(x,topY);
           ctx.lineTo(x,bottomY);
           ctx.lineWidth=1;
-          ctx.strokeStyle=dark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.15)';
+          ctx.strokeStyle=dark?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.12)';
           ctx.setLineDash([4,4]);
           ctx.stroke();
           ctx.restore();
         }
       }
     };
+
+    // External top-bar tooltip like TradeZella
+    const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    function externalTooltip(context){
+      const wrap=document.getElementById('equity-chart').closest('.card');
+      let el=wrap?wrap.querySelector('.eq-topbar'):null;
+      if(!el&&wrap){
+        el=document.createElement('div');
+        el.className='eq-topbar';
+        el.style.cssText='position:absolute;top:12px;left:16px;display:flex;align-items:center;gap:16px;pointer-events:none;z-index:2;font-family:Inter,sans-serif';
+        wrap.style.position='relative';
+        wrap.appendChild(el);
+      }
+      if(!el)return;
+      const {tooltip}=context;
+      if(tooltip.opacity===0||!tooltip.dataPoints){el.innerHTML='';return;}
+      const dp=tooltip.dataPoints[0];
+      const lbl=dp.label;
+      const v=dp.parsed.y;
+      let dateStr='';
+      if(lbl&&lbl!=='start'){
+        try{const p=lbl.split('-');const d=new Date(lbl);const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];dateStr=days[d.getDay()]+', '+parseInt(p[2])+' '+mn[parseInt(p[1])-1]+', '+p[0];}catch(e){dateStr=lbl;}
+      }
+      const pnlColor=v>=0?'#1D9E75':'#D85A30';
+      const pnlStr=(v>=0?'+':'')+' $'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
+      el.innerHTML=`<span style="font-size:13px;font-weight:600;color:${dark?'#ccc':'#444'}">${dateStr}</span><span style="font-size:13px;font-weight:700;color:${pnlColor}">Net P&L ${pnlStr}</span>`;
+    }
+
     eqChart=new Chart(c1,{
       plugins:[crosshairPlugin],
       type:'line',
@@ -1962,54 +1993,40 @@ function drawCharts(trades){
         labels,
         datasets:[{
           data:vals,
-          backgroundColor:'transparent',
+          backgroundColor:grad,
+          borderColor:lineColor,
           borderWidth:2.5,
           pointRadius:0,
-          pointHoverRadius:6,
-          fill:false,
-          tension:0.3,
-          segment:{
-            borderColor:ctx=>ctx.p0.parsed.y>=0&&ctx.p1.parsed.y>=0?'#1D9E75':
-                            ctx.p0.parsed.y<0&&ctx.p1.parsed.y<0?'#D85A30':'#aaa'
-          }
+          pointHoverRadius:5,
+          pointHoverBackgroundColor:lineColor,
+          fill:true,
+          tension:0.4
         }]
       },
       options:{
         responsive:true,
         maintainAspectRatio:false,
-        animation:false,
+        animation:{duration:400,easing:'easeInOutQuart'},
         resizeDelay:100,
         interaction:{mode:'index',intersect:false},
         plugins:{
           legend:{display:false},
           tooltip:{
-            enabled:true,
-            backgroundColor:dark?'#0d0f1c':'#ffffff',
-            borderColor:dark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.10)',
-            borderWidth:1,
-            titleColor:dark?'#aaa':'#666',
-            bodyColor:dark?'#f0f0f0':'#111',
-            padding:{top:10,bottom:10,left:14,right:14},
-            cornerRadius:10,
-            displayColors:false,
-            titleFont:{size:11,weight:'600',family:'Inter'},
-            bodyFont:{size:16,weight:'800',family:'Inter'},
-            callbacks:{
-              title:function(items){
-                const lbl=items[0].label;
-                if(!lbl||lbl==='$0')return 'Start';
-                try{const parts=lbl.split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mn[parseInt(parts[1])-1]+' '+parseInt(parts[2])+', '+parts[0];}catch(e){return lbl;}
-              },
-              label:function(item){
-                const v=item.parsed.y;
-                return(v>=0?'+':'')+' $'+Math.abs(v).toLocaleString();
-              }
-            }
+            enabled:false,
+            external:externalTooltip
           }
         },
         scales:{
-          x:{ticks:{font:{size:11},maxTicksLimit:10,color:tc},grid:{display:false}},
-          y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc}}
+          x:{
+            ticks:{font:{size:11},maxTicksLimit:8,color:tc,maxRotation:0},
+            grid:{display:false},
+            border:{display:false}
+          },
+          y:{
+            ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},
+            grid:{color:gc},
+            border:{display:false}
+          }
         }
       }
     });
