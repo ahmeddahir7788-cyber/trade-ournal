@@ -1928,13 +1928,13 @@ function drawCharts(trades){
     const lineColor=lastVal>=0?'#1D9E75':'#D85A30';
     const grad=c1.createLinearGradient(0,0,0,chartH);
     if(lastVal>=0){
-      grad.addColorStop(0,'rgba(29,158,117,0.35)');
-      grad.addColorStop(0.6,'rgba(29,158,117,0.08)');
-      grad.addColorStop(1,'rgba(29,158,117,0)');
+      grad.addColorStop(0,'rgba(29,158,117,0.6)');
+      grad.addColorStop(0.5,'rgba(29,158,117,0.25)');
+      grad.addColorStop(1,'rgba(29,158,117,0.02)');
     } else {
-      grad.addColorStop(0,'rgba(216,90,48,0.35)');
-      grad.addColorStop(0.6,'rgba(216,90,48,0.08)');
-      grad.addColorStop(1,'rgba(216,90,48,0)');
+      grad.addColorStop(0,'rgba(216,90,48,0.6)');
+      grad.addColorStop(0.5,'rgba(216,90,48,0.25)');
+      grad.addColorStop(1,'rgba(216,90,48,0.02)');
     }
 
     // Crosshair plugin
@@ -1995,7 +1995,7 @@ function drawCharts(trades){
           data:vals,
           backgroundColor:grad,
           borderColor:lineColor,
-          borderWidth:2.5,
+          borderWidth:3,
           pointRadius:0,
           pointHoverRadius:5,
           pointHoverBackgroundColor:lineColor,
