@@ -1287,13 +1287,24 @@ function renderDashboardWithTrades(trades,label){
   const calMonthKey=currentDashKey||curMonthKey();
   const calMonthTrades=getTradesForKey(calMonthKey);
   if(!s){
-    ['m-wr','m-pnl','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—'});
     const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
-    const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='';
+    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
     drawGauge(0,0,0);
     drawProfitFactorBar(0,0);
+    const pfgw2=document.getElementById('pf-gw-lbl');if(pfgw2)pfgw2.textContent='$0';
+    const pfgl2=document.getElementById('pf-gl-lbl');if(pfgl2)pfgl2.textContent='$0';
+    const pfg2=document.getElementById('pf-bar-green');if(pfg2)pfg2.style.width='50%';
+    const pfr2=document.getElementById('pf-bar-red');if(pfr2)pfr2.style.width='50%';
+    const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
+    const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
+    const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='50%';
+    const awr0=document.getElementById('avgwl-red');if(awr0)awr0.style.width='50%';
+    const mb0=document.getElementById('mini-bars');if(mb0)mb0.innerHTML='';
+    const meq0=document.getElementById('mini-eq');if(meq0){const ctx0=meq0.getContext('2d');ctx0.clearRect(0,0,meq0.width,meq0.height);}
+    const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     renderCalendar(calMonthKey,calMonthTrades);
-    if(eqChart){eqChart.destroy();eqChart=null}return;
+    if(eqChart){eqChart.destroy();eqChart=null;}return;
   }
   const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
   const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
@@ -1404,16 +1415,29 @@ function renderDashboard(key){
   if(mSel)mSel.value=parseInt(km);
 
   if(!s){
-    // dash-sub removed
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgwin','m-avgloss','m-pf','m-avgwl-ratio'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    // Reset gauge counts
+    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
     drawGauge(0,0,0);
+    // Reset profit factor bar + labels
     drawProfitFactorBar(0,0);
+    const pfgw=document.getElementById('pf-gw-lbl');if(pfgw)pfgw.textContent='$0';
+    const pfgl=document.getElementById('pf-gl-lbl');if(pfgl)pfgl.textContent='$0';
+    const pfg=document.getElementById('pf-bar-green');if(pfg)pfg.style.width='50%';
+    const pfr=document.getElementById('pf-bar-red');if(pfr)pfr.style.width='50%';
+    // Reset avg win/loss bar + labels
+    const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
+    const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
+    const awg=document.getElementById('avgwl-green');if(awg)awg.style.width='50%';
+    const awr=document.getElementById('avgwl-red');if(awr)awr.style.width='50%';
+    // Reset mini bars
+    const mb=document.getElementById('mini-bars');if(mb)mb.innerHTML='';
+    const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');ctx.clearRect(0,0,meq.width,meq.height);}
     document.getElementById('session-stats').innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
-    if(eqChart){eqChart.destroy();eqChart=null}
-    
+    if(eqChart){eqChart.destroy();eqChart=null;}
     return;
   }
   document.getElementById('m-total').textContent=s.n;
