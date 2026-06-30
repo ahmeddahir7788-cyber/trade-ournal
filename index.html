@@ -522,16 +522,18 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="stat-card-icon" style="background:rgba(167,139,250,0.2)"><i class="ti ti-scale" style="color:var(--purple)"></i></div>
         <div class="stat-card-lbl">Avg Win / Loss</div>
         <div class="stat-card-val" id="m-avgwl-ratio">—</div>
-        <div class="stat-card-bottom" style="margin-top:8px">
-          <div class="avgwl-bar-wrap">
-            <div class="avgwl-bar">
-              <div id="avgwl-green" style="height:100%;background:var(--green);width:50%"></div>
-              <div id="avgwl-red" style="height:100%;background:var(--red);width:50%"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-top:10px">
-              <div><div class="stat-card-val green" style="font-size:17px" id="m-avgwin">—</div><div class="avgwl-lbl">Avg Win</div></div>
-              <div style="text-align:right"><div class="stat-card-val red" style="font-size:17px" id="m-avgloss">—</div><div class="avgwl-lbl">Avg Loss</div></div>
-            </div>
+        <div class="stat-card-bottom" style="margin-top:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em">Avg Win</span>
+            <span style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em">Avg Loss</span>
+          </div>
+          <div style="display:flex;height:10px;border-radius:100px;overflow:hidden;background:var(--border);width:100%">
+            <div id="avgwl-green" style="height:100%;background:linear-gradient(90deg,#1D9E75,#2bc98f);border-radius:100px 0 0 100px;transition:width .4s;width:50%"></div>
+            <div id="avgwl-red" style="height:100%;background:linear-gradient(90deg,#D85A30,#f07050);border-radius:0 100px 100px 0;transition:width .4s;width:50%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px">
+            <span style="font-size:10px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
+            <span style="font-size:10px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
           </div>
         </div>
       </div>
