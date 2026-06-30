@@ -565,6 +565,7 @@ table.tt tr:last-child td{border-bottom:none}
           <span class="cms-label">Monthly stats:</span>
           <span class="cms-chip" id="cms-pnl-chip">$0</span>
           <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
+          <button class="cal-nav-btn" onclick="openCalScreenshots()" title="Screenshots" style="width:auto;padding:0 10px;gap:6px;display:inline-flex;align-items:center"><i class="ti ti-photo-plus"></i> <span style="font-size:12px;font-weight:600">Screenshot</span></button>
         </div>
       </div>
       <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
@@ -921,6 +922,21 @@ table.tt tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- CALENDAR SCREENSHOTS MODAL -->
+<div class="overlay" id="cal-shots-modal">
+  <div class="modal" style="max-width:560px;width:95%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 id="cal-shots-title" style="margin-bottom:0">Screenshots</h2>
+      <button onclick="closeOverlay('cal-shots-modal')" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="cal-shots-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px"></div>
+    <label for="cal-shot-input" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);font-size:13px;color:var(--text2);cursor:pointer">
+      <i class="ti ti-photo-plus"></i> Add picture
+    </label>
+    <input id="cal-shot-input" type="file" accept="image/*" multiple style="display:none" onchange="onCalShotUpload(event)"/>
+  </div>
+</div>
+
 <!-- EDIT TRADE MODAL -->
 <div class="overlay" id="edit-trade-modal">
   <div class="modal" style="max-width:520px">
@@ -1110,6 +1126,7 @@ function loadDB(){
   if(!db.propfirms)db.propfirms=[];
   if(!db.dayNotes)db.dayNotes={};
   if(!db.dayImages)db.dayImages={};
+  if(!db.calShots)db.calShots={};
   if(!db.playbooks)db.playbooks=[];
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
   // Clean phantom trades (trades with missing required fields)
@@ -2956,6 +2973,68 @@ function removeDayShot(dateStr,idx){
   persist();
   renderDayShots(dateStr);
   if(currentDashKey)refreshCurrentDashboardView();
+}
+
+// ── Calendar Screenshots ─────────────────────────────────────
+let calShotsKey=null;
+
+function openCalScreenshots(){
+  calShotsKey=currentDashKey||curMonthKey();
+  if(!db.calShots)db.calShots={};
+  const shots=db.calShots[calShotsKey]||[];
+  const[y,m]=calShotsKey.split('-');
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const titleEl=document.getElementById('cal-shots-title');
+  if(titleEl)titleEl.textContent=mn[parseInt(m)-1]+' '+y+' — Screenshots';
+  renderCalShots();
+  document.getElementById('cal-shots-modal').classList.add('open');
+}
+
+function renderCalShots(){
+  if(!db.calShots)db.calShots={};
+  const grid=document.getElementById('cal-shots-grid');
+  if(!grid)return;
+  const shots=db.calShots[calShotsKey]||[];
+  if(!shots.length){
+    grid.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">No screenshots yet. Tap "Add picture" to upload one.</div>';
+    return;
+  }
+  grid.innerHTML=shots.map((src,i)=>`
+    <div class="nb-shot-thumb" style="width:140px;height:140px">
+      <img src="${src}" style="cursor:pointer" onclick="openShotFull('${calShotsKey}',${i})"/>
+      <button class="nb-shot-remove" onclick="removeCalShot(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+function onCalShotUpload(e){
+  if(!calShotsKey)return;
+  if(!db.calShots)db.calShots={};
+  if(!db.calShots[calShotsKey])db.calShots[calShotsKey]=[];
+  const files=[...e.target.files];
+  let remaining=files.length;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      db.calShots[calShotsKey].push(ev.target.result);
+      remaining--;
+      if(remaining===0){persist();renderCalShots();}
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function removeCalShot(idx){
+  if(!db.calShots||!db.calShots[calShotsKey])return;
+  db.calShots[calShotsKey].splice(idx,1);
+  persist();
+  renderCalShots();
+}
+
+function openShotFull(key,idx){
+  const src=db.calShots[key][idx];
+  const w=window.open();
+  w.document.write('<img src="'+src+'" style="max-width:100%;max-height:100vh"/>');
 }
 
 // ── Notebook ─────────────────────────────────────────────────
