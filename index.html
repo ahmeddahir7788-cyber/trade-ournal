@@ -784,7 +784,20 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div class="field" style="margin-bottom:12px"><label>Title</label><input type="text" id="nb-title" placeholder="Note title…"/></div>
     <div class="field" style="margin-bottom:12px"><label>Content</label><textarea id="nb-content" style="min-height:160px;line-height:1.6" placeholder="Write your thoughts, observations, rules…"></textarea></div>
-    <div class="field" style="margin-bottom:1.25rem"><label>Tags <span style="font-weight:400;color:var(--text3)">(comma separated)</span></label><input type="text" id="nb-tags" placeholder="e.g. mindset, strategy, review"/></div>
+    <div class="field" style="margin-bottom:12px"><label>Tags <span style="font-weight:400;color:var(--text3)">(comma separated)</span></label><input type="text" id="nb-tags" placeholder="e.g. mindset, strategy, review"/></div>
+    <div class="field" style="margin-bottom:1.25rem">
+      <label>Card Color</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="nb-color-picker">
+        <button type="button" class="nb-color-swatch" data-color="" onclick="selectNoteColor(this)" title="Default" style="background:var(--card);border:2px solid var(--blue);width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#1a2a1a" onclick="selectNoteColor(this)" title="Green" style="background:#1a2a1a;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#2a1a1a" onclick="selectNoteColor(this)" title="Red" style="background:#2a1a1a;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#1a1e2e" onclick="selectNoteColor(this)" title="Blue" style="background:#1a1e2e;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#2a2010" onclick="selectNoteColor(this)" title="Gold" style="background:#2a2010;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#22102a" onclick="selectNoteColor(this)" title="Purple" style="background:#22102a;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#101f2a" onclick="selectNoteColor(this)" title="Teal" style="background:#101f2a;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+        <button type="button" class="nb-color-swatch" data-color="#2a1a26" onclick="selectNoteColor(this)" title="Pink" style="background:#2a1a26;border:2px solid transparent;width:28px;height:28px;border-radius:50%;cursor:pointer;flex-shrink:0"></button>
+      </div>
+    </div>
     <div class="mactions">
       <button class="mc" onclick="closeOverlay('nb-modal')">Cancel</button>
       <button class="mp" onclick="saveNote()">Save Note</button>
@@ -2897,7 +2910,7 @@ function renderNotes(){
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmtDate=ts=>{const d=new Date(ts);return mn[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();};
   if(grid)grid.innerHTML=notes.map(n=>`
-    <div class="nb-card" onclick="openNoteModal(${n.id})">
+    <div class="nb-card" onclick="openNoteModal(${n.id})" style="${n.color?'background:'+n.color+';border-color:'+n.color+';':''}" >
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div class="nb-card-title">${n.title||'Untitled'}</div>
         <div class="nb-card-actions" onclick="event.stopPropagation()">
@@ -2920,6 +2933,15 @@ function openNoteModal(id){
   document.getElementById('nb-title').value=note?note.title:'';
   document.getElementById('nb-content').value=note?note.content:'';
   document.getElementById('nb-tags').value=note?(note.tags||[]).join(', '):'';
+  // Restore color swatches
+  const swatches=document.querySelectorAll('.nb-color-swatch');
+  const noteColor=note?note.color||'':'';
+  swatches.forEach(s=>{
+    const isSelected=s.dataset.color===noteColor;
+    s.style.border=isSelected?'2px solid var(--blue)':'2px solid transparent';
+    if(isSelected)s.dataset.selected='1';
+    else delete s.dataset.selected;
+  });
   document.getElementById('nb-modal').classList.add('open');
   setTimeout(()=>document.getElementById('nb-title').focus(),100);
 }
@@ -2929,17 +2951,28 @@ function saveNote(){
   const title=document.getElementById('nb-title').value.trim();
   const content=document.getElementById('nb-content').value.trim();
   const tags=document.getElementById('nb-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const selectedSwatch=document.querySelector('.nb-color-swatch[data-selected="1"]');
+  const color=selectedSwatch?selectedSwatch.dataset.color:'';
   if(!title&&!content)return;
   if(editNoteId){
     const n=db.notes.find(n=>n.id===editNoteId);
-    if(n){n.title=title;n.content=content;n.tags=tags;n.updatedAt=Date.now();}
+    if(n){n.title=title;n.content=content;n.tags=tags;n.color=color;n.updatedAt=Date.now();}
   } else {
-    db.notes.push({id:Date.now(),title,content,tags,createdAt:Date.now(),updatedAt:Date.now()});
+    db.notes.push({id:Date.now(),title,content,tags,color,createdAt:Date.now(),updatedAt:Date.now()});
   }
   persist();
   closeOverlay('nb-modal');
   renderNotes();
   editNoteId=null;
+}
+
+function selectNoteColor(el){
+  document.querySelectorAll('.nb-color-swatch').forEach(s=>{
+    s.style.border='2px solid transparent';
+    s.removeAttribute('data-selected');
+  });
+  el.style.border='2px solid var(--blue)';
+  el.dataset.selected='1';
 }
 
 function deleteNote(id){
