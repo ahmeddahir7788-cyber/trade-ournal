@@ -907,6 +907,14 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <!-- Day trades list -->
     <div id="day-modal-trades"></div>
+    <div style="margin-top:1.25rem">
+      <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:8px">Screenshots</label>
+      <div id="day-modal-shots" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+      <label for="day-shot-input" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);font-size:12px;color:var(--text2);cursor:pointer">
+        <i class="ti ti-photo-plus"></i> Add picture
+      </label>
+      <input id="day-shot-input" type="file" accept="image/*" multiple style="display:none" onchange="onDayShotUpload(event)"/>
+    </div>
     <div style="display:flex;justify-content:flex-end;margin-top:1rem">
       <button class="mc mactions" onclick="closeOverlay('day-modal')" style="padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;background:var(--surface2);color:var(--text2)">Close</button>
     </div>
@@ -1101,6 +1109,7 @@ function loadDB(){
   if(!db.trades)db.trades={};
   if(!db.propfirms)db.propfirms=[];
   if(!db.dayNotes)db.dayNotes={};
+  if(!db.dayImages)db.dayImages={};
   if(!db.playbooks)db.playbooks=[];
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
   // Clean phantom trades (trades with missing required fields)
@@ -1674,6 +1683,8 @@ function renderCalendar(key,trades){
     if(isToday)cls+=' today';
     const baseStyle=d===1&&firstDay>0?`grid-column-start:${firstDay+1};`:'';
     const style=`style="${baseStyle}cursor:pointer"`;
+    const hasShots=db.dayImages&&db.dayImages[ds]&&db.dayImages[ds].length>0;
+    const shotIcon=hasShots?'<i class="ti ti-photo" style="position:absolute;top:5px;left:7px;font-size:11px;color:var(--text3)"></i>':'';
     if(info){
       const dayTrades=trades.filter(t=>t.date===ds);
       const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
@@ -1681,12 +1692,13 @@ function renderCalendar(key,trades){
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?Math.round(dayWins/dayDecisive*100):0;
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
+        ${shotIcon}
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trades">${dayWr}%</div>
       </div>`;
     } else {
-      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
+      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">${shotIcon}<div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
     }
   }
   html+='</div>';
@@ -2901,6 +2913,49 @@ function openDayJournal(dateStr){
     tradesWrap.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades logged for this day.</div>`;
   }
   document.getElementById('day-modal').classList.add('open');
+  renderDayShots(dateStr);
+}
+
+function renderDayShots(dateStr){
+  const wrap=document.getElementById('day-modal-shots');
+  if(!wrap)return;
+  if(!db.dayImages)db.dayImages={};
+  const shots=db.dayImages[dateStr]||[];
+  wrap.innerHTML=shots.map((src,i)=>`
+    <div class="nb-shot-thumb">
+      <img src="${src}"/>
+      <button class="nb-shot-remove" onclick="removeDayShot('${dateStr}',${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+function onDayShotUpload(e){
+  if(!currentDayKey)return;
+  if(!db.dayImages)db.dayImages={};
+  if(!db.dayImages[currentDayKey])db.dayImages[currentDayKey]=[];
+  const files=[...e.target.files];
+  let remaining=files.length;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      db.dayImages[currentDayKey].push(ev.target.result);
+      remaining--;
+      if(remaining===0){
+        persist();
+        renderDayShots(currentDayKey);
+        if(currentDashKey)refreshCurrentDashboardView();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function removeDayShot(dateStr,idx){
+  if(!db.dayImages||!db.dayImages[dateStr])return;
+  db.dayImages[dateStr].splice(idx,1);
+  persist();
+  renderDayShots(dateStr);
+  if(currentDashKey)refreshCurrentDashboardView();
 }
 
 // ── Notebook ─────────────────────────────────────────────────
