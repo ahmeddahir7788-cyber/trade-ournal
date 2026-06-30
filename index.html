@@ -92,9 +92,9 @@ nav button:hover i{color:var(--text)}
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem;align-items:stretch}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
-.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
+.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:12px 12px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
 .stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.02em}
-.stat-card-val{font-size:26px;font-weight:800;line-height:1.1;color:var(--text)}
+.stat-card-val{font-size:20px;font-weight:700;line-height:1.1;color:var(--text)}
 .stat-card-bottom{margin-top:8px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
@@ -497,7 +497,6 @@ table.tt tr:last-child td{border-bottom:none}
               <span class="stat-card-lbl" style="margin-bottom:0">Total Trades</span>
             </div>
             <div class="stat-card-val blue" id="m-total">0</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">All trades logged</div>
           </div>
           <div class="mini-bars" id="mini-bars" style="width:60px;flex-shrink:0"></div>
         </div>
@@ -512,7 +511,6 @@ table.tt tr:last-child td{border-bottom:none}
               <span class="stat-card-lbl" style="margin-bottom:0">Win Rate</span>
             </div>
             <div class="stat-card-val" id="m-wr" style="color:var(--text);font-weight:800">—</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">Win / BE / Loss</div>
           </div>
           <div style="flex-shrink:0;text-align:right">
             <div style="display:flex;gap:5px;justify-content:flex-end;margin-bottom:6px">
@@ -538,7 +536,6 @@ table.tt tr:last-child td{border-bottom:none}
               <span class="stat-card-lbl" style="margin-bottom:0">Net P&amp;L</span>
             </div>
             <div class="stat-card-val" id="m-pnl">$0</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">All time</div>
           </div>
           <canvas id="mini-eq" width="80" height="44" style="width:80px;flex-shrink:0"></canvas>
         </div>
@@ -553,7 +550,6 @@ table.tt tr:last-child td{border-bottom:none}
               <span class="stat-card-lbl" style="margin-bottom:0">Profit Factor</span>
             </div>
             <div class="stat-card-val" id="m-pf">—</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">Gross profit / Gross loss</div>
           </div>
           <div style="flex-shrink:0">
             <canvas id="pf-donut" width="56" height="56"></canvas>
@@ -570,7 +566,6 @@ table.tt tr:last-child td{border-bottom:none}
               <span class="stat-card-lbl" style="margin-bottom:0">Avg Win / Loss</span>
             </div>
             <div class="stat-card-val" id="m-avgwl-ratio">—</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">Avg win/loss ratio</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
             <span style="font-size:11px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
