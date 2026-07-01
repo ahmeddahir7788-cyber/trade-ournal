@@ -1364,11 +1364,11 @@ function go(id,btn){
   const mSel=document.getElementById('dash-month-sel');
   const dmWrap=document.getElementById('dm-toggle-topbar');
   if(id==='dashboard'){
-    if(pSel)pSel.style.display='';
-    if(ySel)ySel.style.display='';
-    if(mSel)mSel.style.display='';
+    if(pSel)pSel.style.display='none';
+    if(ySel)ySel.style.display='none';
+    if(mSel)mSel.style.display='none';
     if(dmWrap)dmWrap.style.display='';
-  const drpWrap=document.getElementById('drp-wrap');if(drpWrap)drpWrap.style.display='';
+    const drpWrap=document.getElementById('drp-wrap');if(drpWrap)drpWrap.style.display='';
     const dmDollar=document.getElementById('dm-btn-dollar');
     const dmPct=document.getElementById('dm-btn-pct');
     if(dmDollar)dmDollar.classList.toggle('active',displayMode==='dollar');
@@ -3768,10 +3768,11 @@ renderDashboard(currentDashKey);
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
-document.getElementById('dash-period-sel').style.display='';
-document.getElementById('dash-year-sel').style.display='';
-document.getElementById('dash-month-sel').style.display='';
+document.getElementById('dash-period-sel').style.display='none';
+document.getElementById('dash-year-sel').style.display='none';
+document.getElementById('dash-month-sel').style.display='none';
 document.getElementById('dm-toggle-topbar').style.display='';
+document.getElementById('drp-wrap').style.display='';
 
 // Global paste fallback: while the Screenshots manager is open and its zone is focused, route pasted clipboard images into it
 document.addEventListener('paste',function(e){
