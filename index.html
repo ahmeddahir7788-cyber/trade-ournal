@@ -168,8 +168,8 @@ nav button:hover i{color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:7px 4px;font-weight:600;background:transparent;border:none;letter-spacing:.02em}
-.cal-day{border-radius:10px;padding:6px 8px 6px;height:80px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;height:80px;visibility:hidden;border:none}
+.cal-day{border-radius:8px;padding:4px 6px;height:68px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;height:68px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
@@ -180,16 +180,14 @@ nav button:hover i{color:var(--text)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
 .cal-day-top{position:absolute;top:4px;right:7px}
 .cal-day-num{font-size:10px;font-weight:500;color:var(--text3)}
-.cal-day-pnl{font-size:14px;font-weight:700;line-height:1.2;color:var(--text)}
-.cal-day.profit .cal-day-pnl{color:var(--green)}
-.cal-day.loss .cal-day-pnl{color:var(--red)}
-.cal-day.breakeven .cal-day-pnl{color:var(--purple)}
-.cal-day-trade-count{font-size:10px;font-weight:500;color:var(--text);margin-top:2px}
-.cal-day-trades{font-size:10px;font-weight:500;color:var(--text);margin-top:1px}
+.cal-day-pnl{font-size:12px;font-weight:700;line-height:1.2;color:var(--text)}
+.cal-day.profit .cal-day-pnl,.cal-day.loss .cal-day-pnl,.cal-day.breakeven .cal-day-pnl{color:var(--text)}
+.cal-day-trade-count{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
+.cal-day-trades{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
 /* Weekly summary */
 .weekly-summary{display:flex;flex-direction:column;gap:0}
 .weekly-summary-title{font-size:12px;font-weight:600;color:var(--text3);padding-bottom:8px;margin-bottom:2px;border-bottom:.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
-.week-card{padding:10px 10px;border-radius:10px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:80px;gap:2px}
+.week-card{padding:8px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:68px;gap:2px}
 .week-card-top{margin-bottom:2px}
 .week-name{font-size:12px;font-weight:700;color:var(--text)}
 .week-days-label{font-size:11px;color:var(--text3);margin-top:2px}
@@ -1789,9 +1787,9 @@ function renderCalendar(key,trades){
     const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:80px;margin-bottom:${isLastRow?0:4}px">
+    wHtml+=`<div class="week-card" style="height:68px;margin-bottom:${isLastRow?0:4}px">
       <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
-      <div style="font-size:17px;font-weight:800;color:${wTradeCount>0?(wMetric>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${wTradeCount>0?wPnlStr:(displayMode==='dollar'?'$0.00':'0R')}</div>
+      <div style="font-size:14px;font-weight:800;color:${wTradeCount>0?(wMetric>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${wTradeCount>0?wPnlStr:(displayMode==='dollar'?'$0.00':'0R')}</div>
       <div class="week-days-label">${wDays} trading ${wDays===1?'day':'days'}</div>
     </div>`;
     wIdx++;
