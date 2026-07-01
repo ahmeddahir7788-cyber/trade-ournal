@@ -598,6 +598,28 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
     </div>
+
+    <!-- Trading Score -->
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <h3 style="margin:0">Trading Score</h3>
+        <i class="ti ti-info-circle" style="font-size:15px;color:var(--text3)" title="Composite score based on Win%, Profit Factor, Avg Win/Loss, Consistency, Max Drawdown and Recovery Factor"></i>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:center">
+        <div style="display:flex;justify-content:center"><canvas id="radar-chart" width="300" height="280" style="width:300px;height:280px"></canvas></div>
+        <div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:4px">Your Trading Score</div>
+          <div id="score-val" style="font-size:52px;font-weight:800;color:var(--text);line-height:1;margin-bottom:20px">—</div>
+          <div style="position:relative;height:14px;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#f39c12,#f1c40f,#2ecc71,#1abc9c);margin-bottom:8px">
+            <div id="score-marker" style="position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid #1abc9c;transform:translate(-50%,-50%);transition:left .5s;left:50%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:20px">
+            <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span>
+          </div>
+          <div id="score-breakdown" style="display:flex;flex-direction:column;gap:7px"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- LOG TRADE -->
@@ -1470,6 +1492,7 @@ function renderDashboardWithTrades(trades,label){
   renderSessionStats(trades);
   renderCalendar(calMonthKey,calMonthTrades);
   renderRecentTrades();
+  renderTradingScore(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
 }
@@ -3030,6 +3053,126 @@ function removeDayShot(dateStr,idx){
   persist();
   renderDayShots(dateStr);
   if(currentDashKey)refreshCurrentDashboardView();
+}
+
+// ── Trading Score ────────────────────────────────────────────
+let radarChart=null;
+
+function renderTradingScore(trades){
+  const scoreVal=document.getElementById('score-val');
+  const marker=document.getElementById('score-marker');
+  const breakdown=document.getElementById('score-breakdown');
+  const canvas=document.getElementById('radar-chart');
+  if(!scoreVal||!canvas)return;
+
+  if(!trades||!trades.length){
+    scoreVal.textContent='—';
+    if(marker)marker.style.left='0%';
+    if(breakdown)breakdown.innerHTML='';
+    if(radarChart){radarChart.destroy();radarChart=null;}
+    return;
+  }
+
+  const n=trades.length;
+  const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+  const losses=trades.filter(t=>t.outcome==='Loss').length;
+  const decisive=trades.filter(t=>t.outcome!=='Break Even').length;
+  const wr=decisive>0?wins/decisive:0;
+
+  const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
+  const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
+  const pf=grossLoss>0?grossWin/grossLoss:(grossWin>0?5:0);
+
+  const winTrades=trades.filter(t=>(t.pnl||0)>0);
+  const lossTrades=trades.filter(t=>(t.pnl||0)<0);
+  const avgWin=winTrades.length?grossWin/winTrades.length:0;
+  const avgLoss=lossTrades.length?grossLoss/lossTrades.length:0;
+  const awl=avgLoss>0?avgWin/avgLoss:0;
+
+  // Consistency: std dev of daily PnL normalized
+  const byDate={};
+  trades.forEach(t=>{if(!byDate[t.date])byDate[t.date]=0;byDate[t.date]+=(t.pnl||0);});
+  const dailyPnls=Object.values(byDate);
+  const mean=dailyPnls.reduce((s,v)=>s+v,0)/dailyPnls.length;
+  const variance=dailyPnls.reduce((s,v)=>s+(v-mean)**2,0)/dailyPnls.length;
+  const stdDev=Math.sqrt(variance);
+  const consistency=stdDev>0?Math.max(0,1-stdDev/Math.max(Math.abs(mean)*3,1)):1;
+
+  // Max drawdown
+  let peak=0,dd=0,cum=0;
+  trades.forEach(t=>{cum+=(t.pnl||0);if(cum>peak)peak=cum;if(peak>0)dd=Math.max(dd,(peak-cum)/peak);});
+  const ddScore=Math.max(0,1-dd*2);
+
+  // Recovery factor
+  const totalPnl=trades.reduce((s,t)=>s+(t.pnl||0),0);
+  const rf=dd>0&&peak>0?Math.min(5,totalPnl/(peak*dd)):0;
+  const rfScore=Math.min(1,rf/5);
+
+  // Normalize each to 0-100
+  const wrScore=Math.min(100,wr*100);
+  const pfScore=Math.min(100,(pf/5)*100);
+  const awlScore=Math.min(100,(awl/4)*100);
+  const consScore=Math.min(100,consistency*100);
+  const ddScoreN=Math.min(100,ddScore*100);
+  const rfScoreN=Math.min(100,rfScore*100);
+
+  const total=(wrScore+pfScore+awlScore+consScore+ddScoreN+rfScoreN)/6;
+  const rounded=Math.round(total*100)/100;
+
+  scoreVal.textContent=rounded.toFixed(2);
+  if(marker)marker.style.left=Math.min(98,Math.max(2,total))+'%';
+
+  // Breakdown rows
+  const rows=[
+    {label:'Win %',val:Math.round(wr*100)+'%',score:wrScore},
+    {label:'Profit Factor',val:pf.toFixed(2),score:pfScore},
+    {label:'Avg Win/Loss',val:awl.toFixed(2),score:awlScore},
+    {label:'Consistency',val:Math.round(consistency*100)+'%',score:consScore},
+    {label:'Max Drawdown',val:Math.round(dd*100)+'%',score:ddScoreN},
+    {label:'Recovery Factor',val:rf.toFixed(2),score:rfScoreN},
+  ];
+  if(breakdown){
+    breakdown.innerHTML=rows.map(r=>`
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text3);width:110px;flex-shrink:0">${r.label}</span>
+        <div style="flex:1;height:5px;border-radius:100px;background:var(--border)">
+          <div style="height:100%;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#2ecc71);width:${r.score}%"></div>
+        </div>
+        <span style="font-size:11px;color:var(--text2);width:36px;text-align:right">${r.val}</span>
+      </div>`).join('');
+  }
+
+  // Radar chart
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const data=[wrScore,pfScore,awlScore,consScore,ddScoreN,rfScoreN];
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  const ctx=canvas.getContext('2d');
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Win %','Profit Factor','Avg Win/Loss','Consistency','Max Drawdown','Recovery Factor'],
+      datasets:[{
+        data,
+        backgroundColor:'rgba(139,92,246,0.25)',
+        borderColor:'rgba(139,92,246,0.8)',
+        borderWidth:2,
+        pointBackgroundColor:'rgba(139,92,246,1)',
+        pointRadius:4,
+        pointHoverRadius:6,
+      }]
+    },
+    options:{
+      responsive:false,
+      scales:{r:{
+        min:0,max:100,
+        ticks:{display:false},
+        grid:{color:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'},
+        pointLabels:{font:{size:11,family:'Inter'},color:dark?'#aaa':'#666'},
+        angleLines:{color:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'}
+      }},
+      plugins:{legend:{display:false},tooltip:{enabled:true}}
+    }
+  });
 }
 
 // ── Calendar Capture ─────────────────────────────────────────
