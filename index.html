@@ -99,7 +99,7 @@ nav button:hover i{color:var(--text)}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
 .gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
-.gc{font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px;text-align:center}
+.gc{font-size:11px;font-weight:700;padding:2px 7px;border-radius:100px;text-align:center;min-width:20px}
 .gc.green{background:rgba(29,158,117,0.15);color:var(--green)}
 .gc.blue{background:rgba(55,138,221,0.15);color:var(--blue)}
 .gc.red{background:rgba(216,90,48,0.15);color:var(--red)}
@@ -513,8 +513,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-wr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="wr-gauge" width="64" height="38" style="width:64px;height:38px"></canvas>
-            <div style="display:flex;gap:4px;margin-top:2px">
+            <canvas id="wr-gauge" width="80" height="48" style="width:80px;height:48px"></canvas>
+            <div style="display:flex;gap:3px;margin-top:1px">
               <span class="gc green" id="g-wins">0</span>
               <span class="gc blue" id="g-be">0</span>
               <span class="gc red" id="g-losses">0</span>
@@ -1806,7 +1806,7 @@ function drawGauge(wins,be,losses){
   const canvas=document.getElementById('wr-gauge');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
-  const W=64,H=38,cx=32,cy=34,r=26,thick=7;
+  const W=80,H=48,cx=40,cy=44,r=34,thick=8;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
   const winAngle=(wins/total)*Math.PI;
