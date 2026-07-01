@@ -165,36 +165,34 @@ nav button:hover i{color:var(--text)}
 .cms-chip-purple{background:rgba(167,139,250,0.15);color:var(--purple)}
 @media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-day.empty{visibility:hidden}
-.cal-day-name{font-size:12px;color:var(--text2);text-align:center;padding:10px 4px;font-weight:700;background:var(--surface2);border:.5px solid var(--border);border-radius:8px;letter-spacing:.03em}
-.cal-day{border-radius:10px;padding:10px 8px 8px;height:110px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border)}
-.cal-day.empty{background:transparent;height:110px;visibility:hidden;border:none}
+.cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:7px 4px;font-weight:600;background:transparent;border:none;letter-spacing:.02em}
+.cal-day{border-radius:10px;padding:6px 8px 6px;height:80px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;height:80px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
-.cal-day.no-trade{background:var(--surface2);opacity:.7}
+.cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
-.cal-day-clickable:hover{filter:brightness(1.12);transition:filter .1s}
-.cal-day.profit{background:rgba(16,100,70,0.85);border-color:rgba(29,158,117,0.5)}
-.cal-day.loss{background:rgba(120,30,20,0.75);border-color:rgba(216,90,48,0.5)}
-.cal-day.breakeven{background:rgba(80,60,160,0.55);border-color:rgba(167,139,250,0.5)}
+.cal-day-clickable:hover{opacity:.85;transition:opacity .1s}
+.cal-day.profit{background:rgba(29,158,117,0.12);border-color:rgba(29,158,117,0.25)}
+.cal-day.loss{background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.25)}
+.cal-day.breakeven{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
-.cal-day-top{position:absolute;top:7px;right:10px}
-.cal-day-num{font-size:12px;font-weight:700;color:rgba(255,255,255,0.5)}
-.cal-day.no-trade .cal-day-num{color:var(--text3)}
-.cal-day-pnl{font-size:15px;font-weight:800;line-height:1.2;color:#fff}
-.cal-day.profit .cal-day-pnl{color:#4ecca8}
-.cal-day.loss .cal-day-pnl{color:#ff7a6b}
-.cal-day.breakeven .cal-day-pnl{color:#c4b5fd}
-.cal-day-trade-count{font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);margin-top:3px}
-.cal-day-trades{font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);margin-top:2px}
-.cal-day.no-trade .cal-day-trade-count,.cal-day.no-trade .cal-day-trades{color:var(--text3)}
+.cal-day-top{position:absolute;top:6px;right:8px}
+.cal-day-num{font-size:11px;font-weight:500;color:var(--text3)}
+.cal-day-pnl{font-size:14px;font-weight:700;line-height:1.2}
+.cal-day.profit .cal-day-pnl{color:var(--green)}
+.cal-day.loss .cal-day-pnl{color:var(--red)}
+.cal-day.breakeven .cal-day-pnl{color:var(--purple)}
+.cal-day-trade-count{font-size:10px;font-weight:500;color:var(--text3);margin-top:2px}
+.cal-day-trades{font-size:10px;font-weight:500;color:var(--text3);margin-top:1px}
 /* Weekly summary */
 .weekly-summary{display:flex;flex-direction:column;gap:0}
 .weekly-summary-title{font-size:12px;font-weight:600;color:var(--text3);padding-bottom:8px;margin-bottom:2px;border-bottom:.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
-.week-card{padding:10px 8px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;gap:4px}
+.week-card{padding:10px 10px;border-radius:10px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:80px;gap:2px}
 .week-card-top{margin-bottom:2px}
-.week-name{font-size:12px;font-weight:700;color:var(--text2)}
-.week-days-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(100,80,220,0.25);color:#a78bfa;font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;margin-top:4px}
+.week-name{font-size:12px;font-weight:700;color:var(--text)}
+.week-days-label{font-size:11px;color:var(--text3);margin-top:2px}
 
 .week-stats{display:none}
 .week-pnl{font-weight:600}
@@ -1758,7 +1756,7 @@ function renderCalendar(key,trades){
   // First Sunday on or before month start
   const firstSunday=new Date(y,m-1,1-firstDay);
 
-  let wHtml=`<div class="weekly-summary-title" style="height:${headerH}px;display:flex;align-items:flex-end;padding-bottom:8px">Weekly Summary</div>`;
+  let wHtml='';
 
   let wIdx=0;
   for(let w=0;w<numRows;w++){
@@ -1791,13 +1789,10 @@ function renderCalendar(key,trades){
     const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
     const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
     const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:110px;margin-bottom:${isLastRow?0:5}px">
+    wHtml+=`<div class="week-card" style="height:80px;margin-bottom:${isLastRow?0:4}px">
       <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
-      ${wTradeCount>0
-        ?`<div style="font-size:18px;font-weight:800;color:${wMetric>=0?'#4ecca8':'#ff7a6b'}">${wPnlStr}</div>
-           <div class="week-days-pill"><i class="ti ti-calendar" style="font-size:10px"></i>${wDays} ${wDays===1?'day':'days'}</div>`
-        :`<div style="font-size:16px;font-weight:800;color:var(--text3)">${displayMode==='dollar'?'$0':'0R'}</div>
-           <div class="week-days-pill" style="opacity:.4">0 days</div>`}
+      <div style="font-size:17px;font-weight:800;color:${wTradeCount>0?(wMetric>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${wTradeCount>0?wPnlStr:(displayMode==='dollar'?'$0.00':'0R')}</div>
+      <div class="week-days-label">${wDays} trading ${wDays===1?'day':'days'}</div>
     </div>`;
     wIdx++;
   }
