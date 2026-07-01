@@ -490,7 +490,7 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="stat-cards">
       <!-- Total Trades -->
       <div class="stat-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
           <div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
               <i class="ti ti-trending-up" style="font-size:15px;color:var(--green)"></i>
@@ -498,7 +498,7 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
             <div class="stat-card-val blue" id="m-total">0</div>
           </div>
-          <div id="mini-bars" style="display:flex;align-items:flex-end;gap:2px;height:44px;width:64px;flex-shrink:0"></div>
+          <div id="mini-bars" style="display:flex;align-items:flex-end;gap:2px;height:44px;width:60px;flex-shrink:0;margin-right:4px"></div>
         </div>
       </div>
 
@@ -512,17 +512,15 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
             <div class="stat-card-val" id="m-wr">—</div>
           </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px">
-            <div style="display:flex;gap:4px">
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
+            <canvas id="wr-gauge" width="90" height="54" style="width:90px;height:54px"></canvas>
+            <div style="display:flex;gap:5px;margin-top:-4px">
               <span class="gc green" id="g-wins">0</span>
               <span class="gc blue" id="g-be">0</span>
               <span class="gc red" id="g-losses">0</span>
             </div>
-            <div style="display:flex;height:7px;border-radius:100px;overflow:hidden;background:var(--border);width:72px">
-              <div id="wr-green" style="height:100%;background:#1D9E75;width:33%;transition:width .4s"></div>
-              <div id="wr-blue" style="height:100%;background:#378ADD;width:34%;transition:width .4s"></div>
-              <div id="wr-red" style="height:100%;background:#D85A30;width:33%;transition:width .4s"></div>
-            </div>
+            <!-- hidden divs for JS compat -->
+            <div style="display:none"><div id="wr-green"></div><div id="wr-blue"></div><div id="wr-red"></div></div>
           </div>
         </div>
       </div>
@@ -565,13 +563,15 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
             <div class="stat-card-val" id="m-avgwl-ratio">—</div>
           </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-            <span style="font-size:11px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
-            <div style="display:flex;height:7px;border-radius:100px;overflow:hidden;background:var(--border);width:72px">
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div style="display:flex;height:8px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
               <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:50%"></div>
               <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:50%"></div>
             </div>
-            <span style="font-size:11px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
+            <div style="display:flex;gap:6px">
+              <span style="font-size:10px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
+              <span style="font-size:10px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1803,7 +1803,26 @@ function renderCalendar(key,trades){
 
 // ── Session stats ─────────────────────────────────────────────
 function drawGauge(wins,be,losses){
+  const canvas=document.getElementById('wr-gauge');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=90,H=54,cx=45,cy=48,r=36,thick=10;
+  ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
+  const winAngle=(wins/total)*Math.PI;
+  const beAngle=(be/total)*Math.PI;
+  const lossAngle=(losses/total)*Math.PI;
+  const start=-Math.PI;
+  // Win arc (green)
+  ctx.beginPath();ctx.arc(cx,cy,r,start,start+winAngle);
+  ctx.strokeStyle='#1D9E75';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+  // BE arc (blue)
+  ctx.beginPath();ctx.arc(cx,cy,r,start+winAngle,start+winAngle+beAngle);
+  ctx.strokeStyle='#378ADD';ctx.lineWidth=thick;ctx.lineCap='butt';ctx.stroke();
+  // Loss arc (red)
+  ctx.beginPath();ctx.arc(cx,cy,r,start+winAngle+beAngle,0);
+  ctx.strokeStyle='#D85A30';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+  // Update hidden compat divs (no-op but kept for JS safety)
   const gEl=document.getElementById('wr-green');
   const bEl=document.getElementById('wr-blue');
   const rEl=document.getElementById('wr-red');
