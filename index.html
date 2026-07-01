@@ -599,8 +599,9 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Trading Score -->
-    <div class="card" style="margin-top:12px">
+    <!-- Trading Score + P&L by Weekday -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
         <h3 style="margin:0">Trading Score</h3>
         <i class="ti ti-info-circle" style="font-size:15px;color:var(--text3)" title="Composite score based on Win%, Profit Factor, Avg Win/Loss, Consistency, Max Drawdown and Recovery Factor"></i>
@@ -619,6 +620,15 @@ table.tt tr:last-child td{border-bottom:none}
           <div id="score-breakdown" style="display:flex;flex-direction:column;gap:7px"></div>
         </div>
       </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin:0">P&amp;L by Weekday</h3>
+        <span style="font-size:12px;color:var(--text3)">$ · all time</span>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="weekday-chart"></canvas></div>
+    </div>
     </div>
   </div>
 
@@ -1493,6 +1503,7 @@ function renderDashboardWithTrades(trades,label){
   renderCalendar(calMonthKey,calMonthTrades);
   renderRecentTrades();
   renderTradingScore(trades);
+  renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
 }
@@ -3171,6 +3182,91 @@ function renderTradingScore(trades){
         angleLines:{color:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)'}
       }},
       plugins:{legend:{display:false},tooltip:{enabled:true}}
+    }
+  });
+}
+
+// ── P&L by Weekday ───────────────────────────────────────────
+let weekdayChart=null;
+
+function renderWeekdayChart(trades){
+  const canvas=document.getElementById('weekday-chart');
+  if(!canvas)return;
+  if(weekdayChart){weekdayChart.destroy();weekdayChart=null;}
+
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayPnl=[0,0,0,0,0,0,0];
+  trades.forEach(t=>{
+    const d=new Date(t.date);
+    const dow=d.getDay(); // 0=Sun
+    const idx=dow===0?6:dow-1; // Mon=0..Sun=6
+    dayPnl[idx]+=(t.pnl||0);
+  });
+
+  // Filter to only days with any trades
+  const hasTrade=dayPnl.map(v=>v!==0);
+  const labels=days.filter((_,i)=>hasTrade[i]);
+  const data=dayPnl.filter((_,i)=>hasTrade[i]);
+  const colors=data.map(v=>v>=0?'#2ecc71':'#e74c3c');
+  const hoverColors=data.map(v=>v>=0?'#27ae60':'#c0392b');
+
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const tc=dark?'#666':'#aaa';
+  const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
+
+  const ctx=canvas.getContext('2d');
+  weekdayChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        data,
+        backgroundColor:colors,
+        hoverBackgroundColor:hoverColors,
+        borderRadius:8,
+        borderSkipped:false,
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          enabled:true,
+          callbacks:{
+            label:ctx=>{const v=ctx.parsed.y;return(v>=0?'+':'')+' $'+Math.abs(Math.round(v)).toLocaleString();}
+          }
+        },
+        datalabels:{display:false}
+      },
+      scales:{
+        x:{ticks:{color:tc,font:{size:12}},grid:{display:false},border:{display:false}},
+        y:{
+          ticks:{color:tc,font:{size:11},callback:v=>'$'+v.toLocaleString()},
+          grid:{color:gc},
+          border:{display:false}
+        }
+      },
+      // Draw value labels above/below bars
+      animation:{onComplete:function(e){
+        const chart=e.chart;
+        const ctx2=chart.ctx;
+        ctx2.save();
+        ctx2.font='bold 11px Inter';
+        ctx2.textAlign='center';
+        ctx2.textBaseline='middle';
+        chart.data.datasets.forEach((ds,di)=>{
+          chart.getDatasetMeta(di).data.forEach((bar,i)=>{
+            const v=ds.data[i];
+            const str=(v>=0?'+':'')+' $'+Math.abs(Math.round(v)).toLocaleString();
+            ctx2.fillStyle=v>=0?'#2ecc71':'#e74c3c';
+            const yOff=v>=0?-12:12;
+            ctx2.fillText(str,bar.x,bar.y+yOff);
+          });
+        });
+        ctx2.restore();
+      }}
     }
   });
 }
