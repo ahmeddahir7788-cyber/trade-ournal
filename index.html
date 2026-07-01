@@ -513,8 +513,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-wr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="wr-gauge" width="90" height="54" style="width:90px;height:54px"></canvas>
-            <div style="display:flex;gap:5px;margin-top:-4px">
+            <canvas id="wr-gauge" width="64" height="38" style="width:64px;height:38px"></canvas>
+            <div style="display:flex;gap:4px;margin-top:2px">
               <span class="gc green" id="g-wins">0</span>
               <span class="gc blue" id="g-be">0</span>
               <span class="gc red" id="g-losses">0</span>
@@ -555,7 +555,7 @@ table.tt tr:last-child td{border-bottom:none}
 
       <!-- Avg Win / Loss -->
       <div class="stat-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
               <i class="ti ti-scale" style="font-size:15px;color:var(--purple)"></i>
@@ -1806,7 +1806,7 @@ function drawGauge(wins,be,losses){
   const canvas=document.getElementById('wr-gauge');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
-  const W=90,H=54,cx=45,cy=48,r=36,thick=10;
+  const W=64,H=38,cx=32,cy=34,r=26,thick=7;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
   const winAngle=(wins/total)*Math.PI;
