@@ -474,19 +474,6 @@ table.tt tr:last-child td{border-bottom:none}
   </div>
   <div class="top-bar-right" id="top-bar-right">
     <!-- Dashboard period selector - single smart select -->
-    <select class="sel" id="dash-period-sel" onchange="onPeriodChange()" style="font-weight:500;display:none">
-          <option value="week">Weekly</option>
-          <option value="month">Monthly</option>
-          <option value="Q1">Q1</option>
-          <option value="Q2">Q2</option>
-          <option value="Q3">Q3</option>
-          <option value="Q4">Q4</option>
-          <option value="yearly">Yearly</option>
-          <option value="alltime">All Time</option>
-    </select>
-    <select class="sel" id="dash-year-sel" onchange="onDashYearChange()" style="display:none"></select>
-    <select class="sel" id="dash-month-sel" onchange="onDashMonthChange()" style="display:none"></select>
-    <select class="sel" id="dash-week-sel" onchange="onDashWeekChange()" style="display:none"></select>
     <!-- Date Range Picker -->
     <div id="drp-wrap" style="display:none;position:relative">
       <button id="drp-btn" onclick="toggleDRP()" style="display:flex;align-items:center;gap:7px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:7px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:Inter,sans-serif">
@@ -1275,351 +1262,25 @@ function toggleTheme(){
 }
 
 function refreshCurrentDashboardView(){
-  const pSel=document.getElementById('dash-period-sel');
-  const period=pSel?pSel.value:'month';
-  const wSel=document.getElementById('dash-week-sel');
-  if(period==='week'&&wSel&&wSel.value){
-    onDashWeekChange();
-  } else if(period==='yearly'||period==='alltime'||(period&&period.startsWith('Q'))){
-    onPeriodChange();
-  } else if(currentDashKey){
+  if(currentDashKey){
     renderDashboard(currentDashKey);
   }
 }
 
-// Step the calendar's month forward (1) or backward (-1) using the arrow buttons in its header
-function navMonth(direction){
-  const key=currentDashKey||curMonthKey();
-  const[y,m]=key.split('-').map(Number);
-  let newY=y,newM=m+direction;
-  if(newM<1){newM=12;newY--;}
-  else if(newM>12){newM=1;newY++;}
-  const newKey=mkKey(newY,newM);
-  currentDashKey=newKey;
-  // Keep the Monthly dropdowns in sync in case the user switches back to Monthly view
-  const ySel=document.getElementById('dash-year-sel');
-  const mSel=document.getElementById('dash-month-sel');
-  if(ySel){
-    if(!Array.from(ySel.options).some(o=>o.value===String(newY))){
-      const opt=document.createElement('option');
-      opt.value=newY;opt.textContent=newY;
-      ySel.appendChild(opt);
-    }
-    ySel.value=newY;
-  }
-  if(mSel)mSel.value=newM;
-  refreshCurrentDashboardView();
-}
-
-// ── Sidebar ───────────────────────────────────────────────────
-function isMobileViewport(){return window.innerWidth<=768}
-
-function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  const body=document.getElementById('app-body');
-  const backdrop=document.getElementById('sidebar-backdrop');
-  const iconTop=document.getElementById('sb-icon-top');
-  if(isMobileViewport()){
-    const open=sb.classList.toggle('mobile-open');
-    if(backdrop)backdrop.classList.toggle('open',open);
-    if(iconTop)iconTop.className=open?'ti ti-x':'ti ti-menu-2';
-    return;
-  }
-  const collapsed=sb.classList.toggle('collapsed');
-  body.classList.toggle('collapsed',collapsed);
-  if(iconTop)iconTop.className=collapsed?'ti ti-layout-sidebar-left-expand':'ti ti-layout-sidebar-left-collapse';
-  localStorage.setItem('tj_v10_sb',collapsed?'1':'0');
-  // The content area's width animates (CSS transition) after this class toggle.
-  // Re-render the dashboard once that settles so the calendar grid and charts
-  // recalculate against the new width instead of staying stale/misaligned.
-  if(document.getElementById('page-dashboard').classList.contains('active')){
-    setTimeout(refreshCurrentDashboardView,260);
-  }
-}
-
-// Close the mobile drawer automatically after navigating to a page (better UX than leaving it open)
-function closeMobileSidebar(){
-  if(!isMobileViewport())return;
-  const sb=document.getElementById('sidebar');
-  const backdrop=document.getElementById('sidebar-backdrop');
-  const iconTop=document.getElementById('sb-icon-top');
-  sb.classList.remove('mobile-open');
-  if(backdrop)backdrop.classList.remove('open');
-  if(iconTop)iconTop.className='ti ti-menu-2';
-}
-
 function initSidebar(){
-  if(isMobileViewport()){
-    return; // mobile uses drawer
-  }
-  // Sidebar is always icon-only by default (expands on hover via CSS)
+  // Sidebar expands on hover via CSS — no JS needed
 }
 
-// ── Navigation ────────────────────────────────────────────────
-const PAGE_LABELS={
-  dashboard:{icon:'ti-layout-dashboard',label:'Dashboard'},
-  log:{icon:'ti-plus',label:'Log Trade'},
-  trades:{icon:'ti-list',label:'Trades'},
-  accounts:{icon:'ti-building-bank',label:'Accounts'},
-  playbooks:{icon:'ti-notebook',label:'Playbooks'},
-  reports:{icon:'ti-chart-pie',label:'Reports'}
-};
-function go(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if(btn)btn.classList.add('active');
-  closeMobileSidebar();
-  // Update top bar label
-  const pg=PAGE_LABELS[id]||{icon:'ti-circle',label:id};
-  const tb=document.getElementById('top-bar-section');
-  if(tb)tb.textContent=pg.label;
-  // Show/hide dashboard selectors in top bar
-  const pSel=document.getElementById('dash-period-sel');
-  const ySel=document.getElementById('dash-year-sel');
-  const mSel=document.getElementById('dash-month-sel');
-  const dmWrap=document.getElementById('dm-toggle-topbar');
-  if(id==='dashboard'){
-    if(pSel)pSel.style.display='none';
-    if(ySel)ySel.style.display='none';
-    if(mSel)mSel.style.display='none';
-    if(dmWrap)dmWrap.style.display='';
-    const drpWrap=document.getElementById('drp-wrap');if(drpWrap)drpWrap.style.display='';
-    const dmDollar=document.getElementById('dm-btn-dollar');
-    const dmPct=document.getElementById('dm-btn-pct');
-    if(dmDollar)dmDollar.classList.toggle('active',displayMode==='dollar');
-    if(dmPct)dmPct.classList.toggle('active',displayMode==='percent');
-  } else {
-    if(pSel)pSel.style.display='none';
-    if(ySel)ySel.style.display='none';
-    if(mSel)mSel.style.display='none';
-    const wSelH=document.getElementById('dash-week-sel');if(wSelH)wSelH.style.display='none';
-    if(dmWrap)dmWrap.style.display='none';
-    const drpWrapH=document.getElementById('drp-wrap');if(drpWrapH)drpWrapH.style.display='none';
-    const drpPanel=document.getElementById('drp-panel');if(drpPanel)drpPanel.style.display='none';
-    const drpBd=document.getElementById('drp-backdrop');if(drpBd)drpBd.style.display='none';
-  }
-  if(id==='dashboard'){
-    initDashSelectors();
-    refreshCurrentDashboardView();
-  }
-  if(id==='log')initLogPage();
-  if(id==='trades'){initTradeYearSel();renderMonthCards();}
-  if(id==='accounts')renderAccounts();
-  if(id==='playbooks')renderPlaybooks();
-  if(id==='reports')initReportsPage();
-  if(id==='notebook')initNotebook();
-}
+function isMobileViewport(){return window.innerWidth<700;}
 
-// ── Dashboard selectors ───────────────────────────────────────
-function onPeriodChange(){
-  const period=document.getElementById('dash-period-sel').value;
-  const year=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
-  const ySel=document.getElementById('dash-year-sel');
-  const mSel=document.getElementById('dash-month-sel');
-  const wSel=document.getElementById('dash-week-sel');
-  if(period==='week'){
-    ySel.style.display='none';
-    mSel.style.display='none';
-    if(wSel){
-      // Build list of all Mon–Sun weeks that have trades, plus current week
-      const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      const allDates=Object.values(db.trades).flat().map(t=>t.date).filter(Boolean);
-      const weekStarts=new Set();
-      // Always include current week
-      const now=new Date();
-      const todayDay=now.getDay();
-      const curMon=new Date(now);curMon.setDate(now.getDate()-(todayDay===0?6:todayDay-1));
-      weekStarts.add(fmt(curMon));
-      allDates.forEach(dateStr=>{
-        const d=new Date(dateStr);
-        const day=d.getDay();
-        const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
-        weekStarts.add(fmt(mon));
-      });
-      const sorted=[...weekStarts].sort((a,b)=>b.localeCompare(a));
-      const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const fmtLabel=s=>{const[y,mo,d]=s.split('-');const sun=new Date(s);sun.setDate(sun.getDate()+6);return mn[parseInt(mo)-1]+' '+parseInt(d)+' – '+mn[sun.getMonth()]+' '+sun.getDate()+', '+y;};
-      wSel.innerHTML=sorted.map(s=>`<option value="${s}">${fmtLabel(s)}</option>`).join('');
-      // Default to current week
-      wSel.value=fmt(curMon);
-      wSel.style.display='';
-    }
-    onDashWeekChange();
-  } else if(period==='month'){
-    if(wSel)wSel.style.display='none';
-    ySel.style.display='';
-    mSel.style.display='';
-    onDashMonthChange();
-  } else if(period==='yearly'){
-    if(wSel)wSel.style.display='none';
-    mSel.style.display='none';
-    ySel.style.display='';
-    const yr=parseInt(document.getElementById('dash-year-sel').value)||new Date().getFullYear();
-    const yearTrades=Object.values(db.trades).flat().filter(t=>t.date&&t.date.startsWith(String(yr))).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-    const tb=document.getElementById('top-bar-section');
-    if(tb)tb.textContent='Dashboard';
-    renderDashboardWithTrades(yearTrades,'Year '+yr);
-  } else if(period==='alltime'){
-    if(wSel)wSel.style.display='none';
-    ySel.style.display='none';
-    mSel.style.display='none';
-    const allTrades=Object.values(db.trades).flat().sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-    const tb=document.getElementById('top-bar-section');
-    if(tb)tb.textContent='Dashboard';
-    renderDashboardWithTrades(allTrades,'All Time');
-  } else {
-    if(wSel)wSel.style.display='none';
-    mSel.style.display='none';
-    ySel.style.display='';
-    const qNum=parseInt(period[1]);
-    const months=[];
-    for(let i=0;i<3;i++)months.push(mkKey(year,(qNum-1)*3+i+1));
-    const trades=months.flatMap(k=>getTradesForKey(k)).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-    const tb=document.getElementById('top-bar-section');
-    if(tb)tb.textContent='Dashboard';
-    renderDashboardWithTrades(trades,period+' '+year);
-  }
-}
+function initDashSelectors(){}
 
-function onDashWeekChange(){
-  const wSel=document.getElementById('dash-week-sel');
-  if(!wSel)return;
-  const monStr=wSel.value;
-  if(!monStr)return;
-  const sun=new Date(monStr);sun.setDate(sun.getDate()+6);
-  const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const sunStr=fmt(sun);
-  const trades=Object.values(db.trades).flat().filter(t=>t.date>=monStr&&t.date<=sunStr).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const[y,mo,d]=monStr.split('-');
-  const label=mn[parseInt(mo)-1]+' '+parseInt(d)+' – '+mn[sun.getMonth()]+' '+sun.getDate();
-  const tb=document.getElementById('top-bar-section');
-  if(tb)tb.textContent='Dashboard';
-  renderDashboardWithTrades(trades,label);
-}
+function onDashWeekChange(){}
+function onDashYearChange(){}
+function onDashMonthChange(){}
+function onPeriodChange(){}
 
-function renderDashboardWithTrades(trades,label){
-  // dash-sub removed
-  const s=statsOf(trades);
-  // Calendar always shows the FULL current month, independent of the selected period
-  const calMonthKey=currentDashKey||curMonthKey();
-  const calMonthTrades=getTradesForKey(calMonthKey);
-  if(!s){
-    const mtx=document.getElementById('m-total');if(mtx)mtx.textContent='0';
-    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
-    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
-    drawGauge(0,0,0);
-    drawProfitFactorBar(0,0);
-    const pfDonut2=document.getElementById('pf-donut');
-    if(pfDonut2){const ctx3=pfDonut2.getContext('2d');if(ctx3)ctx3.clearRect(0,0,56,56);}
-    const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
-    const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
-    const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='50%';
-    const awr0=document.getElementById('avgwl-red');if(awr0)awr0.style.width='50%';
-    const mb0=document.getElementById('mini-bars');if(mb0)mb0.innerHTML='';
-    const meq0=document.getElementById('mini-eq');if(meq0){const ctx0=meq0.getContext('2d');if(ctx0)ctx0.clearRect(0,0,meq0.width,meq0.height);}
-    const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
-    renderCalendar(calMonthKey,calMonthTrades);
-    renderRecentTrades();
-    if(eqChart){eqChart.destroy();eqChart=null;}return;
-  }
-  const mtEl2=document.getElementById('m-total');if(mtEl2)mtEl2.textContent=s.n;
-  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');
-  if(pe){
-    if(displayMode==='percent'){
-      const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);
-      pe.textContent=rrPct(rrSum);
-    } else {
-      pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
-    }
-    pe.className='stat-card-val';
-  }
-  const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
-  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
-  const winRRs2=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
-  const lossRRs2=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
-  const avgWinRR2=winRRs2.length?winRRs2.reduce((a,b)=>a+b,0)/winRRs2.length:0;
-  const avgLossRR2=lossRRs2.length?lossRRs2.reduce((a,b)=>a+b,0)/lossRRs2.length:0;
-  const aw2=document.getElementById('m-avgwin');
-  const al2=document.getElementById('m-avgloss');
-  const ratioEl2=document.getElementById('m-avgwl-ratio');
-  if(displayMode==='percent'){
-    if(aw2)aw2.textContent=winRRs2.length?'+'+Math.abs(Math.round(avgWinRR2*100)/100)+'R':'—';
-    if(al2)al2.textContent=lossRRs2.length?'-'+Math.abs(Math.round(avgLossRR2*100)/100)+'R':'—';
-    if(ratioEl2)ratioEl2.textContent=(lossRRs2.length&&Math.abs(avgLossRR2)>0)?(Math.abs(avgWinRR2)/Math.abs(avgLossRR2)).toFixed(2):'—';
-  } else {
-    if(aw2)aw2.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
-    if(al2)al2.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
-    if(ratioEl2)ratioEl2.textContent=s.avgWinLossRatio||'—';
-  }
-  const totalAvg2=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
-  const gwb=document.getElementById('avgwl-green');if(gwb)gwb.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg2*100)+'%';
-  const rlb=document.getElementById('avgwl-red');if(rlb)rlb.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg2*100)+'%';
-  const gw3=document.getElementById('g-wins');if(gw3)gw3.textContent=s.wins;
-  const gb3=document.getElementById('g-be');if(gb3)gb3.textContent=s.be;
-  const gl3=document.getElementById('g-losses');if(gl3)gl3.textContent=s.losses;
-  drawGauge(s.wins,s.be,s.losses);
-
-  renderSessionStats(trades);
-  renderCalendar(calMonthKey,calMonthTrades);
-  renderRecentTrades();
-  renderTradingScore(trades);
-  renderWeekdayChart(trades);
-  drawMiniCharts(trades);
-  drawCharts(trades);
-}
-
-function initDashSelectors(){
-  const curKey=curMonthKey();
-  const curYear=new Date().getFullYear();
-  const years=[...new Set([curYear,...allYears().map(Number)])].sort((a,b)=>b-a);
-  const ySel=document.getElementById('dash-year-sel');
-  if(ySel){
-    ySel.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');
-    ySel.style.display='';
-  }
-  if(!currentDashKey)currentDashKey=curKey;
-  const[ky,km]=currentDashKey.split('-');
-  if(ySel)ySel.value=ky;
-  const mSel=document.getElementById('dash-month-sel');
-  if(mSel)mSel.style.display='';
-  populateDashMonthSel(parseInt(ky),parseInt(km));
-  const pSel=document.getElementById('dash-period-sel');
-  if(pSel)pSel.style.display='';
-}
-
-function populateDashMonthSel(year,selMonth){
-  const mSel=document.getElementById('dash-month-sel');
-  mSel.innerHTML=MONTHS_FULL.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
-  mSel.value=selMonth||(new Date().getMonth()+1);
-}
-
-function onDashYearChange(){
-  const pSel=document.getElementById('dash-period-sel');
-  const period=pSel?pSel.value:'month';
-  const wSel2=document.getElementById('dash-week-sel');if(wSel2)wSel2.style.display='none';
-  if(period==='yearly'||period!=='month'){
-    onPeriodChange();
-    return;
-  }
-  const y=parseInt(document.getElementById('dash-year-sel').value);
-  const m=parseInt(document.getElementById('dash-month-sel').value);
-  populateDashMonthSel(y,m);
-  const key=mkKey(y,document.getElementById('dash-month-sel').value);
-  currentDashKey=key;
-  renderDashboard(key);
-}
-
-function onDashMonthChange(){
-  const y=document.getElementById('dash-year-sel').value;
-  const m=document.getElementById('dash-month-sel').value;
-  const key=mkKey(y,String(m).padStart(2,'0'));
-  currentDashKey=key;
-  renderDashboard(key);
-}
-
+// ── Dashboard render ──────────────────────────────────────────
 // ── Dashboard render ──────────────────────────────────────────
 function renderDashboard(key){
   currentDashKey=key;
@@ -1628,12 +1289,6 @@ function renderDashboard(key){
   if(tb4)tb4.textContent='Dashboard';
   const trades=getTradesForKey(key);
   const s=statsOf(trades);
-  // Sync selectors
-  const[ky,km]=key.split('-');
-  const ySel=document.getElementById('dash-year-sel');
-  if(ySel)ySel.value=ky;
-  const mSel=document.getElementById('dash-month-sel');
-  if(mSel)mSel.value=parseInt(km);
 
   if(!s){
     const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
@@ -3522,6 +3177,28 @@ function drpDayClick(ds){
   renderDRPCals();
 }
 
+// ── Recent Trades Table ──────────────────────────────────────
+function renderRecentTradesTable(){
+  const wrap=document.getElementById('recent-trades-table');
+  if(!wrap)return;
+  const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  if(!all.length){wrap.innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px">No trades yet.</div>';return;}
+  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  wrap.innerHTML=all.map(t=>{
+    const[y,m,d]=t.date.split('-');
+    const dateStr=m+'-'+d+'-'+y;
+    const pnl=t.pnl||0;
+    const pnlColor=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text3)';
+    const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
+    const sym=PAIRS[t.symbol]||t.symbol||'—';
+    return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:10px 0;border-bottom:.5px solid var(--border);align-items:center">
+      <span style="font-size:13px;color:var(--text2)">${dateStr}</span>
+      <span style="font-size:13px;font-weight:600;color:var(--text)">${sym}</span>
+      <span style="font-size:13px;font-weight:700;color:${pnlColor};text-align:right">${pnlStr}</span>
+    </div>`;
+  }).join('');
+}
+
 // ── Forex News Calendar ─────────────────────────────────────
 function loadForexNews(){
   const wrap=document.getElementById('forex-news-list');
@@ -3885,8 +3562,6 @@ applyTheme();
 initSidebar();
 document.getElementById('f-date').value=today();
 currentDashKey=curMonthKey();
-const initialPeriodSel=document.getElementById('dash-period-sel');
-if(initialPeriodSel)initialPeriodSel.value='month';
 // Init DRP to alltime label
 const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
 initDashSelectors();
@@ -3894,9 +3569,6 @@ renderDashboard(currentDashKey);
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
-document.getElementById('dash-period-sel').style.display='none';
-document.getElementById('dash-year-sel').style.display='none';
-document.getElementById('dash-month-sel').style.display='none';
 document.getElementById('dm-toggle-topbar').style.display='';
 document.getElementById('drp-wrap').style.display='';
 
