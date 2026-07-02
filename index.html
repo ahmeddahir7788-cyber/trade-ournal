@@ -1270,6 +1270,17 @@ function refreshCurrentDashboardView(){
 function initSidebar(){
   // Sidebar expands on hover via CSS — no JS needed
 }
+function toggleSidebar(){}
+function closeMobileSidebar(){}
+function openMobileSidebar(){}
+function navMonth(dir){
+  if(!currentDashKey)return;
+  const[y,m]=currentDashKey.split('-');
+  const d=new Date(parseInt(y),parseInt(m)-1+dir,1);
+  const newKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  currentDashKey=newKey;
+  renderDashboard(newKey);
+}
 
 function isMobileViewport(){return window.innerWidth<700;}
 
@@ -1279,6 +1290,36 @@ function onDashWeekChange(){}
 function onDashYearChange(){}
 function onDashMonthChange(){}
 function onPeriodChange(){}
+
+// ── Navigation ────────────────────────────────────────────────
+function go(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  const page=document.getElementById('page-'+id);
+  if(page)page.classList.add('active');
+  if(btn)btn.classList.add('active');
+  const tb=document.getElementById('top-bar-section');
+  if(tb){
+    const labels={dashboard:'Dashboard',log:'Add Trade',trades:'Trades',accounts:'Accounts',playbooks:'Playbooks',reports:'Reports',notebook:'Notebook'};
+    tb.textContent=labels[id]||id;
+  }
+  const dmWrap=document.getElementById('dm-toggle-topbar');
+  const drpWrap=document.getElementById('drp-wrap');
+  const drpPanel=document.getElementById('drp-panel');
+  const drpBd=document.getElementById('drp-backdrop');
+  if(id==='dashboard'){
+    if(dmWrap)dmWrap.style.display='';
+    if(drpWrap)drpWrap.style.display='';
+  } else {
+    if(dmWrap)dmWrap.style.display='none';
+    if(drpWrap)drpWrap.style.display='none';
+    if(drpPanel)drpPanel.style.display='none';
+    if(drpBd)drpBd.style.display='none';
+  }
+  if(id==='reports')initReportsPage();
+  if(id==='notebook')initNotebook();
+}
+
 
 // ── Dashboard render ──────────────────────────────────────────
 // ── Dashboard render ──────────────────────────────────────────
