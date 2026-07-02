@@ -654,6 +654,26 @@ table.tt tr:last-child td{border-bottom:none}
       <div style="position:relative;height:280px"><canvas id="weekday-chart"></canvas></div>
     </div>
     </div>
+
+    <!-- Forex News Calendar -->
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h3 style="margin:0">Forex News</h3>
+          <span id="forex-date" style="font-size:12px;color:var(--text3)"></span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text3)">Impact:</span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#e74c3c;display:inline-block"></span>High</span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#f39c12;display:inline-block"></span>Med</span>
+          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block"></span>Low</span>
+          <button onclick="loadForexNews()" style="background:none;border:.5px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif;margin-left:6px"><i class="ti ti-refresh"></i> Refresh</button>
+        </div>
+      </div>
+      <div id="forex-news-list" style="display:flex;flex-direction:column;gap:0">
+        <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-loader" style="font-size:20px;display:block;margin-bottom:8px"></i>Loading news...</div>
+      </div>
+    </div>
   </div>
 
   <!-- LOG TRADE -->
@@ -3485,6 +3505,96 @@ function drpDayClick(ds){
     return;
   }
   renderDRPCals();
+}
+
+// ── Forex News Calendar ─────────────────────────────────────
+function loadForexNews(){
+  const wrap=document.getElementById('forex-news-list');
+  const dateEl=document.getElementById('forex-date');
+  if(!wrap)return;
+  wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-loader" style="font-size:20px;display:block;margin-bottom:8px"></i>Loading news...</div>';
+
+  const now=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if(dateEl)dateEl.textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+
+  // Use allorigins proxy to bypass CORS on Forex Factory JSON
+  const ffUrl=encodeURIComponent('https://nfs.faireconomy.media/ff_calendar_thisweek.json');
+  fetch('https://api.allorigins.win/raw?url='+ffUrl)
+    .then(r=>r.json())
+    .then(data=>{
+      renderForexNews(data,now);
+    })
+    .catch(()=>{
+      // Fallback: try direct
+      fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json')
+        .then(r=>r.json())
+        .then(data=>renderForexNews(data,now))
+        .catch(()=>{
+          wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-wifi-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Could not load news.<br>Check your connection and tap Refresh.</div>';
+        });
+    });
+}
+
+function renderForexNews(data,now){
+  const wrap=document.getElementById('forex-news-list');
+  if(!wrap)return;
+
+  const todayStr=now.toISOString().slice(0,10);
+  const todayEvents=data.filter(e=>{
+    const d=new Date(e.date);
+    return d.toISOString().slice(0,10)===todayStr;
+  });
+
+  if(!todayEvents.length){
+    wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:8px"></i>No events today.</div>';
+    return;
+  }
+
+  const impactColor={High:'#e74c3c',Medium:'#f39c12',Low:'#aaa'};
+  const impactBg={High:'rgba(231,76,60,0.1)',Medium:'rgba(243,156,18,0.1)',Low:'rgba(170,170,170,0.05)'};
+
+  // Table header
+  let html=`<div style="display:grid;grid-template-columns:70px 60px 1fr 90px 90px 90px;gap:0;border-bottom:.5px solid var(--border);padding-bottom:8px;margin-bottom:4px">
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Time</span>
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Cur</span>
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Event</span>
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Actual</span>
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Forecast</span>
+    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Previous</span>
+  </div>`;
+
+  todayEvents.forEach(e=>{
+    const impact=e.impact||'Low';
+    const color=impactColor[impact]||'#aaa';
+    const bg=impactBg[impact]||'transparent';
+    const time=e.date?new Date(e.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
+    const actual=e.actual||'—';
+    const forecast=e.forecast||'—';
+    const previous=e.previous||'—';
+    const actualColor=e.actual&&e.forecast?(parseFloat(e.actual)>parseFloat(e.forecast)?'var(--green)':parseFloat(e.actual)<parseFloat(e.forecast)?'var(--red)':'var(--text)'):'var(--text)';
+    html+=`<div style="display:grid;grid-template-columns:70px 60px 1fr 90px 90px 90px;gap:0;padding:10px 0;border-bottom:.5px solid var(--border);align-items:center;background:${impact==='High'?bg:'transparent'}">
+      <span style="font-size:12px;color:var(--text2)">${time}</span>
+      <span style="display:inline-flex;align-items:center;gap:5px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)">${e.currency||'—'}</span>
+      </span>
+      <span style="font-size:13px;font-weight:${impact==='High'?'600':'400'};color:var(--text);padding-right:8px">${e.title||'—'}</span>
+      <span style="font-size:12px;font-weight:700;color:${actualColor};text-align:right">${actual}</span>
+      <span style="font-size:12px;color:var(--text3);text-align:right">${forecast}</span>
+      <span style="font-size:12px;color:var(--text3);text-align:right">${previous}</span>
+    </div>`;
+  });
+
+  wrap.innerHTML=html;
+}
+
+// Auto-load on dashboard init
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(loadForexNews,800));
+} else {
+  setTimeout(loadForexNews,800);
 }
 
 // ── Calendar Capture ─────────────────────────────────────────
