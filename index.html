@@ -494,25 +494,6 @@ table.tt tr:last-child td{border-bottom:none}
         <span id="drp-label">All Time</span>
         <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
       </button>
-      <div id="drp-panel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:400;background:var(--surface);border:.5px solid var(--border2);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:620px;overflow:hidden">
-        <div style="display:flex;width:100%">
-          <!-- Left presets -->
-          <div style="width:160px;flex-shrink:0;border-right:.5px solid var(--border);padding:8px">
-            <div id="drp-presets"></div>
-          </div>
-          <!-- Right dual calendar -->
-          <div style="flex:1;padding:16px">
-            <div style="display:flex;gap:16px">
-              <div style="flex:1" id="drp-cal-left"></div>
-              <div style="flex:1" id="drp-cal-right"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
-              <button onclick="drpClear()" style="background:none;border:none;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif">Clear</button>
-              <span id="drp-range-label" style="font-size:12px;color:var(--text3)">All time</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
@@ -520,7 +501,7 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
   </div>
 </div>
-<div onclick="closeDRPOutside(event)" id="drp-backdrop" style="display:none;position:fixed;inset:0;z-index:299"></div>
+
 <div class="content">
 
   <!-- DASHBOARD -->
@@ -3343,12 +3324,22 @@ const DRP_PRESETS=[
 function toggleDRP(){
   const panel=document.getElementById('drp-panel');
   const backdrop=document.getElementById('drp-backdrop');
+  const btn=document.getElementById('drp-btn');
   const isOpen=panel.style.display!=='none';
-  panel.style.display=isOpen?'none':'flex';
-  if(!isOpen)panel.style.flexDirection='row';
-  if(backdrop)backdrop.style.display=isOpen?'none':'block';
-  if(!isOpen){initDRPPanel();}
+  if(isOpen){
+    panel.style.display='none';
+    if(backdrop)backdrop.style.display='none';
+    return;
+  }
+  const rect=btn.getBoundingClientRect();
+  panel.style.top=(rect.bottom+8)+'px';
+  panel.style.right=(window.innerWidth-rect.right)+'px';
+  panel.style.left='auto';
+  panel.style.display='block';
+  if(backdrop)backdrop.style.display='block';
+  initDRPPanel();
 }
+
 
 function closeDRPOutside(e){
   if(e.target===document.getElementById('drp-backdrop')){
@@ -3803,5 +3794,24 @@ window.addEventListener('resize',function(){
   }
 });
 </script>
+<!-- DRP Panel - at body level to avoid stacking context issues -->
+<div id="drp-backdrop" onclick="closeDRPOutside(event)" style="display:none;position:fixed;inset:0;z-index:500"></div>
+<div id="drp-panel" style="display:none;position:fixed;z-index:600;background:var(--surface);border:.5px solid var(--border2);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);width:660px;overflow:hidden">
+  <div style="display:flex;width:100%">
+    <div style="width:170px;flex-shrink:0;border-right:.5px solid var(--border);padding:10px">
+      <div id="drp-presets"></div>
+    </div>
+    <div style="flex:1;padding:16px">
+      <div style="display:flex;gap:16px">
+        <div style="flex:1" id="drp-cal-left"></div>
+        <div style="flex:1" id="drp-cal-right"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
+        <button onclick="drpClear()" style="background:none;border:none;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif">Clear</button>
+        <span id="drp-range-label" style="font-size:12px;color:var(--text3)">All time</span>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
