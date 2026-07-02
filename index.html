@@ -494,8 +494,8 @@ table.tt tr:last-child td{border-bottom:none}
         <span id="drp-label">All Time</span>
         <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
       </button>
-      <div id="drp-panel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:300;background:var(--surface);border:.5px solid var(--border2);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:620px;overflow:hidden">
-        <div style="display:flex">
+      <div id="drp-panel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:400;background:var(--surface);border:.5px solid var(--border2);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:620px;overflow:hidden">
+        <div style="display:flex;width:100%">
           <!-- Left presets -->
           <div style="width:160px;flex-shrink:0;border-right:.5px solid var(--border);padding:8px">
             <div id="drp-presets"></div>
@@ -3345,13 +3345,16 @@ function toggleDRP(){
   const backdrop=document.getElementById('drp-backdrop');
   const isOpen=panel.style.display!=='none';
   panel.style.display=isOpen?'none':'flex';
+  if(!isOpen)panel.style.flexDirection='row';
   if(backdrop)backdrop.style.display=isOpen?'none':'block';
   if(!isOpen){initDRPPanel();}
 }
 
 function closeDRPOutside(e){
-  document.getElementById('drp-panel').style.display='none';
-  document.getElementById('drp-backdrop').style.display='none';
+  if(e.target===document.getElementById('drp-backdrop')){
+    document.getElementById('drp-panel').style.display='none';
+    document.getElementById('drp-backdrop').style.display='none';
+  }
 }
 
 function initDRPPanel(){
