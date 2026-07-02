@@ -1496,13 +1496,13 @@ function renderDashboardWithTrades(trades,label){
     drawGauge(0,0,0);
     drawProfitFactorBar(0,0);
     const pfDonut2=document.getElementById('pf-donut');
-    if(pfDonut2){const ctx3=pfDonut2.getContext('2d');ctx3.clearRect(0,0,56,56);}
+    if(pfDonut2){const ctx3=pfDonut2.getContext('2d');if(ctx3)ctx3.clearRect(0,0,56,56);}
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='50%';
     const awr0=document.getElementById('avgwl-red');if(awr0)awr0.style.width='50%';
     const mb0=document.getElementById('mini-bars');if(mb0)mb0.innerHTML='';
-    const meq0=document.getElementById('mini-eq');if(meq0){const ctx0=meq0.getContext('2d');ctx0.clearRect(0,0,meq0.width,meq0.height);}
+    const meq0=document.getElementById('mini-eq');if(meq0){const ctx0=meq0.getContext('2d');if(ctx0)ctx0.clearRect(0,0,meq0.width,meq0.height);}
     const ssx=document.getElementById('session-stats');if(ssx)ssx.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     renderCalendar(calMonthKey,calMonthTrades);
     renderRecentTrades();
@@ -1628,7 +1628,7 @@ function renderDashboard(key){
     // Reset profit factor bar + labels
     drawProfitFactorBar(0,0);
     const pfDonut=document.getElementById('pf-donut');
-    if(pfDonut){const ctx2=pfDonut.getContext('2d');ctx2.clearRect(0,0,56,56);}
+    if(pfDonut){const ctx2=pfDonut.getContext('2d');if(ctx2)ctx2.clearRect(0,0,56,56);}
     // Reset avg win/loss bar + labels
     const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
     const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
@@ -1636,7 +1636,7 @@ function renderDashboard(key){
     const awr=document.getElementById('avgwl-red');if(awr)awr.style.width='50%';
     // Reset mini bars
     const mb=document.getElementById('mini-bars');if(mb)mb.innerHTML='';
-    const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');ctx.clearRect(0,0,meq.width,meq.height);}
+    const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');if(ctx)ctx.clearRect(0,0,meq.width,meq.height);}
     const _ss=document.getElementById('session-stats');if(_ss)_ss.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
@@ -1885,6 +1885,7 @@ function drawGauge(wins,be,losses){
   const canvas=document.getElementById('wr-gauge');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
+  if(!ctx)return;
   const W=80,H=48,cx=40,cy=44,r=34,thick=8;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
@@ -1980,7 +1981,7 @@ function drawMiniCharts(trades){
   }
   // Mini equity line in Net P&L card
   const miniEq=document.getElementById('mini-eq');
-  if(miniEq&&trades.length){
+  if(miniEq&&miniEq.getContext&&miniEq.getContext('2d')&&trades.length){
     miniEq.width=160;miniEq.height=38;
     const ctx=miniEq.getContext('2d');
     ctx.clearRect(0,0,160,38);
@@ -3415,7 +3416,11 @@ function applyDRPPreset(id){
   document.getElementById('drp-range-label').textContent=drpStart&&drpEnd?drpStart+' → '+drpEnd:'All time';
   renderDRPPresets();
   renderDRPCals();
-  renderDashboardWithTrades(trades,label);
+  try{
+    renderDashboardWithTrades(trades,label);
+  }catch(e){
+    console.error('DRP render error:',e);
+  }
   document.getElementById('drp-panel').style.display='none';
   document.getElementById('drp-backdrop').style.display='none';
 }
