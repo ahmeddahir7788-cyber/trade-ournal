@@ -1356,6 +1356,7 @@ function renderDashboard(key){
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
     renderRecentTrades();
+    renderRecentTradesTable();
     if(eqChart){eqChart.destroy();eqChart=null;}
     return;
   }
@@ -1402,6 +1403,7 @@ function renderDashboard(key){
   renderCalendar(key,trades);
   renderSessionStats(trades);
   renderRecentTrades();
+  renderRecentTradesTable();
   renderTradingScore(trades);
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
@@ -3256,21 +3258,24 @@ function loadForexNews(){
   if(dateEl)dateEl.textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
 
   // Use allorigins proxy to bypass CORS on Forex Factory JSON
-  const ffUrl=encodeURIComponent('https://nfs.faireconomy.media/ff_calendar_thisweek.json');
-  fetch('https://api.allorigins.win/raw?url='+ffUrl)
-    .then(r=>r.json())
-    .then(data=>{
-      renderForexNews(data,now);
-    })
-    .catch(()=>{
-      // Fallback: try direct
-      fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json')
-        .then(r=>r.json())
-        .then(data=>renderForexNews(data,now))
-        .catch(()=>{
-          wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-wifi-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Could not load news.<br>Check your connection and tap Refresh.</div>';
-        });
-    });
+  // Try multiple proxies for CORS
+  const ffUrl='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+  const proxies=[
+    'https://corsproxy.io/?'+encodeURIComponent(ffUrl),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(ffUrl),
+    ffUrl
+  ];
+  function tryNext(i){
+    if(i>=proxies.length){
+      wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-wifi-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Could not load news.<br>Tap Refresh to try again.</div>';
+      return;
+    }
+    fetch(proxies[i])
+      .then(r=>{if(!r.ok)throw new Error('bad');return r.json();})
+      .then(data=>renderForexNews(data,now))
+      .catch(()=>tryNext(i+1));
+  }
+  tryNext(0);
 }
 
 function renderForexNews(data,now){
