@@ -635,6 +635,10 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
           </div>
           <div id="score-breakdown" style="display:none"></div>
+          <div style="margin-top:18px;padding-top:14px;border-top:.5px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Most Traded Instruments</div>
+            <div id="most-traded-wrap" style="display:flex;justify-content:space-around;gap:8px"></div>
+          </div>
         </div>
 
       </div>
@@ -1460,6 +1464,7 @@ function renderDashboardWithTrades(trades,label){
   renderCalendar(key,trades);
   renderRecentTradesTable();
   renderTradingScore(trades);
+  renderMostTraded(trades);
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
@@ -3012,6 +3017,48 @@ function renderTradingScore(trades){
 
 // ── P&L by Weekday ───────────────────────────────────────────
 let weekdayChart=null;
+
+function renderMostTraded(trades){
+  const wrap=document.getElementById('most-traded-wrap');
+  if(!wrap)return;
+  if(!trades||!trades.length){wrap.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;width:100%">No trades yet</div>';return;}
+
+  // Count by symbol
+  const bySymbol={};
+  trades.forEach(t=>{
+    const sym=PAIRS[t.symbol]||t.symbol||'?';
+    if(!bySymbol[sym])bySymbol[sym]=0;
+    bySymbol[sym]++;
+  });
+  const total=trades.length;
+  const sorted=Object.entries(bySymbol).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+  wrap.innerHTML=sorted.map(([sym,count])=>{
+    const pct=Math.round(count/total*1000)/10;
+    const angle=(pct/100)*360;
+    const r=38,cx=44,cy=44,stroke=6;
+    const circ=2*Math.PI*r;
+    const dash=(pct/100)*circ;
+    const intPart=Math.floor(pct);
+    const decPart=(pct%1).toFixed(2).slice(1);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="position:relative;width:88px;height:88px">
+        <svg width="88" height="88" style="transform:rotate(-90deg)">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(55,138,221,0.15)" stroke-width="${stroke}"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#378ADD" stroke-width="${stroke}"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:row">
+          <span style="font-size:18px;font-weight:800;color:var(--text)">${intPart}</span><span style="font-size:11px;font-weight:600;color:var(--text2)">${decPart}%</span>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:12px;font-weight:700;color:#378ADD">${sym}</div>
+        <div style="font-size:11px;color:var(--text3)">${count} trade${count===1?'':'s'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function renderWeekdayChart(trades){
   const canvas=document.getElementById('weekday-chart');
