@@ -589,8 +589,6 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Calendar (left) + Forex News & Trading Score stacked (right) -->
     <div style="display:grid;grid-template-columns:1fr 340px;gap:12px;margin-top:12px;align-items:start">
-
-      <!-- Calendar -->
       <div class="card" id="cal-card" style="margin-bottom:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -609,7 +607,7 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Right column: Forex News + Trading Score -->
-      <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0;align-self:start">
 
         <!-- Forex News -->
         <div class="card" style="margin-bottom:0">
