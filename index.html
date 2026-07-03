@@ -619,8 +619,7 @@ table.tt tr:last-child td{border-bottom:none}
               <span id="forex-date" style="font-size:11px;color:var(--text3)"></span>
             </div>
             <div style="display:flex;gap:5px;align-items:center">
-              <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3)"><span style="width:7px;height:7px;border-radius:50%;background:#e74c3c;display:inline-block"></span>High</span>
-              <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3)"><span style="width:7px;height:7px;border-radius:50%;background:#f39c12;display:inline-block"></span>Med</span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#e74c3c"><i class="ti ti-folder-filled" style="font-size:13px"></i>USD High Impact</span>
               <button onclick="loadForexNews()" style="background:none;border:.5px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
@@ -3284,52 +3283,32 @@ function renderForexNews(data,now){
   if(!wrap)return;
 
   const todayStr=now.toISOString().slice(0,10);
-  const todayEvents=data.filter(e=>{
+  const events=data.filter(e=>{
     const d=new Date(e.date);
-    return d.toISOString().slice(0,10)===todayStr;
+    return d.toISOString().slice(0,10)===todayStr
+      && e.impact==='High'
+      && e.currency==='USD';
   });
 
-  if(!todayEvents.length){
-    wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:8px"></i>No events today.</div>';
+  if(!events.length){
+    wrap.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px"><i class="ti ti-calendar-check" style="font-size:22px;display:block;margin-bottom:8px"></i>No high-impact USD news today.</div>';
     return;
   }
 
-  const impactColor={High:'#e74c3c',Medium:'#f39c12',Low:'#aaa'};
-  const impactBg={High:'rgba(231,76,60,0.1)',Medium:'rgba(243,156,18,0.1)',Low:'rgba(170,170,170,0.05)'};
-
-  // Table header
-  let html=`<div style="display:grid;grid-template-columns:70px 60px 1fr 90px 90px 90px;gap:0;border-bottom:.5px solid var(--border);padding-bottom:8px;margin-bottom:4px">
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Time</span>
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Cur</span>
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Event</span>
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Actual</span>
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Forecast</span>
-    <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right">Previous</span>
-  </div>`;
-
-  todayEvents.forEach(e=>{
-    const impact=e.impact||'Low';
-    const color=impactColor[impact]||'#aaa';
-    const bg=impactBg[impact]||'transparent';
-    const time=e.date?new Date(e.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
-    const actual=e.actual||'—';
-    const forecast=e.forecast||'—';
-    const previous=e.previous||'—';
-    const actualColor=e.actual&&e.forecast?(parseFloat(e.actual)>parseFloat(e.forecast)?'var(--green)':parseFloat(e.actual)<parseFloat(e.forecast)?'var(--red)':'var(--text)'):'var(--text)';
-    html+=`<div style="display:grid;grid-template-columns:70px 60px 1fr 90px 90px 90px;gap:0;padding:10px 0;border-bottom:.5px solid var(--border);align-items:center;background:${impact==='High'?bg:'transparent'}">
-      <span style="font-size:12px;color:var(--text2)">${time}</span>
-      <span style="display:inline-flex;align-items:center;gap:5px">
-        <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
-        <span style="font-size:12px;font-weight:700;color:var(--text)">${e.currency||'—'}</span>
-      </span>
-      <span style="font-size:13px;font-weight:${impact==='High'?'600':'400'};color:var(--text);padding-right:8px">${e.title||'—'}</span>
-      <span style="font-size:12px;font-weight:700;color:${actualColor};text-align:right">${actual}</span>
-      <span style="font-size:12px;color:var(--text3);text-align:right">${forecast}</span>
-      <span style="font-size:12px;color:var(--text3);text-align:right">${previous}</span>
+  wrap.innerHTML=events.map(e=>{
+    const time=e.date?new Date(e.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'All Day';
+    const actual=e.actual||'';
+    const forecast=e.forecast||'';
+    const actualColor=actual&&forecast?(parseFloat(actual)>parseFloat(forecast)?'var(--green)':parseFloat(actual)<parseFloat(forecast)?'var(--red)':'var(--text)'):'var(--green)';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid var(--border)">
+      <i class="ti ti-folder-filled" style="font-size:18px;color:#e74c3c;flex-shrink:0"></i>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">${time}</div>
+      </div>
+      ${actual?`<span style="font-size:12px;font-weight:700;color:${actualColor};flex-shrink:0">${actual}</span>`:''}
     </div>`;
-  });
-
-  wrap.innerHTML=html;
+  }).join('');
 }
 
 // Auto-load on dashboard init
