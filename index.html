@@ -609,27 +609,7 @@ table.tt tr:last-child td{border-bottom:none}
       <!-- Right column: Forex News + Trading Score -->
       <div style="display:flex;flex-direction:column;gap:12px;min-width:0;align-self:start">
 
-        <!-- Forex News -->
-        <div class="card" style="margin-bottom:0">
-          <!-- Date header -->
-          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px">
-            <span id="fn-day-num" style="font-size:32px;font-weight:800;color:var(--text);line-height:1"></span>
-            <div>
-              <div id="fn-month" style="font-size:16px;font-weight:700;color:var(--text)"></div>
-              <div id="fn-weekday" style="font-size:12px;color:var(--text3)"></div>
-            </div>
-          </div>
-          <!-- Mini week strip -->
-          <div id="fn-week-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:10px 0 14px;border-top:.5px solid var(--border);padding-top:10px"></div>
-          <!-- News section -->
-          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-            <span>Today's News</span>
-            <button onclick="loadForexNews()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0"><i class="ti ti-refresh"></i></button>
-          </div>
-          <div id="forex-news-list" style="max-height:180px;overflow-y:auto">
-            <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">Loading...</div>
-          </div>
-        </div>
+
 
         <!-- Trading Score -->
         <div class="card" style="margin-bottom:0">
@@ -3254,97 +3234,6 @@ function renderRecentTradesTable(){
       <span style="font-size:13px;font-weight:700;color:${pnlColor};text-align:right">${pnlStr}</span>
     </div>`;
   }).join('');
-}
-
-// ── Forex News Calendar ─────────────────────────────────────
-function loadForexNews(){
-  const wrap=document.getElementById('forex-news-list');
-  if(!wrap)return;
-  wrap.innerHTML='<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">Loading...</div>';
-
-  const now=new Date();
-  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  // Date header
-  const dayNum=document.getElementById('fn-day-num');
-  const monthEl=document.getElementById('fn-month');
-  const weekdayEl=document.getElementById('fn-weekday');
-  if(dayNum)dayNum.textContent=now.getDate();
-  if(monthEl)monthEl.textContent=months[now.getMonth()];
-  if(weekdayEl)weekdayEl.textContent='Today, '+days[now.getDay()];
-
-  // Week strip Mon-Sun
-  const strip=document.getElementById('fn-week-strip');
-  if(strip){
-    const dow=now.getDay();
-    const monOffset=dow===0?-6:1-dow;
-    const labels=['M','T','W','T','F','S','S'];
-    const weekDays=[];
-    for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()+monOffset+i);weekDays.push(d);}
-    strip.innerHTML=weekDays.map((d,i)=>{
-      const isToday=d.toDateString()===now.toDateString();
-      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-        <span style="font-size:10px;color:var(--text3)">${labels[i]}</span>
-        <span style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:${isToday?'700':'500'};background:${isToday?'#e74c3c':'transparent'};color:${isToday?'#fff':'var(--text2)'}">${d.getDate()}</span>
-      </div>`;
-    }).join('');
-  }
-
-  const ffUrl='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
-  const proxies=[
-    'https://corsproxy.io/?'+encodeURIComponent(ffUrl),
-    'https://api.allorigins.win/raw?url='+encodeURIComponent(ffUrl),
-    ffUrl
-  ];
-  function tryNext(i){
-    if(i>=proxies.length){
-      wrap.innerHTML='<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">No events today</div>';
-      return;
-    }
-    fetch(proxies[i])
-      .then(r=>{if(!r.ok)throw new Error('bad');return r.json();})
-      .then(data=>renderForexNews(data,now))
-      .catch(()=>tryNext(i+1));
-  }
-  tryNext(0);
-}
-
-
-function renderForexNews(data,now){
-  const wrap=document.getElementById('forex-news-list');
-  if(!wrap)return;
-
-  const todayStr=now.toISOString().slice(0,10);
-  const events=data.filter(e=>{
-    const d=new Date(e.date);
-    return d.toISOString().slice(0,10)===todayStr
-      && e.impact==='High'
-      && e.currency==='USD';
-  });
-
-  if(!events.length){
-    wrap.innerHTML='<div style="background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:space-between"><span>No events today</span><span style="width:8px;height:8px;border-radius:50%;background:#2ecc71;display:inline-block"></span></div>';
-    return;
-  }
-
-  wrap.innerHTML=events.map(e=>{
-    const time=e.date?new Date(e.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'All Day';
-    return `<div style="background:var(--surface2);border-radius:10px;padding:11px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
-      <i class="ti ti-folder-filled" style="font-size:20px;color:#e74c3c;flex-shrink:0"></i>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'—'}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">${time} · USD</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// Auto-load on dashboard init
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(loadForexNews,800));
-} else {
-  setTimeout(loadForexNews,800);
 }
 
 // ── Calendar Capture ─────────────────────────────────────────
