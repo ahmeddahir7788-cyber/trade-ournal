@@ -587,11 +587,10 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:30% 1fr;gap:12px;margin-top:0;align-items:stretch">
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <h3>Equity Curve</h3>
-        <div class="chart-wrap" style="flex:1"><canvas id="equity-chart"></canvas></div>
-      </div>
+    <!-- Calendar (left) + Forex News & Trading Score stacked (right) -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:12px;margin-top:12px;align-items:start">
+
+      <!-- Calendar -->
       <div class="card" id="cal-card" style="margin-bottom:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -608,73 +607,75 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
-    </div>
 
-    <!-- Trading Score + P&L by Weekday -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-        <h3 style="margin:0">Trading Score</h3>
-        <i class="ti ti-info-circle" style="font-size:15px;color:var(--text3)" title="Composite score based on Win%, Profit Factor, Avg Win/Loss, Consistency, Max Drawdown and Recovery Factor"></i>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:center">
-        <div style="display:flex;justify-content:center"><canvas id="radar-chart" width="300" height="280" style="width:300px;height:280px"></canvas></div>
-        <div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:4px">Your Trading Score</div>
-          <div id="score-val" style="font-size:52px;font-weight:800;color:var(--text);line-height:1;margin-bottom:20px">—</div>
-          <div style="position:relative;height:14px;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#f39c12,#f1c40f,#2ecc71,#1abc9c);margin-bottom:8px">
-            <div id="score-marker" style="position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid #1abc9c;transform:translate(-50%,-50%);transition:left .5s;left:50%"></div>
+      <!-- Right column: Forex News + Trading Score -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Forex News -->
+        <div class="card" style="margin-bottom:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <h3 style="margin:0">Forex News</h3>
+              <span id="forex-date" style="font-size:11px;color:var(--text3)"></span>
+            </div>
+            <div style="display:flex;gap:5px;align-items:center">
+              <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3)"><span style="width:7px;height:7px;border-radius:50%;background:#e74c3c;display:inline-block"></span>High</span>
+              <span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3)"><span style="width:7px;height:7px;border-radius:50%;background:#f39c12;display:inline-block"></span>Med</span>
+              <button onclick="loadForexNews()" style="background:none;border:.5px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif"><i class="ti ti-refresh"></i></button>
+            </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:20px">
-            <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span>
+          <div id="forex-news-list" style="max-height:220px;overflow-y:auto">
+            <div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Loading news...</div>
           </div>
-          <div id="score-breakdown" style="display:flex;flex-direction:column;gap:7px"></div>
         </div>
+
+        <!-- Trading Score -->
+        <div class="card" style="margin-bottom:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <h3 style="margin:0">Trading Score</h3>
+            <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
+          </div>
+          <div style="display:flex;gap:16px;align-items:center">
+            <canvas id="radar-chart" width="180" height="170" style="width:180px;height:170px;flex-shrink:0"></canvas>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Your Score</div>
+              <div id="score-val" style="font-size:36px;font-weight:800;color:var(--text);line-height:1;margin-bottom:12px">—</div>
+              <div style="position:relative;height:10px;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#f39c12,#f1c40f,#2ecc71,#1abc9c);margin-bottom:6px">
+                <div id="score-marker" style="position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid #1abc9c;transform:translate(-50%,-50%);transition:left .5s;left:50%"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:12px"><span>0</span><span>50</span><span>100</span></div>
+              <div id="score-breakdown" style="display:flex;flex-direction:column;gap:5px"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <h3 style="margin:0">P&amp;L by Weekday</h3>
-        <span style="font-size:12px;color:var(--text3)">$ · all time</span>
-      </div>
-      <div style="position:relative;height:280px"><canvas id="weekday-chart"></canvas></div>
-    </div>
-    </div>
-
-    <!-- Recent Trades + Forex News -->
+    <!-- Equity Curve + P&L by Weekday -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
+        <h3>Equity Curve</h3>
+        <div class="chart-wrap" style="flex:1;min-height:220px"><canvas id="equity-chart"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h3 style="margin:0">P&amp;L by Weekday</h3>
+          <span style="font-size:12px;color:var(--text3)">$ · all time</span>
+        </div>
+        <div style="position:relative;height:220px"><canvas id="weekday-chart"></canvas></div>
+      </div>
+    </div>
 
     <!-- Recent Trades -->
-    <div class="card" style="margin-bottom:0">
+    <div class="card" style="margin-top:12px">
       <h3 style="margin-bottom:14px">Recent Trades</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-bottom:.5px solid var(--border);padding-bottom:8px;margin-bottom:4px">
         <span style="font-size:11px;font-weight:600;color:var(--text3)">Open Date</span>
         <span style="font-size:11px;font-weight:600;color:var(--text3)">Symbol</span>
         <span style="font-size:11px;font-weight:600;color:var(--text3);text-align:right">Net P&amp;L</span>
       </div>
-      <div id="recent-trades-table" style="max-height:340px;overflow-y:auto"></div>
-    </div>
-
-    <!-- Forex News Calendar -->
-    <div class="card" style="margin-bottom:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <h3 style="margin:0">Forex News</h3>
-          <span id="forex-date" style="font-size:12px;color:var(--text3)"></span>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#e74c3c;display:inline-block"></span>High</span>
-          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#f39c12;display:inline-block"></span>Med</span>
-          <span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block"></span>Low</span>
-          <button onclick="loadForexNews()" style="background:none;border:.5px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif;margin-left:4px"><i class="ti ti-refresh"></i></button>
-        </div>
-      </div>
-      <div id="forex-news-list" style="display:flex;flex-direction:column;gap:0;max-height:340px;overflow-y:auto">
-        <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading news...</div>
-      </div>
-    </div>
-
+      <div id="recent-trades-table" style="max-height:300px;overflow-y:auto"></div>
     </div>
   </div>
 
