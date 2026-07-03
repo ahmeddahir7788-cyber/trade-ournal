@@ -613,18 +613,23 @@ table.tt tr:last-child td{border-bottom:none}
 
         <!-- Forex News -->
         <div class="card" style="margin-bottom:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <h3 style="margin:0">Forex News</h3>
-              <span id="forex-date" style="font-size:11px;color:var(--text3)"></span>
-            </div>
-            <div style="display:flex;gap:5px;align-items:center">
-              <span style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#e74c3c"><i class="ti ti-folder-filled" style="font-size:13px"></i>USD High Impact</span>
-              <button onclick="loadForexNews()" style="background:none;border:.5px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer;font-family:Inter,sans-serif"><i class="ti ti-refresh"></i></button>
+          <!-- Date header -->
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px">
+            <span id="fn-day-num" style="font-size:32px;font-weight:800;color:var(--text);line-height:1"></span>
+            <div>
+              <div id="fn-month" style="font-size:16px;font-weight:700;color:var(--text)"></div>
+              <div id="fn-weekday" style="font-size:12px;color:var(--text3)"></div>
             </div>
           </div>
-          <div id="forex-news-list" style="max-height:220px;overflow-y:auto">
-            <div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Loading news...</div>
+          <!-- Mini week strip -->
+          <div id="fn-week-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:10px 0 14px;border-top:.5px solid var(--border);padding-top:10px"></div>
+          <!-- News section -->
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span>Today's News</span>
+            <button onclick="loadForexNews()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:0"><i class="ti ti-refresh"></i></button>
+          </div>
+          <div id="forex-news-list" style="max-height:180px;overflow-y:auto">
+            <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">Loading...</div>
           </div>
         </div>
 
@@ -3248,17 +3253,38 @@ function renderRecentTradesTable(){
 // ── Forex News Calendar ─────────────────────────────────────
 function loadForexNews(){
   const wrap=document.getElementById('forex-news-list');
-  const dateEl=document.getElementById('forex-date');
   if(!wrap)return;
-  wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-loader" style="font-size:20px;display:block;margin-bottom:8px"></i>Loading news...</div>';
+  wrap.innerHTML='<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">Loading...</div>';
 
   const now=new Date();
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  if(dateEl)dateEl.textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
 
-  // Use allorigins proxy to bypass CORS on Forex Factory JSON
-  // Try multiple proxies for CORS
+  // Date header
+  const dayNum=document.getElementById('fn-day-num');
+  const monthEl=document.getElementById('fn-month');
+  const weekdayEl=document.getElementById('fn-weekday');
+  if(dayNum)dayNum.textContent=now.getDate();
+  if(monthEl)monthEl.textContent=months[now.getMonth()];
+  if(weekdayEl)weekdayEl.textContent='Today, '+days[now.getDay()];
+
+  // Week strip Mon-Sun
+  const strip=document.getElementById('fn-week-strip');
+  if(strip){
+    const dow=now.getDay();
+    const monOffset=dow===0?-6:1-dow;
+    const labels=['M','T','W','T','F','S','S'];
+    const weekDays=[];
+    for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()+monOffset+i);weekDays.push(d);}
+    strip.innerHTML=weekDays.map((d,i)=>{
+      const isToday=d.toDateString()===now.toDateString();
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <span style="font-size:10px;color:var(--text3)">${labels[i]}</span>
+        <span style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:${isToday?'700':'500'};background:${isToday?'#e74c3c':'transparent'};color:${isToday?'#fff':'var(--text2)'}">${d.getDate()}</span>
+      </div>`;
+    }).join('');
+  }
+
   const ffUrl='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
   const proxies=[
     'https://corsproxy.io/?'+encodeURIComponent(ffUrl),
@@ -3267,7 +3293,7 @@ function loadForexNews(){
   ];
   function tryNext(i){
     if(i>=proxies.length){
-      wrap.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px"><i class="ti ti-wifi-off" style="font-size:24px;display:block;margin-bottom:8px"></i>Could not load news.<br>Tap Refresh to try again.</div>';
+      wrap.innerHTML='<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text3)">No events today</div>';
       return;
     }
     fetch(proxies[i])
@@ -3277,6 +3303,7 @@ function loadForexNews(){
   }
   tryNext(0);
 }
+
 
 function renderForexNews(data,now){
   const wrap=document.getElementById('forex-news-list');
