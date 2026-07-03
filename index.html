@@ -1399,6 +1399,72 @@ function renderDashboard(key){
   drawCharts(trades);
 }
 
+function renderDashboardWithTrades(trades,label){
+  // Render dashboard with an arbitrary set of trades (used by date range picker)
+  const key=currentDashKey||curMonthKey();
+  const s=statsOf(trades);
+  const tb=document.getElementById('top-bar-section');
+  if(tb)tb.textContent='Dashboard';
+
+  if(!s){
+    const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
+    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
+    drawGauge(0,0,0);
+    drawProfitFactorBar(0,0);
+    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,56,56);}
+    const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
+    const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
+    renderCalendar(key,[]);
+    renderRecentTradesTable();
+    renderTradingScore([]);
+    renderWeekdayChart([]);
+    drawMiniCharts([]);
+    if(eqChart){eqChart.destroy();eqChart=null;}
+    return;
+  }
+
+  document.getElementById('m-total').textContent=s.n;
+  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
+  const pe=document.getElementById('m-pnl');
+  if(pe){
+    if(displayMode==='percent'){const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);pe.textContent=rrPct(rrSum);}
+    else{pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();}
+    pe.className='stat-card-val';
+  }
+  const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
+  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
+  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
+  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
+  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
+  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
+  const aw=document.getElementById('m-avgwin');
+  const al=document.getElementById('m-avgloss');
+  const ratioEl=document.getElementById('m-avgwl-ratio');
+  if(displayMode==='percent'){
+    if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
+    if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
+    if(ratioEl)ratioEl.textContent=(lossRRs.length&&Math.abs(avgLossRR)>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
+  } else {
+    if(aw)aw.textContent=s.avgWin?'+$'+s.avgWin:'—';
+    if(al)al.textContent=s.avgLoss?'-$'+s.avgLoss:'—';
+    if(ratioEl)ratioEl.textContent=s.avgWinLossRatio||'—';
+  }
+  const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
+  const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
+  const rlEl=document.getElementById('avgwl-red');if(rlEl)rlEl.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg*100)+'%';
+  const gw=document.getElementById('g-wins');if(gw)gw.textContent=s.wins;
+  const gb=document.getElementById('g-be');if(gb)gb.textContent=s.be;
+  const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
+  drawGauge(s.wins,s.be,s.losses);
+  renderCalendar(key,trades);
+  renderRecentTradesTable();
+  renderTradingScore(trades);
+  renderWeekdayChart(trades);
+  drawMiniCharts(trades);
+  drawCharts(trades);
+}
+
 function renderRecentTrades(allMonthTrades){
   const wrap=document.getElementById('recent-trades-list');
   if(!wrap)return;
