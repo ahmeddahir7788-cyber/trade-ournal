@@ -3318,22 +3318,18 @@ function renderForexNews(data,now){
   });
 
   if(!events.length){
-    wrap.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px"><i class="ti ti-calendar-check" style="font-size:22px;display:block;margin-bottom:8px"></i>No high-impact USD news today.</div>';
+    wrap.innerHTML='<div style="background:var(--surface2);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:space-between"><span>No events today</span><span style="width:8px;height:8px;border-radius:50%;background:#2ecc71;display:inline-block"></span></div>';
     return;
   }
 
   wrap.innerHTML=events.map(e=>{
     const time=e.date?new Date(e.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'All Day';
-    const actual=e.actual||'';
-    const forecast=e.forecast||'';
-    const actualColor=actual&&forecast?(parseFloat(actual)>parseFloat(forecast)?'var(--green)':parseFloat(actual)<parseFloat(forecast)?'var(--red)':'var(--text)'):'var(--green)';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid var(--border)">
-      <i class="ti ti-folder-filled" style="font-size:18px;color:#e74c3c;flex-shrink:0"></i>
+    return `<div style="background:var(--surface2);border-radius:10px;padding:11px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+      <i class="ti ti-folder-filled" style="font-size:20px;color:#e74c3c;flex-shrink:0"></i>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title||'—'}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">${time}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">${time} · USD</div>
       </div>
-      ${actual?`<span style="font-size:12px;font-weight:700;color:${actualColor};flex-shrink:0">${actual}</span>`:''}
     </div>`;
   }).join('');
 }
