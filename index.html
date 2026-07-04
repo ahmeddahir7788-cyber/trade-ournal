@@ -610,12 +610,12 @@ table.tt tr:last-child td{border-bottom:none}
       <div style="display:flex;flex-direction:column;gap:12px;align-self:start">
 
         <!-- Trading Score -->
-        <div class="card" style="margin-bottom:0;padding:12px">
+        <div class="card" style="margin-bottom:0;padding:12px;height:388px;display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
             <h3 style="margin:0">Trading Score</h3>
             <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
           </div>
-          <div style="position:relative;height:160px">
+          <div style="position:relative;flex:1;min-height:0">
             <canvas id="radar-chart"></canvas>
           </div>
           <div style="display:flex;align-items:flex-end;gap:10px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)">
