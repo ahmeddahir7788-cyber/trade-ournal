@@ -3037,22 +3037,39 @@ function renderBestWorstPair(trades){
   if(!pairs.length){wrap.innerHTML='<div style="font-size:12px;color:var(--text3)">No data.</div>';return;}
   const best=pairs.reduce((a,b)=>b[1]>a[1]?b:a);
   const worst=pairs.reduce((a,b)=>b[1]<a[1]?b:a);
-  const fmt=(v)=>(v>=0?'+':'-')+'$'+Math.abs(Math.round(v)).toLocaleString();
-  const items=[
-    {label:'Best Pair',sym:best[0],pnl:best[1],color:'var(--green)',bg:'rgba(29,158,117,0.1)',icon:'ti-trending-up'},
-    {label:'Worst Pair',sym:worst[0],pnl:worst[1],color:'var(--red)',bg:'rgba(216,90,48,0.1)',icon:'ti-trending-down'},
-  ];
-  wrap.innerHTML=items.map(item=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:${item.bg}">
-      <div style="display:flex;align-items:center;gap:10px">
-        <i class="ti ${item.icon}" style="font-size:20px;color:${item.color}"></i>
-        <div>
-          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${item.label}</div>
-          <div style="font-size:16px;font-weight:800;color:${item.color}">${item.sym}</div>
+  const totalPnl=pairs.reduce((s,p)=>s+Math.abs(p[1]),0)||1;
+
+  function ring(sym,pnl,color,label){
+    const pct=Math.round(Math.abs(pnl)/totalPnl*1000)/10;
+    const r=30,cx=36,cy=36,stroke=5;
+    const circ=2*Math.PI*r;
+    const dash=(pct/100)*circ;
+    const intPart=Math.floor(pct);
+    const decPart=(pct%1).toFixed(1).slice(1);
+    const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
+      <div style="position:relative;width:72px;height:72px">
+        <svg width="72" height="72" style="transform:rotate(-90deg)">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}22" stroke-width="${stroke}"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <span style="font-size:13px;font-weight:800;color:var(--text)">${intPart}<span style="font-size:9px">${decPart}%</span></span>
         </div>
       </div>
-      <div style="font-size:16px;font-weight:800;color:${item.color}">${fmt(item.pnl)}</div>
-    </div>`).join('');
+      <div style="text-align:center">
+        <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">${label}</div>
+        <div style="font-size:13px;font-weight:800;color:${color}">${sym}</div>
+        <div style="font-size:12px;font-weight:700;color:${color}">${pnlStr}</div>
+      </div>
+    </div>`;
+  }
+
+  wrap.innerHTML=`<div style="display:flex;gap:12px;justify-content:space-around">
+    ${ring(best[0],best[1],'#1D9E75','Best Pair')}
+    ${ring(worst[0],worst[1],'#D85A30','Worst Pair')}
+  </div>`;
 }
 
 function renderWeekdayChart(trades){
