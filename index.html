@@ -610,18 +610,18 @@ table.tt tr:last-child td{border-bottom:none}
       <div style="display:flex;flex-direction:column;gap:12px;align-self:start">
 
         <!-- Trading Score -->
-        <div class="card" style="margin-bottom:0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div class="card" style="margin-bottom:0;padding:12px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
             <h3 style="margin:0">Trading Score</h3>
             <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
           </div>
-          <div style="position:relative;height:200px">
+          <div style="position:relative;height:160px">
             <canvas id="radar-chart"></canvas>
           </div>
-          <div style="display:flex;align-items:flex-end;gap:14px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
+          <div style="display:flex;align-items:flex-end;gap:10px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)">
             <div style="flex-shrink:0">
               <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Your Trading Score</div>
-              <div id="score-val" style="font-size:28px;font-weight:800;color:var(--text);line-height:1">—</div>
+              <div id="score-val" style="font-size:22px;font-weight:800;color:var(--text);line-height:1">—</div>
             </div>
             <div style="flex:1">
               <div style="position:relative;height:10px;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#f39c12,#f1c40f,#2ecc71,#1abc9c);margin-bottom:5px">
@@ -636,8 +636,8 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
 
         <!-- Best & Worst Pair -->
-        <div class="card" style="margin-bottom:0">
-          <h3 style="margin-bottom:14px">Best &amp; Worst Pair</h3>
+        <div class="card" style="margin-bottom:0;padding:12px">
+          <h3 style="margin-bottom:10px">Best &amp; Worst Pair</h3>
           <div id="best-worst-wrap" style="display:flex;flex-direction:column;gap:10px"></div>
         </div>
 
@@ -3041,15 +3041,15 @@ function renderBestWorstPair(trades){
 
   function ring(sym,pnl,color,label){
     const pct=Math.round(Math.abs(pnl)/totalPnl*1000)/10;
-    const r=30,cx=36,cy=36,stroke=5;
+    const r=26,cx=32,cy=32,stroke=5;
     const circ=2*Math.PI*r;
     const dash=(pct/100)*circ;
     const intPart=Math.floor(pct);
     const decPart=(pct%1).toFixed(1).slice(1);
     const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex:1">
-      <div style="position:relative;width:72px;height:72px">
-        <svg width="72" height="72" style="transform:rotate(-90deg)">
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+      <div style="position:relative;width:64px;height:64px">
+        <svg width="64" height="64" style="transform:rotate(-90deg)">
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}22" stroke-width="${stroke}"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
             stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
