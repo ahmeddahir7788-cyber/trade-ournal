@@ -588,7 +588,7 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Calendar (left) + Forex News & Trading Score stacked (right) -->
-    <div style="display:grid;grid-template-columns:70% 1fr;gap:12px;margin-top:12px;align-items:start">
+    <div style="display:grid;grid-template-columns:70% 1fr;gap:12px;margin-top:12px;align-items:stretch">
       <div class="card" id="cal-card" style="margin-bottom:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -607,10 +607,10 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Right column: Trading Score + Best & Worst Pair -->
-      <div style="display:flex;flex-direction:column;gap:12px;align-self:start">
+      <div style="display:flex;flex-direction:column;gap:12px;">
 
         <!-- Trading Score -->
-        <div class="card" style="margin-bottom:0;padding:12px;height:388px;display:flex;flex-direction:column">
+        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
             <h3 style="margin:0">Trading Score</h3>
             <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
@@ -636,7 +636,7 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
 
         <!-- Best & Worst Pair -->
-        <div class="card" style="margin-bottom:0;padding:12px;height:234px;display:flex;flex-direction:column">
+        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:0 0 auto">
           <h3 style="margin-bottom:10px">Best &amp; Worst Pair</h3>
           <div id="best-worst-wrap" style="display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center"></div>
         </div>
