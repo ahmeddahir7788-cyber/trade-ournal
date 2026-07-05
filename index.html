@@ -645,19 +645,15 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Equity Curve + P&L by Weekday + Recent Trades -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
-      <!-- Daily Net Cumulative P&L -->
+    <div style="display:grid;grid-template-columns:40% 40% 1fr;gap:12px;margin-top:12px">
+      <!-- Equity Curve -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-          <h3 style="margin:0">Equity Curve</h3>
-        </div>
+        <h3 style="margin-bottom:12px">Equity Curve</h3>
         <div class="chart-wrap" style="flex:1;min-height:200px"><canvas id="equity-chart"></canvas></div>
       </div>
-      <!-- Net Daily P&L -->
+      <!-- P&L by Weekday -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-          <h3 style="margin:0">P&amp;L by Weekday</h3>
-        </div>
+        <h3 style="margin-bottom:12px">P&amp;L by Weekday</h3>
         <div style="position:relative;flex:1;min-height:200px"><canvas id="weekday-chart"></canvas></div>
       </div>
       <!-- Recent Trades -->
