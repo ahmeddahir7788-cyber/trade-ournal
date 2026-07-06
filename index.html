@@ -3113,20 +3113,7 @@ function renderWeekdayChart(trades){
       scales:{
         x:{ticks:{color:tc,font:{size:10},maxRotation:0},grid:{display:false},border:{display:false}},
         y:{ticks:{color:tc,font:{size:10},callback:v=>'$'+v.toLocaleString()},grid:{color:gc,borderDash:[4,4]},border:{display:false}}
-      },
-      animation:{onComplete:function(e){
-        const chart=e.chart;const ctx2=chart.ctx;
-        ctx2.save();ctx2.font='bold 10px Inter';ctx2.textAlign='center';
-        chart.data.datasets.forEach((ds,di)=>{
-          chart.getDatasetMeta(di).data.forEach((bar,i)=>{
-            const v=ds.data[i];
-            const str='+ $'+Math.abs(Math.round(v)).toLocaleString();
-            ctx2.fillStyle=v>=0?'#2ecc71':'#e74c3c';
-            ctx2.fillText(str,bar.x,bar.y-(v>=0?6:-14));
-          });
-        });
-        ctx2.restore();
-      }}
+      }
     }
   });
 }
