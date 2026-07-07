@@ -3092,7 +3092,7 @@ function renderWeekdayChart(trades){
   const tc=dark?'#666':'#aaa';
   const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
 
-  if(!sortedDates.length){return;}
+  if(!data.length){return;}
   const ctx=canvas.getContext('2d');
   if(!ctx)return;
   weekdayChart=new Chart(ctx,{
