@@ -3073,12 +3073,18 @@ function renderWeekdayChart(trades){
   if(!canvas)return;
   if(weekdayChart){weekdayChart.destroy();weekdayChart=null;}
 
-  // Group by date
-  const byDate={};
-  trades.forEach(t=>{if(!byDate[t.date])byDate[t.date]=0;byDate[t.date]+=(t.pnl||0);});
-  const sortedDates=Object.keys(byDate).sort();
-  const labels=sortedDates.map(d=>{const[y,m,day]=d.split('-');return m+'/'+day+'/'+y.slice(2);});
-  const data=sortedDates.map(d=>byDate[d]);
+  // Group by weekday
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayPnl=[0,0,0,0,0,0,0];
+  trades.forEach(t=>{
+    const d=new Date(t.date);
+    const dow=d.getDay();
+    const idx=dow===0?6:dow-1;
+    dayPnl[idx]+=(t.pnl||0);
+  });
+  const hasTrade=dayPnl.map(v=>v!==0);
+  const labels=days.filter((_,i)=>hasTrade[i]);
+  const data=dayPnl.filter((_,i)=>hasTrade[i]);
   const colors=data.map(v=>v>=0?'#2ecc71':'#e74c3c');
   const hoverColors=data.map(v=>v>=0?'#27ae60':'#c0392b');
 
