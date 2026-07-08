@@ -417,13 +417,6 @@ table.tt tr:last-child td{border-bottom:none}
 .drp-day.in-range{background:rgba(55,138,221,0.15);color:var(--text)}
 .drp-day.range-start,.drp-day.range-end{background:var(--blue);color:#fff;font-weight:700}
 .drp-day.today{font-weight:800;color:var(--blue)}
-/* RECENT TRADES */
-.rt-item{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .12s}
-.rt-item:last-child{border-bottom:none}
-.rt-item:hover{background:var(--surface2)}
-.rt-symbol{font-size:13px;font-weight:700;color:var(--text)}
-.rt-date{font-size:11px;color:var(--text3);margin-top:2px}
-.rt-pnl{font-size:13px;font-weight:700;flex-shrink:0;margin-left:8px}
 /* NOTEBOOK */
 .nb-list-item{display:flex;align-items:flex-start;gap:8px;padding:10px 10px;border-radius:8px;cursor:pointer;transition:background .12s;margin-bottom:2px}
 .nb-list-item:hover{background:var(--surface2)}
@@ -644,8 +637,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Equity Curve + P&L by Weekday + Recent Trades -->
-    <div style="display:grid;grid-template-columns:40% 1fr 20%;gap:12px;margin-top:12px">
+    <!-- Equity Curve + P&L by Weekday -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
       <!-- Equity Curve -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
         <h3 style="margin-bottom:12px">Equity Curve</h3>
@@ -655,16 +648,6 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
         <h3 style="margin-bottom:12px">P&amp;L by Weekday</h3>
         <div style="position:relative;flex:1"><canvas id="weekday-chart"></canvas></div>
-      </div>
-      <!-- Recent Trades -->
-      <div class="card" style="margin-bottom:0">
-        <h3 style="margin-bottom:12px">Recent Trades</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-bottom:.5px solid var(--border);padding-bottom:8px;margin-bottom:4px">
-          <span style="font-size:10px;font-weight:600;color:var(--text3)">Open Date</span>
-          <span style="font-size:10px;font-weight:600;color:var(--text3)">Symbol</span>
-          <span style="font-size:10px;font-weight:600;color:var(--text3);text-align:right">Net P&amp;L</span>
-        </div>
-        <div id="recent-trades-table" style="max-height:280px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
@@ -1005,14 +988,6 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <!-- Day trades list -->
     <div id="day-modal-trades"></div>
-    <div style="margin-top:1.25rem">
-      <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:8px">Screenshots</label>
-      <div id="day-modal-shots" style="display:flex;flex-wrap:wrap;gap:10px"></div>
-      <label for="day-shot-input" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--r);font-size:12px;color:var(--text2);cursor:pointer">
-        <i class="ti ti-photo-plus"></i> Add picture
-      </label>
-      <input id="day-shot-input" type="file" accept="image/*" multiple style="display:none" onchange="onDayShotUpload(event)"/>
-    </div>
     <div style="display:flex;justify-content:flex-end;margin-top:1rem">
       <button class="mc mactions" onclick="closeOverlay('day-modal')" style="padding:8px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;background:var(--surface2);color:var(--text2)">Close</button>
     </div>
@@ -1346,8 +1321,6 @@ function renderDashboard(key){
     const _ss=document.getElementById('session-stats');if(_ss)_ss.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
-    renderRecentTrades();
-    renderRecentTradesTable();
     if(eqChart){eqChart.destroy();eqChart=null;}
     return;
   }
@@ -1393,8 +1366,6 @@ function renderDashboard(key){
 
   renderCalendar(key,trades);
   renderSessionStats(trades);
-  renderRecentTrades();
-  renderRecentTradesTable();
   renderTradingScore(trades);
   renderBestWorstPair(trades);
   renderWeekdayChart(trades);
@@ -1419,7 +1390,6 @@ function renderDashboardWithTrades(trades,label){
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     renderCalendar(key,[]);
-    renderRecentTradesTable();
     renderTradingScore([]);
     renderWeekdayChart([]);
     drawMiniCharts([]);
@@ -1461,37 +1431,11 @@ function renderDashboardWithTrades(trades,label){
   const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
   drawGauge(s.wins,s.be,s.losses);
   renderCalendar(key,trades);
-  renderRecentTradesTable();
   renderTradingScore(trades);
   renderBestWorstPair(trades);
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
-}
-
-function renderRecentTrades(allMonthTrades){
-  const wrap=document.getElementById('recent-trades-list');
-  if(!wrap)return;
-  // Use ALL trades across all months/accounts for "recent", sorted by date desc
-  const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  const recent=all.slice(0,15);
-  if(!recent.length){
-    wrap.innerHTML='<div style="padding:1rem 4px;text-align:center;color:var(--text3);font-size:12px">No trades yet.</div>';
-    return;
-  }
-  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  wrap.innerHTML=recent.map(t=>{
-    const pnl=t.pnl||0;
-    const rr=t.rr||0;
-    const metric=displayMode==='percent'?rr:pnl;
-    const pnlColor=metric>0?'var(--green)':metric<0?'var(--red)':'var(--text3)';
-    const pnlStr=displayMode==='percent'?rrPct(rr):(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
-    const sym=PAIRS[t.symbol]||t.symbol||'—';
-    return `<div class="rt-item" onclick="openDayJournal('${t.date}')">
-      <div class="rt-symbol">${sym}</div>
-      <div class="rt-pnl" style="color:${pnlColor}">${pnlStr}</div>
-    </div>`;
-  }).join('');
 }
 
 function statsOf(trades){
@@ -1576,8 +1520,6 @@ function renderCalendar(key,trades){
     if(isToday)cls+=' today';
     const baseStyle=d===1&&firstDay>0?`grid-column-start:${firstDay+1};`:'';
     const style=`style="${baseStyle}cursor:pointer"`;
-    const hasShots=db.dayImages&&db.dayImages[ds]&&db.dayImages[ds].length>0;
-    const shotIcon=hasShots?'<i class="ti ti-photo" style="position:absolute;top:5px;left:7px;font-size:11px;color:var(--text3)"></i>':'';
     if(info){
       const dayTrades=trades.filter(t=>t.date===ds);
       const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
@@ -1586,14 +1528,13 @@ function renderCalendar(key,trades){
       const dayWr=dayDecisive>0?(dayWins/dayDecisive*100).toFixed(1):0;
       const tradeWord=dayTrades.length===1?'trade':'trades';
       html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
-        ${shotIcon}
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
         <div class="cal-day-trades">${dayWr}%</div>
       </div>`;
     } else {
-      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">${shotIcon}<div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
+      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
     }
   }
   html+='</div>';
@@ -2847,49 +2788,6 @@ function openDayJournal(dateStr){
     tradesWrap.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px">No trades logged for this day.</div>`;
   }
   document.getElementById('day-modal').classList.add('open');
-  renderDayShots(dateStr);
-}
-
-function renderDayShots(dateStr){
-  const wrap=document.getElementById('day-modal-shots');
-  if(!wrap)return;
-  if(!db.dayImages)db.dayImages={};
-  const shots=db.dayImages[dateStr]||[];
-  wrap.innerHTML=shots.map((src,i)=>`
-    <div class="nb-shot-thumb">
-      <img src="${src}"/>
-      <button class="nb-shot-remove" onclick="removeDayShot('${dateStr}',${i})"><i class="ti ti-x"></i></button>
-    </div>`).join('');
-}
-
-function onDayShotUpload(e){
-  if(!currentDayKey)return;
-  if(!db.dayImages)db.dayImages={};
-  if(!db.dayImages[currentDayKey])db.dayImages[currentDayKey]=[];
-  const files=[...e.target.files];
-  let remaining=files.length;
-  files.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      db.dayImages[currentDayKey].push(ev.target.result);
-      remaining--;
-      if(remaining===0){
-        persist();
-        renderDayShots(currentDayKey);
-        if(currentDashKey)refreshCurrentDashboardView();
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-  e.target.value='';
-}
-
-function removeDayShot(dateStr,idx){
-  if(!db.dayImages||!db.dayImages[dateStr])return;
-  db.dayImages[dateStr].splice(idx,1);
-  persist();
-  renderDayShots(dateStr);
-  if(currentDashKey)refreshCurrentDashboardView();
 }
 
 // ── Trading Score ────────────────────────────────────────────
@@ -3305,28 +3203,6 @@ function drpDayClick(ds){
     return;
   }
   renderDRPCals();
-}
-
-// ── Recent Trades Table ──────────────────────────────────────
-function renderRecentTradesTable(){
-  const wrap=document.getElementById('recent-trades-table');
-  if(!wrap)return;
-  const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  if(!all.length){wrap.innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px">No trades yet.</div>';return;}
-  const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  wrap.innerHTML=all.map(t=>{
-    const[y,m,d]=t.date.split('-');
-    const dateStr=m+'-'+d+'-'+y;
-    const pnl=t.pnl||0;
-    const pnlColor=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text3)';
-    const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
-    const sym=PAIRS[t.symbol]||t.symbol||'—';
-    return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:7px 0;border-bottom:.5px solid var(--border);align-items:center">
-      <span style="font-size:11px;color:var(--text2)">${dateStr}</span>
-      <span style="font-size:11px;font-weight:600;color:var(--text)">${sym}</span>
-      <span style="font-size:11px;font-weight:700;color:${pnlColor};text-align:right">${pnlStr}</span>
-    </div>`;
-  }).join('');
 }
 
 // ── Calendar Capture ─────────────────────────────────────────
