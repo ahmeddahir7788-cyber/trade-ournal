@@ -193,6 +193,15 @@ nav button:hover i{color:var(--text)}
 .week-days-label{font-size:11px;color:var(--text3);margin-top:2px}
 
 .week-stats{display:none}
+
+/* Mini Calendar (simple, plain style) */
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-cal-day-name{font-size:11px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px;letter-spacing:.02em}
+.mini-cal-day{font-size:13px;font-weight:500;color:var(--text);text-align:center;padding:8px 2px;border-radius:8px;cursor:pointer;height:36px;display:flex;align-items:center;justify-content:center}
+.mini-cal-day.empty{visibility:hidden;cursor:default}
+.mini-cal-day:hover:not(.empty){background:var(--surface2)}
+.mini-cal-day.today{background:var(--red);color:#fff;font-weight:700}
+.mini-cal-day.today:hover{opacity:.9;background:var(--red)}
 .week-pnl{font-weight:600}
 .week-no-trades{font-size:13px;font-weight:700;color:var(--text3)}
 
@@ -668,21 +677,37 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Drawdown -->
-    <div class="card" style="margin-bottom:0;margin-top:12px">
-      <h3 style="margin-bottom:12px">Drawdown</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">MAX</div>
-          <div id="dd-max" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
+    <!-- Mini Calendar + Drawdown -->
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:12px;margin-top:12px;align-items:stretch">
+      <!-- Mini Calendar -->
+      <div class="card mini-cal-card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <h3 style="margin:0">Calendar</h3>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+            <span id="mini-cal-title" style="font-size:14px;font-weight:600;white-space:nowrap"></span>
+            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+          </div>
         </div>
-        <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">CURRENT</div>
-          <div id="dd-current" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
-        </div>
+        <div id="mini-cal-wrap" class="mini-cal-grid"></div>
       </div>
-      <div class="chart-wrap" style="height:210px"><canvas id="drawdown-chart"></canvas></div>
-      <div id="dd-trough" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+
+      <!-- Drawdown -->
+      <div class="card" style="margin-bottom:0">
+        <h3 style="margin-bottom:12px">Drawdown</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
+            <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">MAX</div>
+            <div id="dd-max" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
+            <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">CURRENT</div>
+            <div id="dd-current" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:210px"><canvas id="drawdown-chart"></canvas></div>
+        <div id="dd-trough" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -1356,6 +1381,7 @@ function renderDashboard(key){
     const _ss=document.getElementById('session-stats');if(_ss)_ss.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
+    renderMiniCalendar(key);
     if(eqChart){eqChart.destroy();eqChart=null;}
     if(ddChart){ddChart.destroy();ddChart=null;}
     const ddm=document.getElementById('dd-max');if(ddm)ddm.textContent='—';
@@ -1404,6 +1430,7 @@ function renderDashboard(key){
   drawGauge(s.wins,s.be,s.losses);
 
   renderCalendar(key,trades);
+  renderMiniCalendar(key);
   renderSessionStats(trades);
   renderTradingScore(trades);
   renderBestWorstPair(trades);
@@ -1430,6 +1457,7 @@ function renderDashboardWithTrades(trades,label){
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     renderCalendar(key,[]);
+    renderMiniCalendar(key);
     renderTradingScore([]);
     renderWeekdayChart([]);
     drawMiniCharts([]);
@@ -1475,6 +1503,7 @@ function renderDashboardWithTrades(trades,label){
   const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
   drawGauge(s.wins,s.be,s.losses);
   renderCalendar(key,trades);
+  renderMiniCalendar(key);
   renderTradingScore(trades);
   renderBestWorstPair(trades);
   renderWeekdayChart(trades);
@@ -1640,6 +1669,28 @@ function renderCalendar(key,trades){
     wIdx++;
   }
   weekWrap.innerHTML=wHtml;
+}
+
+// ── Mini Calendar (simple, plain style) ────────────────────────
+function renderMiniCalendar(key){
+  const wrap=document.getElementById('mini-cal-wrap');
+  const titleEl=document.getElementById('mini-cal-title');
+  if(!wrap)return;
+  const[y,m]=key.split('-').map(Number);
+  const todayStr=today();
+  if(titleEl)titleEl.textContent=MONTHS_FULL[m-1].slice(0,3)+' '+y;
+  const daysInMonth=new Date(y,m,0).getDate();
+  const firstDay=new Date(y,m-1,1).getDay();
+  const dayNames=['S','M','T','W','T','F','S'];
+  let html='';
+  dayNames.forEach(d=>html+=`<div class="mini-cal-day-name">${d}</div>`);
+  for(let i=0;i<firstDay;i++)html+='<div class="mini-cal-day empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday=ds===todayStr;
+    html+=`<div class="mini-cal-day${isToday?' today':''}" onclick="openDayJournal('${ds}')">${d}</div>`;
+  }
+  wrap.innerHTML=html;
 }
 
 // ── Session stats ─────────────────────────────────────────────
