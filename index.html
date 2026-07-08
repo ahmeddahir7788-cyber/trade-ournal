@@ -198,8 +198,8 @@ nav button:hover i{color:var(--text)}
 .mini-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:0}
 .mini-cal-day-name{font-size:12px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px}
 .mini-cal-day{font-size:14px;font-weight:500;color:var(--text);text-align:center;border-radius:10px;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center}
-.mini-cal-day.empty{visibility:hidden;cursor:default}
-.mini-cal-day:hover:not(.empty){background:var(--surface2)}
+.mini-cal-day.mc-hidden{visibility:hidden;cursor:default}
+.mini-cal-day:hover:not(.mc-hidden){background:var(--surface2)}
 .mini-cal-day.today{background:var(--red);color:#fff;font-weight:700}
 .mini-cal-day.today:hover{opacity:.9;background:var(--red)}
 .week-pnl{font-weight:600}
@@ -1678,7 +1678,7 @@ function renderMiniCalendar(key){
   const dayNames=['S','M','T','W','T','F','S'];
   let html='';
   dayNames.forEach(d=>html+=`<div class="mini-cal-day-name">${d}</div>`);
-  for(let i=0;i<firstDay;i++)html+='<div class="mini-cal-day empty"></div>';
+  for(let i=0;i<firstDay;i++)html+='<div class="mini-cal-day mc-hidden"></div>';
   for(let d=1;d<=daysInMonth;d++){
     const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isToday=ds===todayStr;
