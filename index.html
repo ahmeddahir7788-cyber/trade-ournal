@@ -196,7 +196,7 @@ nav button:hover i{color:var(--text)}
 
 /* Mini Calendar (simple, plain style) */
 .mini-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:0}
-.mini-cal-day-name{font-size:12px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px 14px}
+.mini-cal-day-name{font-size:12px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px}
 .mini-cal-day{font-size:14px;font-weight:500;color:var(--text);text-align:center;border-radius:10px;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center}
 .mini-cal-day.empty{visibility:hidden;cursor:default}
 .mini-cal-day:hover:not(.empty){background:var(--surface2)}
@@ -1383,10 +1383,7 @@ function renderDashboard(key){
     renderCalendar(key,[]);
     renderMiniCalendar(key);
     if(eqChart){eqChart.destroy();eqChart=null;}
-    if(ddChart){ddChart.destroy();ddChart=null;}
-    const ddm=document.getElementById('dd-max');if(ddm)ddm.textContent='—';
-    const ddc=document.getElementById('dd-current');if(ddc)ddc.textContent='—';
-    const ddt=document.getElementById('dd-trough');if(ddt)ddt.textContent='';
+    drawDrawdownChart();
     return;
   }
   document.getElementById('m-total').textContent=s.n;
@@ -1437,7 +1434,7 @@ function renderDashboard(key){
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
-  drawDrawdownChart(trades);
+  drawDrawdownChart();
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -1462,10 +1459,7 @@ function renderDashboardWithTrades(trades,label){
     renderWeekdayChart([]);
     drawMiniCharts([]);
     if(eqChart){eqChart.destroy();eqChart=null;}
-    if(ddChart){ddChart.destroy();ddChart=null;}
-    const ddm2=document.getElementById('dd-max');if(ddm2)ddm2.textContent='—';
-    const ddc2=document.getElementById('dd-current');if(ddc2)ddc2.textContent='—';
-    const ddt2=document.getElementById('dd-trough');if(ddt2)ddt2.textContent='';
+    drawDrawdownChart();
     return;
   }
 
@@ -1509,7 +1503,7 @@ function renderDashboardWithTrades(trades,label){
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
-  drawDrawdownChart(trades);
+  drawDrawdownChart();
 }
 
 function statsOf(trades){
@@ -1972,7 +1966,7 @@ function drawCharts(trades){
   }
 }
 
-function drawDrawdownChart(trades){
+function drawDrawdownChart(){
   const dark=document.documentElement.getAttribute('data-theme')!=='light';
   const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
   const tc=dark?'#555':'#aaa';
@@ -1985,7 +1979,12 @@ function drawDrawdownChart(trades){
   const ddCurEl=document.getElementById('dd-current');
   const ddTroughEl=document.getElementById('dd-trough');
 
-  const sorted=[...trades].filter(t=>t.date).sort((a,b)=>a.date.localeCompare(b.date)||(a.id-b.id));
+  // Drawdown reflects the whole account history up to today (not just the
+  // month/range currently viewed on the dashboard, and not trades dated in
+  // the future), so "current" always means "where my account stands today".
+  const todayStr=today();
+  const allTrades=Object.values(db.trades).flat();
+  const sorted=[...allTrades].filter(t=>t.date&&t.date<=todayStr).sort((a,b)=>a.date.localeCompare(b.date)||(a.id-b.id));
   if(!sorted.length){
     if(ddMaxEl)ddMaxEl.textContent='—';
     if(ddCurEl)ddCurEl.textContent='—';
@@ -2007,10 +2006,11 @@ function drawDrawdownChart(trades){
   });
   const currentDD=vals[vals.length-1];
 
-  if(ddMaxEl)ddMaxEl.textContent=(maxDD>=0?'-$0':'-$'+Math.abs(Math.round(maxDD)).toLocaleString());
-  if(ddCurEl)ddCurEl.textContent=(currentDD>=0?'-$0':'-$'+Math.abs(Math.round(currentDD)).toLocaleString());
+  const fmtDD=v=>v>=0?'$0':'-$'+Math.abs(Math.round(v)).toLocaleString();
+  if(ddMaxEl)ddMaxEl.textContent=fmtDD(maxDD);
+  if(ddCurEl)ddCurEl.textContent=fmtDD(currentDD);
   if(ddTroughEl){
-    if(troughDate){
+    if(troughDate&&maxDD<0){
       const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const[y,m,d]=troughDate.split('-');
       ddTroughEl.textContent='trough '+mn[parseInt(m)-1]+' '+parseInt(d);
