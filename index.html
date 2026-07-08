@@ -195,9 +195,9 @@ nav button:hover i{color:var(--text)}
 .week-stats{display:none}
 
 /* Mini Calendar (simple, plain style) */
-.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.mini-cal-day-name{font-size:11px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px;letter-spacing:.02em}
-.mini-cal-day{font-size:13px;font-weight:500;color:var(--text);text-align:center;padding:8px 2px;border-radius:8px;cursor:pointer;height:36px;display:flex;align-items:center;justify-content:center}
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:0}
+.mini-cal-day-name{font-size:12px;font-weight:600;color:var(--text3);text-align:center;padding:6px 2px 14px}
+.mini-cal-day{font-size:14px;font-weight:500;color:var(--text);text-align:center;border-radius:10px;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center}
 .mini-cal-day.empty{visibility:hidden;cursor:default}
 .mini-cal-day:hover:not(.empty){background:var(--surface2)}
 .mini-cal-day.today{background:var(--red);color:#fff;font-weight:700}
@@ -678,14 +678,14 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Mini Calendar + Drawdown -->
-    <div style="display:grid;grid-template-columns:300px 1fr;gap:12px;margin-top:12px;align-items:stretch">
+    <div style="display:grid;grid-template-columns:32% 1fr;gap:12px;margin-top:12px;align-items:stretch">
       <!-- Mini Calendar -->
-      <div class="card mini-cal-card" style="margin-bottom:0">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card mini-cal-card" style="margin-bottom:0;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <h3 style="margin:0">Calendar</h3>
-          <div style="display:flex;align-items:center;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
             <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
-            <span id="mini-cal-title" style="font-size:14px;font-weight:600;white-space:nowrap"></span>
+            <span id="mini-cal-title" style="font-size:15px;white-space:nowrap"></span>
             <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
           </div>
         </div>
@@ -693,7 +693,7 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Drawdown -->
-      <div class="card" style="margin-bottom:0">
+      <div class="card" style="margin-bottom:0;min-width:0">
         <h3 style="margin-bottom:12px">Drawdown</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
@@ -1678,7 +1678,7 @@ function renderMiniCalendar(key){
   if(!wrap)return;
   const[y,m]=key.split('-').map(Number);
   const todayStr=today();
-  if(titleEl)titleEl.textContent=MONTHS_FULL[m-1].slice(0,3)+' '+y;
+  if(titleEl)titleEl.innerHTML=`<b>${MONTHS_FULL[m-1]}</b> ${y}`;
   const daysInMonth=new Date(y,m,0).getDate();
   const firstDay=new Date(y,m-1,1).getDay();
   const dayNames=['S','M','T','W','T','F','S'];
@@ -2062,7 +2062,16 @@ function drawDrawdownChart(trades){
       },
       scales:{
         x:{
-          ticks:{font:{size:11},maxTicksLimit:8,color:tc,maxRotation:0},
+          ticks:{
+            font:{size:11},maxTicksLimit:8,color:tc,maxRotation:0,
+            callback:function(val){
+              const lbl=this.getLabelForValue(val);
+              if(!lbl||lbl==='start')return'start';
+              const[y,m,d]=lbl.split('-');
+              const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+              return mn[parseInt(m)-1]+' '+parseInt(d);
+            }
+          },
           grid:{display:false},
           border:{display:false}
         },
