@@ -275,7 +275,8 @@ nav button:hover i{color:var(--text)}
 
 /* TRADES PAGE - Year/Month grid */
 .year-sel-row{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
-.months-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+.months-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+@media(max-width:700px){.months-card-grid{grid-template-columns:repeat(2,1fr)}}
 .month-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:14px;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:border-color .15s,transform .1s;position:relative}
 .month-card:hover{border-color:var(--blue);transform:translateY(-1px)}
 .month-card.active-month{border-color:var(--blue)}
