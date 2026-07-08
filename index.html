@@ -599,16 +599,16 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
 
-      <!-- Right column: Trading Score + Best & Worst Pair -->
+      <!-- Right column: Trading Score + Best Pair + Fear & Greed -->
       <div style="display:flex;flex-direction:column;gap:12px;">
 
         <!-- Trading Score -->
-        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1">
+        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:0 0 auto">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
             <h3 style="margin:0">Trading Score</h3>
             <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
           </div>
-          <div style="position:relative;flex:1;min-height:0">
+          <div style="position:relative;height:135px">
             <canvas id="radar-chart"></canvas>
           </div>
           <div style="display:flex;align-items:flex-end;gap:10px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)">
@@ -628,10 +628,26 @@ table.tt tr:last-child td{border-bottom:none}
           <div id="score-breakdown" style="display:none"></div>
         </div>
 
-        <!-- Best & Worst Pair -->
-        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:0 0 auto">
-          <h3 style="margin-bottom:10px">Best &amp; Worst Pair</h3>
-          <div id="best-worst-wrap" style="display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center"></div>
+        <!-- Best Pair + Fear & Greed side by side -->
+        <div style="display:flex;gap:12px;flex:1">
+          <!-- Best Pair -->
+          <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1;min-width:0">
+            <h3 style="margin-bottom:10px">Best Pair</h3>
+            <div id="best-worst-wrap" style="display:flex;flex-direction:column;flex:1;align-items:center;justify-content:center"></div>
+          </div>
+
+          <!-- Fear & Greed Index -->
+          <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;white-space:nowrap;overflow:hidden">
+              <i class="ti ti-gauge" style="font-size:15px;color:var(--text3);flex-shrink:0"></i>
+              <h3 style="margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fear &amp; Greed Index</h3>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:2px">
+              <svg id="fng-gauge" viewBox="0 0 120 66" style="width:100%;max-width:130px;height:auto"></svg>
+              <div id="fng-value" style="font-size:22px;font-weight:800;color:var(--text);line-height:1;margin-top:-6px">—</div>
+              <div id="fng-label" style="font-size:11px;color:var(--text3)">Loading…</div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -2932,38 +2948,84 @@ function renderBestWorstPair(trades){
   const pairs=Object.entries(byPair);
   if(!pairs.length){wrap.innerHTML='<div style="font-size:12px;color:var(--text3)">No data.</div>';return;}
   const best=pairs.reduce((a,b)=>b[1]>a[1]?b:a);
-  const worst=pairs.reduce((a,b)=>b[1]<a[1]?b:a);
   const totalPnl=pairs.reduce((s,p)=>s+Math.abs(p[1]),0)||1;
 
-  function ring(sym,pnl,color,label){
+  function ring(sym,pnl,color){
     const pct=Math.round(Math.abs(pnl)/totalPnl*1000)/10;
-    const r=26,cx=32,cy=32,stroke=5;
+    const r=34,cx=40,cy=40,stroke=6;
     const circ=2*Math.PI*r;
     const dash=(pct/100)*circ;
     const intPart=Math.floor(pct);
     const decPart=(pct%1).toFixed(1).slice(1);
     const pnlStr=(pnl>=0?'+':'-')+'$'+Math.abs(Math.round(pnl)).toLocaleString();
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
-      <div style="position:relative;width:64px;height:64px">
-        <svg width="64" height="64" style="transform:rotate(-90deg)">
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="position:relative;width:80px;height:80px">
+        <svg width="80" height="80" style="transform:rotate(-90deg)">
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}22" stroke-width="${stroke}"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
             stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
         </svg>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-          <span style="font-size:12px;font-weight:800;color:var(--text)">${intPart}<span style="font-size:9px">${decPart}%</span></span>
+          <span style="font-size:15px;font-weight:800;color:var(--text)">${intPart}<span style="font-size:11px">${decPart}%</span></span>
         </div>
       </div>
       <div style="text-align:center">
-        <div style="font-size:12px;font-weight:800;color:${color}">${sym}</div>
+        <div style="font-size:13px;font-weight:800;color:${color}">${sym}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">${pnlStr}</div>
       </div>
     </div>`;
   }
 
-  wrap.innerHTML=`<div style="display:flex;gap:12px;justify-content:space-around">
-    ${ring(best[0],best[1],'#1D9E75','Best Pair')}
-    ${ring(worst[0],worst[1],'#D85A30','Worst Pair')}
-  </div>`;
+  wrap.innerHTML=ring(best[0],best[1],'#1D9E75');
+}
+
+// ── Fear & Greed Index ────────────────────────────────────────
+let fngFetched=false;
+function polarPoint(cx,cy,r,angleDeg){
+  const rad=angleDeg*Math.PI/180;
+  return{x:cx+r*Math.cos(rad),y:cy-r*Math.sin(rad)};
+}
+
+function drawFearGreedGauge(value){
+  const svg=document.getElementById('fng-gauge');
+  if(!svg)return;
+  const cx=60,cy=60,r=48,stroke=10;
+  const colors=['#e74c3c','#f39c12','#f1c40f','#2ecc71','#1abc9c'];
+  let paths='';
+  for(let i=0;i<5;i++){
+    const vStart=i*20,vEnd=(i+1)*20;
+    const aStart=180-(vStart/100*180);
+    const aEnd=180-(vEnd/100*180);
+    const p1=polarPoint(cx,cy,r,aStart);
+    const p2=polarPoint(cx,cy,r,aEnd);
+    paths+=`<path d="M${p1.x.toFixed(2)},${p1.y.toFixed(2)} A${r},${r} 0 0,1 ${p2.x.toFixed(2)},${p2.y.toFixed(2)}" fill="none" stroke="${colors[i]}" stroke-width="${stroke}" stroke-linecap="round"/>`;
+  }
+  const v=Math.max(0,Math.min(100,value));
+  const markerAngle=180-(v/100*180);
+  const mp=polarPoint(cx,cy,r,markerAngle);
+  const colorIdx=Math.min(4,Math.floor(v/20));
+  paths+=`<circle cx="${mp.x.toFixed(2)}" cy="${mp.y.toFixed(2)}" r="6.5" fill="${colors[colorIdx]}" stroke="var(--card)" stroke-width="2.5"/>`;
+  svg.innerHTML=paths;
+}
+
+function renderFearGreed(){
+  const valEl=document.getElementById('fng-value');
+  const lblEl=document.getElementById('fng-label');
+  drawFearGreedGauge(50);
+  fetch('https://api.alternative.me/fng/?limit=1')
+    .then(r=>r.json())
+    .then(d=>{
+      const item=d&&d.data&&d.data[0];
+      if(!item)throw new Error('no data');
+      const val=parseInt(item.value,10);
+      if(valEl)valEl.textContent=val;
+      if(lblEl)lblEl.textContent=item.value_classification||'';
+      drawFearGreedGauge(val);
+    })
+    .catch(()=>{
+      if(valEl)valEl.textContent='—';
+      if(lblEl)lblEl.textContent='Unavailable';
+    });
 }
 
 function renderWeekdayChart(trades){
@@ -3482,6 +3544,7 @@ currentDashKey=curMonthKey();
 const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
 initDashSelectors();
 renderDashboard(currentDashKey);
+renderFearGreed();
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
