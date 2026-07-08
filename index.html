@@ -667,6 +667,23 @@ table.tt tr:last-child td{border-bottom:none}
         <div style="position:relative;flex:1"><canvas id="weekday-chart"></canvas></div>
       </div>
     </div>
+
+    <!-- Drawdown -->
+    <div class="card" style="margin-bottom:0;margin-top:12px">
+      <h3 style="margin-bottom:12px">Drawdown</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">MAX</div>
+          <div id="dd-max" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">CURRENT</div>
+          <div id="dd-current" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:210px"><canvas id="drawdown-chart"></canvas></div>
+      <div id="dd-trough" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+    </div>
   </div>
 
   <!-- LOG TRADE -->
@@ -1151,6 +1168,7 @@ const PF_STEPS={'1-step':['Phase 1','Funded','Payout'],'2-step':['Phase 1','Phas
 // db.trades: { "2026-06": [{id,date,symbol,session,direction,outcome,pnl,rr},...], ... }
 let db={trades:{},propfirms:[],playbooks:[]};
 let eqChart=null;
+let ddChart=null;
 let currentDashKey=null;
 let currentDetailKey=null;
 let pendingDelTradeId=null, pendingDelKey=null;
@@ -1339,6 +1357,10 @@ function renderDashboard(key){
     const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
     renderCalendar(key,[]);
     if(eqChart){eqChart.destroy();eqChart=null;}
+    if(ddChart){ddChart.destroy();ddChart=null;}
+    const ddm=document.getElementById('dd-max');if(ddm)ddm.textContent='—';
+    const ddc=document.getElementById('dd-current');if(ddc)ddc.textContent='—';
+    const ddt=document.getElementById('dd-trough');if(ddt)ddt.textContent='';
     return;
   }
   document.getElementById('m-total').textContent=s.n;
@@ -1388,6 +1410,7 @@ function renderDashboard(key){
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
+  drawDrawdownChart(trades);
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -1411,6 +1434,10 @@ function renderDashboardWithTrades(trades,label){
     renderWeekdayChart([]);
     drawMiniCharts([]);
     if(eqChart){eqChart.destroy();eqChart=null;}
+    if(ddChart){ddChart.destroy();ddChart=null;}
+    const ddm2=document.getElementById('dd-max');if(ddm2)ddm2.textContent='—';
+    const ddc2=document.getElementById('dd-current');if(ddc2)ddc2.textContent='—';
+    const ddt2=document.getElementById('dd-trough');if(ddt2)ddt2.textContent='';
     return;
   }
 
@@ -1453,6 +1480,7 @@ function renderDashboardWithTrades(trades,label){
   renderWeekdayChart(trades);
   drawMiniCharts(trades);
   drawCharts(trades);
+  drawDrawdownChart(trades);
 }
 
 function statsOf(trades){
@@ -1891,6 +1919,110 @@ function drawCharts(trades){
       }
     });
   }
+}
+
+function drawDrawdownChart(trades){
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
+  const tc=dark?'#555':'#aaa';
+  const canvas=document.getElementById('drawdown-chart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  if(ddChart){ddChart.destroy();ddChart=null;}
+
+  const ddMaxEl=document.getElementById('dd-max');
+  const ddCurEl=document.getElementById('dd-current');
+  const ddTroughEl=document.getElementById('dd-trough');
+
+  const sorted=[...trades].filter(t=>t.date).sort((a,b)=>a.date.localeCompare(b.date)||(a.id-b.id));
+  if(!sorted.length){
+    if(ddMaxEl)ddMaxEl.textContent='—';
+    if(ddCurEl)ddCurEl.textContent='—';
+    if(ddTroughEl)ddTroughEl.textContent='';
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    return;
+  }
+
+  let cum=0,peak=0,maxDD=0,troughDate=null,troughVal=0;
+  const labels=['start'];
+  const vals=[0];
+  sorted.forEach(t=>{
+    cum+=(t.pnl||0);
+    if(cum>peak)peak=cum;
+    const dd=cum-peak; // <=0
+    if(dd<maxDD){maxDD=dd;troughDate=t.date;troughVal=dd;}
+    labels.push(t.date);
+    vals.push(Math.round(dd));
+  });
+  const currentDD=vals[vals.length-1];
+
+  if(ddMaxEl)ddMaxEl.textContent=(maxDD>=0?'-$0':'-$'+Math.abs(Math.round(maxDD)).toLocaleString());
+  if(ddCurEl)ddCurEl.textContent=(currentDD>=0?'-$0':'-$'+Math.abs(Math.round(currentDD)).toLocaleString());
+  if(ddTroughEl){
+    if(troughDate){
+      const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const[y,m,d]=troughDate.split('-');
+      ddTroughEl.textContent='trough '+mn[parseInt(m)-1]+' '+parseInt(d);
+    } else ddTroughEl.textContent='';
+  }
+
+  const chartH=canvas.clientHeight||210;
+  const grad=ctx.createLinearGradient(0,0,0,chartH);
+  grad.addColorStop(0,'rgba(216,90,48,0.02)');
+  grad.addColorStop(0.5,'rgba(216,90,48,0.15)');
+  grad.addColorStop(1,'rgba(216,90,48,0.5)');
+
+  ddChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        data:vals,
+        backgroundColor:grad,
+        borderColor:'#D85A30',
+        borderWidth:3,
+        pointRadius:0,
+        pointHoverRadius:5,
+        pointHoverBackgroundColor:'#D85A30',
+        fill:true,
+        tension:0.4
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:400,easing:'easeInOutQuart'},
+      resizeDelay:100,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            title:items=>{
+              const lbl=items[0].label;
+              if(!lbl||lbl==='start')return'';
+              const[y,m,d]=lbl.split('-');
+              const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+              return mn[parseInt(m)-1]+' '+parseInt(d)+', '+y;
+            },
+            label:item=>'Drawdown: -$'+Math.abs(item.parsed.y).toLocaleString()
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{font:{size:11},maxTicksLimit:8,color:tc,maxRotation:0},
+          grid:{display:false},
+          border:{display:false}
+        },
+        y:{
+          ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},
+          grid:{color:gc},
+          border:{display:false}
+        }
+      }
+    }
+  });
 }
 
 function initLogPage(){
