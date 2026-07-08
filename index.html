@@ -275,17 +275,17 @@ nav button:hover i{color:var(--text)}
 
 /* TRADES PAGE - Year/Month grid */
 .year-sel-row{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
-.months-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-@media(max-width:700px){.months-card-grid{grid-template-columns:repeat(2,1fr)}}
-.month-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:14px;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:border-color .15s,transform .1s;position:relative}
+.months-card-grid{display:grid;grid-template-columns:34px repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
+.q-label{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.03em;writing-mode:vertical-lr;text-orientation:mixed;background:var(--surface2);border-radius:var(--r);grid-row:span 1}
+.month-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:10px;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:border-color .15s,transform .1s;position:relative}
 .month-card:hover{border-color:var(--blue);transform:translateY(-1px)}
 .month-card.active-month{border-color:var(--blue)}
 .month-card.no-data{opacity:.35;cursor:default}
 .month-card.no-data:hover{transform:none;border-color:var(--border)}
-.mc-name{font-size:14px;font-weight:600;margin-bottom:8px}
-.mc-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:100px;background:rgba(55,138,221,0.15);color:var(--blue);display:inline-block;margin-bottom:6px}
-.mc-stats{display:flex;flex-direction:column;gap:3px}
-.mc-row{font-size:12px;color:var(--text2);display:flex;justify-content:space-between}
+.mc-name{font-size:13px;font-weight:600;margin-bottom:6px}
+.mc-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:100px;background:rgba(55,138,221,0.15);color:var(--blue);display:inline-block;margin-bottom:4px}
+.mc-stats{display:flex;flex-direction:column;gap:2px}
+.mc-row{font-size:11px;color:var(--text2);display:flex;justify-content:space-between}
 .mc-row span{font-weight:500;color:var(--text)}
 
 /* TRADES DETAIL */
@@ -2088,24 +2088,30 @@ function initTradeYearSel(){
 function renderMonthCards(){
   const year=parseInt(document.getElementById('t-year-sel').value);
   const curKey=curMonthKey();
-  const cards=Array.from({length:12},(_,i)=>{
-    const key=mkKey(year,i+1);
-    const trades=getTradesForKey(key);
-    const isCur=key===curKey;
-    if(!trades.length){
-      return`<div class="month-card no-data"><div class="mc-name">${MONTHS_FULL[i]}</div><div style="font-size:12px;color:var(--text3);margin-top:4px">No trades</div></div>`;
+  let cards='';
+  for(let q=0;q<4;q++){
+    cards+=`<div class="q-label">Q${q+1}</div>`;
+    for(let j=0;j<3;j++){
+      const i=q*3+j;
+      const key=mkKey(year,i+1);
+      const trades=getTradesForKey(key);
+      const isCur=key===curKey;
+      if(!trades.length){
+        cards+=`<div class="month-card no-data"><div class="mc-name">${MONTHS_FULL[i]}</div><div style="font-size:12px;color:var(--text3);margin-top:4px">No trades</div></div>`;
+        continue;
+      }
+      const s=statsOf(trades);
+      cards+=`<div class="month-card${isCur?' active-month':''}" onclick="openMonthDetail('${key}')">
+        ${isCur?'<div class="mc-tag">CURRENT</div>':''}
+        <div class="mc-name">${MONTHS_FULL[i]}</div>
+        <div class="mc-stats">
+          <div class="mc-row">Trades <span>${s.n}</span></div>
+          <div class="mc-row">Win Rate <span style="color:${s.wr>=50?'var(--green)':'var(--red)'}">${s.wr}%</span></div>
+          <div class="mc-row">P&amp;L <span style="color:${s.tot>=0?'var(--green)':'var(--red)'}">${s.tot>=0?'+':''}$${Math.abs(Math.round(s.tot)).toLocaleString()}</span></div>
+        </div>
+      </div>`;
     }
-    const s=statsOf(trades);
-    return`<div class="month-card${isCur?' active-month':''}" onclick="openMonthDetail('${key}')">
-      ${isCur?'<div class="mc-tag">CURRENT</div>':''}
-      <div class="mc-name">${MONTHS_FULL[i]}</div>
-      <div class="mc-stats">
-        <div class="mc-row">Trades <span>${s.n}</span></div>
-        <div class="mc-row">Win Rate <span style="color:${s.wr>=50?'var(--green)':'var(--red)'}">${s.wr}%</span></div>
-        <div class="mc-row">P&amp;L <span style="color:${s.tot>=0?'var(--green)':'var(--red)'}">${s.tot>=0?'+':''}$${Math.abs(Math.round(s.tot)).toLocaleString()}</span></div>
-      </div>
-    </div>`;
-  }).join('');
+  }
   document.getElementById('month-cards-wrap').innerHTML=cards;
 }
 
