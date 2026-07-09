@@ -99,6 +99,18 @@ nav button:hover i{color:var(--text)}
 .stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.02em}
 .stat-info-icon{font-size:12px;color:var(--text3);opacity:.7}
 .stat-card-count{font-size:11px;font-weight:600;color:var(--text3);margin-left:2px}
+
+/* Drag-to-reorder */
+.dashboard-block{position:relative}
+.drag-handle,.sub-drag-handle{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);cursor:grab;opacity:0;pointer-events:none;transition:opacity .15s,background .15s;z-index:5;background:var(--surface2)}
+.sub-drag-handle{top:6px;right:6px;width:22px;height:22px}
+.dashboard-block:hover>.drag-handle,.sub-block:hover>.sub-drag-handle{opacity:1;pointer-events:auto}
+.drag-handle:hover,.sub-drag-handle:hover{background:var(--border)}
+.drag-handle:active,.sub-drag-handle:active{cursor:grabbing}
+.dashboard-block.dragging,.sub-block.dragging{opacity:.4}
+.dashboard-block.drag-over-line{box-shadow:0 -3px 0 0 var(--blue) inset}
+.sub-block.drag-over-line{box-shadow:-3px 0 0 0 var(--blue) inset}
+.drag-handle i,.sub-drag-handle i{font-size:15px}
 .stat-card-val{font-size:20px;font-weight:700;line-height:1.1;color:var(--text)}
 .stat-card-bottom{margin-top:8px}
 /* Gauge */
@@ -502,9 +514,11 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="dash-title" style="display:none"></div>
     <div id="dash-sub" style="display:none"></div>
 
-    <div class="stat-cards">
+    <div class="stat-cards dashboard-block" data-block-id="stats">
+      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <!-- Net P&L -->
-      <div class="stat-card">
+      <div class="stat-card sub-block" data-sub-id="netpl">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
@@ -518,7 +532,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Trade win % -->
-      <div class="stat-card">
+      <div class="stat-card sub-block" data-sub-id="tradewr">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
@@ -541,7 +556,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Profit factor -->
-      <div class="stat-card">
+      <div class="stat-card sub-block" data-sub-id="pf">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
@@ -555,7 +571,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Day win % -->
-      <div class="stat-card">
+      <div class="stat-card sub-block" data-sub-id="daywr">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
@@ -576,7 +593,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Avg win/loss trade -->
-      <div class="stat-card">
+      <div class="stat-card sub-block" data-sub-id="avgwl">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
@@ -600,7 +618,8 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Calendar (left) + Forex News & Trading Score stacked (right) -->
-    <div style="display:grid;grid-template-columns:70% 1fr;gap:12px;margin-top:12px;align-items:stretch">
+    <div class="dashboard-block" data-block-id="calendar" style="display:grid;grid-template-columns:70% 1fr;gap:12px;margin-top:12px;align-items:stretch">
+      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <div class="card" id="cal-card" style="margin-bottom:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -673,7 +692,8 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Equity Curve + P&L by Weekday -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div class="dashboard-block" data-block-id="equity" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <!-- Equity Curve -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
         <h3 style="margin-bottom:12px">Equity Curve</h3>
@@ -687,7 +707,8 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Mini Calendar + Drawdown -->
-    <div style="display:grid;grid-template-columns:32% 1fr;gap:12px;margin-top:12px;align-items:stretch">
+    <div class="dashboard-block" data-block-id="drawdown" style="display:grid;grid-template-columns:32% 1fr;gap:12px;margin-top:12px;align-items:stretch">
+      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <!-- Mini Calendar -->
       <div class="card mini-cal-card" style="margin-bottom:0;min-width:0">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -3777,6 +3798,74 @@ function deleteCurrentNote(){
   }
 }
 
+// ── Drag-to-reorder dashboard blocks ────────────────────────────
+function enableDragReorder(containerEl,itemSelector,handleSelector,idAttr,storageKey){
+  if(!containerEl)return;
+  function getItems(){return[...containerEl.children].filter(el=>el.matches&&el.matches(itemSelector));}
+
+  function saveOrder(){
+    const order=getItems().map(el=>el.getAttribute(idAttr));
+    try{localStorage.setItem(storageKey,JSON.stringify(order));}catch(e){}
+  }
+
+  function applySavedOrder(){
+    let order;
+    try{order=JSON.parse(localStorage.getItem(storageKey));}catch(e){order=null;}
+    if(!order||!Array.isArray(order))return;
+    const items=getItems();
+    const map={};
+    items.forEach(el=>{map[el.getAttribute(idAttr)]=el;});
+    order.forEach(id=>{if(map[id])containerEl.appendChild(map[id]);});
+  }
+
+  applySavedOrder();
+
+  let dragEl=null;
+
+  document.addEventListener('mouseup',()=>{
+    getItems().forEach(el=>{el.draggable=false;});
+  });
+
+  getItems().forEach(item=>{
+    item.draggable=false;
+    const handle=item.querySelector(handleSelector);
+    if(handle){
+      handle.addEventListener('mousedown',()=>{item.draggable=true;});
+    }
+    item.addEventListener('dragstart',e=>{
+      dragEl=item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      try{e.dataTransfer.setData('text/plain','');}catch(err){}
+    });
+    item.addEventListener('dragend',()=>{
+      item.classList.remove('dragging');
+      item.draggable=false;
+      getItems().forEach(el=>el.classList.remove('drag-over-line'));
+      dragEl=null;
+      saveOrder();
+    });
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();
+      if(!dragEl||dragEl===item)return;
+      getItems().forEach(el=>{if(el!==item)el.classList.remove('drag-over-line');});
+      item.classList.add('drag-over-line');
+    });
+    item.addEventListener('dragleave',()=>{
+      item.classList.remove('drag-over-line');
+    });
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      item.classList.remove('drag-over-line');
+      if(!dragEl||dragEl===item)return;
+      const items2=getItems();
+      const dragIdx=items2.indexOf(dragEl);
+      const targetIdx=items2.indexOf(item);
+      if(dragIdx<targetIdx){item.after(dragEl);}else{item.before(dragEl);}
+    });
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────────
 // ── Init ──────────────────────────────────────────────────────
 loadDB();
@@ -3789,6 +3878,8 @@ const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='
 initDashSelectors();
 renderDashboard(currentDashKey);
 renderFearGreed();
+enableDragReorder(document.getElementById('page-dashboard'),'.dashboard-block','.drag-handle','data-block-id','tj_v10_order_dashboard');
+enableDragReorder(document.querySelector('.stat-cards'),'.sub-block','.sub-drag-handle','data-sub-id','tj_v10_order_statcards');
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
