@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -1300,7 +1300,7 @@ function loadDB(){
 
 // ── Theme ─────────────────────────────────────────────────────
 function applyTheme(){
-  const t=localStorage.getItem('tj_v10_theme')||'dark';
+  const t=localStorage.getItem('tj_v10_theme')||'light';
   document.documentElement.setAttribute('data-theme',t);
   document.getElementById('theme-icon').className=t==='dark'?'ti ti-sun':'ti ti-moon';
   const lbl=document.getElementById('theme-label');
