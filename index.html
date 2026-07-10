@@ -596,21 +596,21 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="stat-card sub-block" data-sub-id="avgwl">
         <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div>
+          <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:10px">
               <span class="stat-card-lbl">Avg win/loss trade</span>
               <i class="ti ti-info-circle stat-info-icon"></i>
             </div>
             <div class="stat-card-val" id="m-avgwl-ratio">—</div>
           </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-            <div style="display:flex;height:9px;border-radius:100px;overflow:hidden;background:var(--border);width:100px">
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <div style="display:flex;height:12px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
               <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:50%"></div>
               <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:50%"></div>
             </div>
-            <div style="display:flex;gap:8px">
-              <span style="font-size:13px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
-              <span style="font-size:13px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
+            <div style="display:flex;gap:6px">
+              <span style="font-size:12px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
+              <span style="font-size:12px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
             </div>
           </div>
         </div>
