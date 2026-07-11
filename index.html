@@ -3,123 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <title>Trading Dashboard</title>
-
+<link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0d1117;
-  color: #e6edf3;
-}
-
-.container {
-  padding: 20px;
-}
-
-/* TOP STATS */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
-}
-
-.card {
-  background: #161b22;
-  padding: 15px;
-  border-radius: 10px;
-}
-
-/* MIDDLE */
-.middle {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.box {
-  background: #161b22;
-  padding: 15px;
-  border-radius: 10px;
-}
-
-.large {
-  height: 300px;
-}
-
-/* BOTTOM */
-.bottom {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-/* TABLE */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-td, th {
-  padding: 8px;
-  border-bottom: 1px solid #30363d;
-}
-
-.green { color: #00c853; }
-.red { color: #ff5252; }
-
-/* CALENDAR */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-}
-
-.day {
-  padding: 10px;
-  text-align: center;
-  border-radius: 5px;
-}
-
-.day.green {
-  background: rgba(0,200,83,0.2);
-}
-
-.day.red {
-  background: rgba(255,82,82,0.2);
-}
-</style>
 </head>
 
 <body>
-
 <div class="container">
 
-  <!-- TOP -->
+  <!-- TOP STATS -->
   <div class="stats">
-    <div class="card"><h4>Net P&L</h4><h2>$126,900</h2></div>
-    <div class="card"><h4>Win Rate</h4><h2>46.5%</h2></div>
-    <div class="card"><h4>Profit Factor</h4><h2>1.70</h2></div>
-    <div class="card"><h4>Day Win %</h4><h2>72%</h2></div>
-    <div class="card"><h4>Avg W/L</h4><h2>1.96</h2></div>
+    <div class="card">
+      <h4>Net P&L</h4>
+      <h2>$126,900.81</h2>
+    </div>
+
+    <div class="card">
+      <h4>Win Rate</h4>
+      <h2>46.56%</h2>
+    </div>
+
+    <div class="card">
+      <h4>Profit Factor</h4>
+      <h2>1.70</h2>
+    </div>
+
+    <div class="card">
+      <h4>Day Win %</h4>
+      <h2>72%</h2>
+    </div>
+
+    <div class="card">
+      <h4>Avg Win/Loss</h4>
+      <h2>1.96</h2>
+    </div>
   </div>
 
   <!-- MIDDLE -->
   <div class="middle">
 
+    <!-- RADAR -->
     <div class="box">
       <h3>Zella Score</h3>
       <canvas id="radar"></canvas>
     </div>
 
+    <!-- EQUITY -->
     <div class="box large">
       <h3>Equity Curve</h3>
       <canvas id="equity"></canvas>
     </div>
 
+    <!-- DAILY PNL -->
     <div class="box">
       <h3>Daily P&L</h3>
       <canvas id="pnl"></canvas>
@@ -130,7 +64,8 @@ td, th {
   <!-- BOTTOM -->
   <div class="bottom">
 
-    <div class="box">
+    <!-- RECENT TRADES -->
+    <div class="box table-box">
       <h3>Recent Trades</h3>
       <table>
         <tr><th>Date</th><th>Pair</th><th>P&L</th></tr>
@@ -139,7 +74,8 @@ td, th {
       </table>
     </div>
 
-    <div class="box">
+    <!-- CALENDAR -->
+    <div class="box calendar">
       <h3>Monthly Performance</h3>
       <div class="grid">
         <div class="day green">+9K</div>
@@ -154,40 +90,6 @@ td, th {
 
 </div>
 
-<script>
-// EQUITY
-new Chart(document.getElementById("equity"), {
-  type: "line",
-  data: {
-    labels: ["Jan","Feb","Mar","Apr"],
-    datasets: [{
-      data: [10000, 40000, 80000, 120000]
-    }]
-  }
-});
-
-// PNL
-new Chart(document.getElementById("pnl"), {
-  type: "bar",
-  data: {
-    labels: ["D1","D2","D3"],
-    datasets: [{
-      data: [5000, -2000, 7000]
-    }]
-  }
-});
-
-// RADAR
-new Chart(document.getElementById("radar"), {
-  type: "radar",
-  data: {
-    labels: ["Win%","RR","DD","Consistency","Recovery"],
-    datasets: [{
-      data: [70,60,50,65,55]
-    }]
-  }
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
