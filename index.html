@@ -1336,12 +1336,7 @@ function computeMetrics(trades){
   return{n,grossWin,grossLoss,net,pf,wins,losses,be,wr};
 }
 
-function pctChange(cur,prev){
-  if(prev==null||prev===0||!isFinite(prev)||!isFinite(cur))return null;
-  return((cur-prev)/Math.abs(prev))*100;
-}
-
-function setStatCard(id,val,chg,opts){
+function setStatCard(id,val,chgEl_text,chgEl_color,opts){
   opts=opts||{};
   const valEl=document.getElementById('snc-'+id);
   const chgEl=document.getElementById('snc-'+id+'-chg');
@@ -1356,11 +1351,9 @@ function setStatCard(id,val,chg,opts){
       const goodness=!isFinite(val)?'Excellent':val>=2?'Excellent':val>=1.5?'Good':val>=1?'Fair':'Poor';
       chgEl.textContent=goodness;
       chgEl.style.color=(!isFinite(val)||val>=1.5)?'var(--blue)':val>=1?'var(--gold)':'var(--red)';
-    } else if(chg==null){
-      chgEl.textContent='';
     } else {
-      chgEl.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';
-      chgEl.style.color=chg>=0?'var(--green)':'var(--red)';
+      chgEl.textContent=chgEl_text;
+      chgEl.style.color=chgEl_color;
     }
   }
 }
@@ -1381,6 +1374,21 @@ function drawSparkline(canvasId,color,pts){
   ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
 }
 
+// Formats an absolute (non-percentage) change vs the previous month — a $ amount,
+// a point difference, or a plain count — so small prior-month bases never blow up
+// into misleading four-digit percentages.
+function fmtDelta(diff,kind){
+  if(diff==null)return{text:'No prior data',color:'var(--text3)'};
+  const sign=diff>0?'+':diff<0?'-':'';
+  const abs=Math.abs(diff);
+  let text;
+  if(kind==='dollar')text=sign+'$'+Math.round(abs).toLocaleString();
+  else if(kind==='pts')text=sign+abs.toFixed(1)+' pts';
+  else text=sign+Math.round(abs)+(kind==='trades'?(abs===1?' trade':' trades'):'');
+  const color=diff>0?'var(--green)':diff<0?'var(--red)':'var(--text3)';
+  return{text:text+' vs last mo',color};
+}
+
 function renderNewStatCards(trades,key){
   const m=computeMetrics(trades);
   let prevM=null;
@@ -1390,11 +1398,15 @@ function renderNewStatCards(trades,key){
     const prevKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     prevM=computeMetrics(getTradesForKey(prevKey));
   }
-  setStatCard('totalprofit',m.grossWin,prevM?pctChange(m.grossWin,prevM.grossWin):null);
-  setStatCard('netprofit',m.net,prevM?pctChange(m.net,prevM.net):null);
-  setStatCard('pf',m.pf,null,{isPF:true});
-  setStatCard('winrate',m.wr,prevM?pctChange(m.wr,prevM.wr):null,{isPct:true});
-  setStatCard('trades',m.n,prevM?pctChange(m.n,prevM.n):null,{isInt:true});
+  const tpDelta=fmtDelta(prevM?m.grossWin-prevM.grossWin:null,'dollar');
+  const npDelta=fmtDelta(prevM?m.net-prevM.net:null,'dollar');
+  const wrDelta=fmtDelta(prevM?m.wr-prevM.wr:null,'pts');
+  const trDelta=fmtDelta(prevM?m.n-prevM.n:null,'trades');
+  setStatCard('totalprofit',m.grossWin,tpDelta.text,tpDelta.color);
+  setStatCard('netprofit',m.net,npDelta.text,npDelta.color);
+  setStatCard('pf',m.pf,null,null,{isPF:true});
+  setStatCard('winrate',m.wr,wrDelta.text,wrDelta.color,{isPct:true});
+  setStatCard('trades',m.n,trDelta.text,trDelta.color,{isInt:true});
 
   const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   let cum=0;const pts=sorted.map(t=>{cum+=(t.pnl||0);return cum;});
