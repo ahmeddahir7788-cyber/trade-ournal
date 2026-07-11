@@ -544,10 +544,10 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
             <canvas id="wr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
-            <div style="display:flex;gap:9px;margin-top:3px">
-              <span class="gc green" id="g-wins">0</span>
-              <span class="gc blue" id="g-be">0</span>
-              <span class="gc red" id="g-losses">0</span>
+            <div style="position:relative;width:90px;height:16px;margin-top:3px" id="wr-gc-wrap">
+              <span class="gc green" id="g-wins" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
+              <span class="gc blue" id="g-be" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
+              <span class="gc red" id="g-losses" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
             </div>
             <!-- hidden divs for JS compat -->
             <div style="display:none"><div id="wr-green"></div><div id="wr-blue"></div><div id="wr-red"></div></div>
@@ -583,10 +583,10 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
             <canvas id="daywr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
-            <div style="display:flex;gap:9px;margin-top:3px">
-              <span class="gc green" id="g-day-wins">0</span>
-              <span class="gc blue" id="g-day-be">0</span>
-              <span class="gc red" id="g-day-losses">0</span>
+            <div style="position:relative;width:90px;height:16px;margin-top:3px" id="daywr-gc-wrap">
+              <span class="gc green" id="g-day-wins" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
+              <span class="gc blue" id="g-day-be" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
+              <span class="gc red" id="g-day-losses" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
             </div>
           </div>
         </div>
@@ -1748,6 +1748,19 @@ function drawGauge(wins,be,losses,canvasId){
   // Loss arc (red)
   ctx.beginPath();ctx.arc(cx,cy,r,start+winAngle+beAngle,0);
   ctx.strokeStyle='#D85A30';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+  // Position win/be/loss labels under the midpoint of their own arc segment
+  const winMid=start+winAngle/2;
+  const beMid=start+winAngle+beAngle/2;
+  const lossMid=start+winAngle+beAngle+lossAngle/2;
+  const ids=canvasId==='wr-gauge'
+    ?{g:'g-wins',b:'g-be',r:'g-losses'}
+    :{g:'g-day-wins',b:'g-day-be',r:'g-day-losses'};
+  const gLbl=document.getElementById(ids.g);
+  const bLbl=document.getElementById(ids.b);
+  const rLbl=document.getElementById(ids.r);
+  if(gLbl)gLbl.style.left=(cx+r*Math.cos(winMid))+'px';
+  if(bLbl)bLbl.style.left=(cx+r*Math.cos(beMid))+'px';
+  if(rLbl)rLbl.style.left=(cx+r*Math.cos(lossMid))+'px';
   // Update hidden compat divs (no-op but kept for JS safety)
   if(canvasId==='wr-gauge'){
     const gEl=document.getElementById('wr-green');
