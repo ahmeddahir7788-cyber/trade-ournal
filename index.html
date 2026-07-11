@@ -605,8 +605,8 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:26px">
             <div style="display:flex;height:8px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
-              <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:50%"></div>
-              <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:50%"></div>
+              <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:0%"></div>
+              <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:0%"></div>
             </div>
             <div style="display:flex;gap:6px">
               <span style="font-size:10px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
@@ -1433,8 +1433,8 @@ function renderDashboard(key){
     // Reset avg win/loss bar + labels
     const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
     const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
-    const awg=document.getElementById('avgwl-green');if(awg)awg.style.width='50%';
-    const awr=document.getElementById('avgwl-red');if(awr)awr.style.width='50%';
+    const awg=document.getElementById('avgwl-green');if(awg)awg.style.width='0%';
+    const awr=document.getElementById('avgwl-red');if(awr)awr.style.width='0%';
     // Reset mini bars
     const mb=document.getElementById('mini-bars');if(mb)mb.innerHTML='';
     const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');if(ctx)ctx.clearRect(0,0,meq.width,meq.height);}
@@ -1521,6 +1521,8 @@ function renderDashboardWithTrades(trades,label){
     const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,56,56);}
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
+    const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='0%';
+    const awr0=document.getElementById('avgwl-red');if(awr0)awr0.style.width='0%';
     renderCalendar(key,[]);
     renderMiniCalendar(key);
     renderTradingScore([]);
@@ -1768,11 +1770,26 @@ function drawGauge(wins,be,losses,canvasId){
   if(!ctx)return;
   const W=80,H=48,cx=40,cy=44,r=34,thick=8;
   ctx.clearRect(0,0,W,H);
-  const total=wins+be+losses||1;
+  const total=wins+be+losses;
+  const start=-Math.PI;
+  if(total<=0){
+    // No data yet: show a neutral empty track instead of a misleading full-red arc
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    ctx.beginPath();ctx.arc(cx,cy,r,start,0);
+    ctx.strokeStyle=isDark?'#2a2e37':'#e5e7eb';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+    if(canvasId==='wr-gauge'){
+      const gEl=document.getElementById('wr-green');
+      const bEl=document.getElementById('wr-blue');
+      const rEl=document.getElementById('wr-red');
+      if(gEl)gEl.style.width='0%';
+      if(bEl)bEl.style.width='0%';
+      if(rEl)rEl.style.width='0%';
+    }
+    return;
+  }
   const winAngle=(wins/total)*Math.PI;
   const beAngle=(be/total)*Math.PI;
   const lossAngle=(losses/total)*Math.PI;
-  const start=-Math.PI;
   // Win arc (green)
   ctx.beginPath();ctx.arc(cx,cy,r,start,start+winAngle);
   ctx.strokeStyle='#1D9E75';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
@@ -1927,17 +1944,23 @@ function drawMiniCharts(trades){
       const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
       const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
       const total=grossWin+grossLoss;
-      const winAngle=total>0?(grossWin/total)*Math.PI*2:Math.PI;
-      const lossAngle=total>0?(grossLoss/total)*Math.PI*2:Math.PI;
       const cx=28,cy=28,r=22,ri=13;
       ctx.clearRect(0,0,56,56);
-      ctx.beginPath();ctx.moveTo(cx,cy);
-      ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+winAngle);
-      ctx.closePath();ctx.fillStyle='#1D9E75';ctx.fill();
-      ctx.beginPath();ctx.moveTo(cx,cy);
-      ctx.arc(cx,cy,r,-Math.PI/2+winAngle,-Math.PI/2+winAngle+lossAngle);
-      ctx.closePath();ctx.fillStyle='#D85A30';ctx.fill();
       const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+      if(total<=0){
+        // No data yet: neutral empty ring instead of a misleading 50/50 split
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fillStyle=isDark?'#2a2e37':'#e5e7eb';ctx.fill();
+      } else {
+        const winAngle=(grossWin/total)*Math.PI*2;
+        const lossAngle=(grossLoss/total)*Math.PI*2;
+        ctx.beginPath();ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+winAngle);
+        ctx.closePath();ctx.fillStyle='#1D9E75';ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,r,-Math.PI/2+winAngle,-Math.PI/2+winAngle+lossAngle);
+        ctx.closePath();ctx.fillStyle='#D85A30';ctx.fill();
+      }
       ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);
       ctx.fillStyle=isDark?'#111318':'#ffffff';ctx.fill();
     }
