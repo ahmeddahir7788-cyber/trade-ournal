@@ -1402,7 +1402,7 @@ function renderDashboard(key){
     // Reset profit factor bar + labels
     drawProfitFactorBar(0,0);
     const pfDonut=document.getElementById('pf-donut');
-    if(pfDonut){const ctx2=pfDonut.getContext('2d');if(ctx2)ctx2.clearRect(0,0,56,56);}
+    if(pfDonut){setupHiDPICanvas(pfDonut,56,56).clearRect(0,0,56,56);}
     // Reset avg win/loss bar + labels
     const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
     const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
@@ -1487,7 +1487,7 @@ function renderDashboardWithTrades(trades,label){
     drawGauge(0,0,0,'daywr-gauge');
     const dwEl2=document.getElementById('m-daywr');if(dwEl2)dwEl2.textContent='—';
     drawProfitFactorBar(0,0);
-    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,56,56);}
+    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){setupHiDPICanvas(pfDonut2,56,56).clearRect(0,0,56,56);}
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     renderCalendar(key,[]);
@@ -1726,13 +1726,31 @@ function renderMiniCalendar(key){
 }
 
 // ── Session stats ─────────────────────────────────────────────
+// Sets up a canvas to render crisply on high-DPI/retina screens.
+// Without this, canvas internal resolution == CSS size, so on a 2x/3x
+// screen every stroke gets upscaled and looks blurry. This resizes the
+// actual pixel buffer to match device pixels, then scales the drawing
+// context back down so all existing draw code can keep using CSS-pixel
+// coordinates (cx, cy, r, etc.) unchanged.
+function setupHiDPICanvas(canvas,cssW,cssH){
+  const dpr=window.devicePixelRatio||1;
+  const targetW=Math.round(cssW*dpr);
+  const targetH=Math.round(cssH*dpr);
+  if(canvas.width!==targetW||canvas.height!==targetH){
+    canvas.width=targetW;
+    canvas.height=targetH;
+  }
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return ctx;
+}
 function drawGauge(wins,be,losses,canvasId){
   canvasId=canvasId||'wr-gauge';
   const canvas=document.getElementById(canvasId);
   if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  if(!ctx)return;
   const W=78,H=46,cx=39,cy=41,r=29,thick=5;
+  const ctx=setupHiDPICanvas(canvas,W,H);
+  if(!ctx)return;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
   const winAngle=(wins/total)*Math.PI;
@@ -1748,10 +1766,23 @@ function drawGauge(wins,be,losses,canvasId){
   // Loss arc (red)
   ctx.beginPath();ctx.arc(cx,cy,r,start+winAngle+beAngle,0);
   ctx.strokeStyle='#D85A30';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
-  // Position win/be/loss labels under the midpoint of their own arc segment
-  const winMid=start+winAngle/2;
-  const beMid=start+winAngle+beAngle/2;
-  const lossMid=start+winAngle+beAngle+lossAngle/2;
+  // Position win/be/loss labels under their own arc segment.
+  // Important: we use the midpoint of the segment's HORIZONTAL EXTENT
+  // (average of its start/end x), not its angular midpoint. For a small
+  // segment those are nearly the same, but for a large segment that
+  // sweeps across the top of the arc (e.g. a 120°+ win segment), the
+  // angular midpoint sits noticeably left of where the color actually
+  // looks centered to the eye. Horizontal-extent midpoint matches what
+  // "aligned under the line" visually means.
+  const winStartX=cx+r*Math.cos(start);
+  const winEndX=cx+r*Math.cos(start+winAngle);
+  const winX=(winStartX+winEndX)/2;
+  const lossStartX=cx+r*Math.cos(start+winAngle+beAngle);
+  const lossEndX=cx+r*Math.cos(0);
+  const lossX=(lossStartX+lossEndX)/2;
+  // BE sits exactly centered between win and loss, rather than tied to
+  // its own (often zero-width) arc segment.
+  const beX=(winX+lossX)/2;
   const ids=canvasId==='wr-gauge'
     ?{g:'g-wins',b:'g-be',r:'g-losses'}
     :{g:'g-day-wins',b:'g-day-be',r:'g-day-losses'};
@@ -1759,9 +1790,9 @@ function drawGauge(wins,be,losses,canvasId){
   const bLbl=document.getElementById(ids.b);
   const rLbl=document.getElementById(ids.r);
   const items=[
-    {el:gLbl,x:cx+r*Math.cos(winMid)},
-    {el:bLbl,x:cx+r*Math.cos(beMid)},
-    {el:rLbl,x:cx+r*Math.cos(lossMid)}
+    {el:gLbl,x:winX},
+    {el:bLbl,x:beX},
+    {el:rLbl,x:lossX}
   ].filter(o=>o.el);
   // First pass: place at natural (arc-aligned) position
   items.forEach(o=>{o.el.style.left=o.x+'px';});
@@ -1939,7 +1970,7 @@ function drawMiniCharts(trades){
   {
     const donutC=document.getElementById('pf-donut');
     if(donutC){
-      const ctx=donutC.getContext('2d');
+      const ctx=setupHiDPICanvas(donutC,56,56);
       const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+(t.pnl||0),0);
       const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+(t.pnl||0),0));
       const total=grossWin+grossLoss;
