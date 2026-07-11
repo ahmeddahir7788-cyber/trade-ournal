@@ -116,10 +116,10 @@ nav button:hover i{color:var(--text)}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
 .gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
-.gc{font-size:11px;font-weight:600;padding:0;border-radius:0;text-align:center;min-width:0;background:none!important}
-.gc.green{color:var(--green)}
-.gc.blue{color:var(--blue)}
-.gc.red{color:var(--red)}
+.gc{font-size:11px;font-weight:700;padding:3px 8px;border-radius:100px;text-align:center;min-width:0}
+.gc.green{background:rgba(29,158,117,0.22);color:var(--green)}
+.gc.blue{background:rgba(55,138,221,0.22);color:var(--blue)}
+.gc.red{background:rgba(216,90,48,0.22);color:var(--red)}
 /* Avg win/loss bar */
 .avgwl-bar-wrap{display:flex;flex-direction:column;gap:6px}
 .avgwl-bar{display:flex;height:8px;border-radius:100px;overflow:hidden;width:100%;position:relative}
@@ -1758,9 +1758,24 @@ function drawGauge(wins,be,losses,canvasId){
   const gLbl=document.getElementById(ids.g);
   const bLbl=document.getElementById(ids.b);
   const rLbl=document.getElementById(ids.r);
-  if(gLbl)gLbl.style.left=(cx+r*Math.cos(winMid))+'px';
-  if(bLbl)bLbl.style.left=(cx+r*Math.cos(beMid))+'px';
-  if(rLbl)rLbl.style.left=(cx+r*Math.cos(lossMid))+'px';
+  const items=[
+    {el:gLbl,x:cx+r*Math.cos(winMid)},
+    {el:bLbl,x:cx+r*Math.cos(beMid)},
+    {el:rLbl,x:cx+r*Math.cos(lossMid)}
+  ].filter(o=>o.el);
+  // First pass: place at natural (arc-aligned) position
+  items.forEach(o=>{o.el.style.left=o.x+'px';});
+  // Second pass: measure real rendered widths and push apart left-to-right so pills never overlap
+  const minGapPx=3;
+  for(let i=1;i<items.length;i++){
+    const prevHalf=items[i-1].el.offsetWidth/2;
+    const curHalf=items[i].el.offsetWidth/2;
+    const minDist=prevHalf+curHalf+minGapPx;
+    if(items[i].x-items[i-1].x<minDist){
+      items[i].x=items[i-1].x+minDist;
+      items[i].el.style.left=items[i].x+'px';
+    }
+  }
   // Update hidden compat divs (no-op but kept for JS safety)
   if(canvasId==='wr-gauge'){
     const gEl=document.getElementById('wr-green');
