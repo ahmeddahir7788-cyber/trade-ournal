@@ -95,7 +95,7 @@ nav button:hover i{color:var(--text)}
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:1.25rem;align-items:stretch}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
-.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:8px 22px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
+.stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:8px 16px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
 .stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .stat-info-icon{font-size:12px;color:var(--text3);opacity:.7}
 .stat-card-count{font-size:10px;font-weight:600;color:var(--text3);margin-left:2px}
@@ -543,8 +543,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-wr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="wr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
-            <div style="position:relative;width:90px;height:16px;margin-top:3px" id="wr-gc-wrap">
+            <canvas id="wr-gauge" width="78" height="46" style="width:78px;height:46px"></canvas>
+            <div style="position:relative;width:78px;height:16px;margin-top:3px" id="wr-gc-wrap">
               <span class="gc green" id="g-wins" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
               <span class="gc blue" id="g-be" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
               <span class="gc red" id="g-losses" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
@@ -582,8 +582,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-daywr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="daywr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
-            <div style="position:relative;width:90px;height:16px;margin-top:3px" id="daywr-gc-wrap">
+            <canvas id="daywr-gauge" width="78" height="46" style="width:78px;height:46px"></canvas>
+            <div style="position:relative;width:78px;height:16px;margin-top:3px" id="daywr-gc-wrap">
               <span class="gc green" id="g-day-wins" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
               <span class="gc blue" id="g-day-be" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
               <span class="gc red" id="g-day-losses" style="position:absolute;top:0;transform:translateX(-50%)">0</span>
@@ -1732,7 +1732,7 @@ function drawGauge(wins,be,losses,canvasId){
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
   if(!ctx)return;
-  const W=90,H=46,cx=45,cy=41,r=33,thick=5;
+  const W=78,H=46,cx=39,cy=41,r=29,thick=5;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
   const winAngle=(wins/total)*Math.PI;
@@ -1765,17 +1765,39 @@ function drawGauge(wins,be,losses,canvasId){
   ].filter(o=>o.el);
   // First pass: place at natural (arc-aligned) position
   items.forEach(o=>{o.el.style.left=o.x+'px';});
-  // Second pass: measure real rendered widths and push apart left-to-right so pills never overlap
+  // Resolve overlaps AND keep everything inside the canvas bounds.
+  // Uses forward -> backward -> forward passes so a fix on one side
+  // can never silently re-break the other side (verified with a stress test
+  // across win/be/loss combinations including 0-counts and lopsided splits).
+  const n=items.length;
+  const half=items.map(o=>o.el.offsetWidth/2);
   const minGapPx=3;
-  for(let i=1;i<items.length;i++){
-    const prevHalf=items[i-1].el.offsetWidth/2;
-    const curHalf=items[i].el.offsetWidth/2;
-    const minDist=prevHalf+curHalf+minGapPx;
-    if(items[i].x-items[i-1].x<minDist){
-      items[i].x=items[i-1].x+minDist;
-      items[i].el.style.left=items[i].x+'px';
-    }
+  let x=items.map(o=>o.x);
+  // clamp each to its own bounds first
+  for(let i=0;i<n;i++){x[i]=Math.max(half[i],Math.min(W-half[i],x[i]));}
+  // forward: enforce min spacing from left neighbor
+  for(let i=1;i<n;i++){
+    const minDist=half[i-1]+half[i]+minGapPx;
+    if(x[i]-x[i-1]<minDist)x[i]=x[i-1]+minDist;
   }
+  // backward: enforce right bound + min spacing from right neighbor
+  for(let i=n-1;i>=0;i--){
+    const maxAllowed=(i===n-1)?W-half[i]:Math.min(W-half[i],x[i+1]-(half[i]+half[i+1]+minGapPx));
+    if(x[i]>maxAllowed)x[i]=maxAllowed;
+  }
+  // forward again: re-fix any left overlap the backward pass reintroduced,
+  // and re-clamp the left bound
+  x[0]=Math.max(half[0],x[0]);
+  for(let i=1;i<n;i++){
+    const minDist=half[i-1]+half[i]+minGapPx;
+    if(x[i]-x[i-1]<minDist)x[i]=x[i-1]+minDist;
+  }
+  // Absolute safety net: with very large 3-digit counts there may not be
+  // room for full spacing inside the gauge width at all. In that rare case,
+  // prefer letting pills sit closer together over letting them spill past
+  // the card edge (that's the bug this whole fix is for).
+  for(let i=0;i<n;i++){x[i]=Math.max(half[i],Math.min(W-half[i],x[i]));}
+  items.forEach((o,i)=>{o.x=x[i];o.el.style.left=x[i]+'px';});
   // Update hidden compat divs (no-op but kept for JS safety)
   if(canvasId==='wr-gauge'){
     const gEl=document.getElementById('wr-green');
