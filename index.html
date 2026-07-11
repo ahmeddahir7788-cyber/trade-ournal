@@ -96,9 +96,9 @@ nav button:hover i{color:var(--text)}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
 .stat-card{background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:8px 22px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
-.stat-card-lbl{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-.stat-info-icon{font-size:14px;color:var(--text3);opacity:.7}
-.stat-card-count{font-size:12px;font-weight:600;color:var(--text3);margin-left:2px}
+.stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.stat-info-icon{font-size:12px;color:var(--text3);opacity:.7}
+.stat-card-count{font-size:10px;font-weight:600;color:var(--text3);margin-left:2px}
 
 /* Drag-to-reorder */
 .dashboard-block{position:relative}
@@ -111,15 +111,15 @@ nav button:hover i{color:var(--text)}
 .dashboard-block.drag-over-line{box-shadow:0 -3px 0 0 var(--blue) inset}
 .sub-block.drag-over-line{box-shadow:-3px 0 0 0 var(--blue) inset}
 .drag-handle i,.sub-drag-handle i{font-size:15px}
-.stat-card-val{font-size:32px;font-weight:700;line-height:1.1;color:var(--text);letter-spacing:-.01em}
+.stat-card-val{font-size:24px;font-weight:700;line-height:1.1;color:var(--text);letter-spacing:-.01em}
 .stat-card-bottom{margin-top:8px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
 .gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
-.gc{font-size:13px;font-weight:700;padding:5px 12px;border-radius:100px;text-align:center;min-width:24px}
-.gc.green{background:rgba(29,158,117,0.15);color:var(--green)}
-.gc.blue{background:rgba(55,138,221,0.15);color:var(--blue)}
-.gc.red{background:rgba(216,90,48,0.15);color:var(--red)}
+.gc{font-size:11px;font-weight:600;padding:0;border-radius:0;text-align:center;min-width:0;background:none!important}
+.gc.green{color:var(--green)}
+.gc.blue{color:var(--blue)}
+.gc.red{color:var(--red)}
 /* Avg win/loss bar */
 .avgwl-bar-wrap{display:flex;flex-direction:column;gap:6px}
 .avgwl-bar{display:flex;height:8px;border-radius:100px;overflow:hidden;width:100%;position:relative}
@@ -543,8 +543,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-wr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="wr-gauge" width="112" height="54" style="width:112px;height:54px"></canvas>
-            <div style="display:flex;gap:8px;margin-top:5px">
+            <canvas id="wr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
+            <div style="display:flex;gap:9px;margin-top:3px">
               <span class="gc green" id="g-wins">0</span>
               <span class="gc blue" id="g-be">0</span>
               <span class="gc red" id="g-losses">0</span>
@@ -566,7 +566,7 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
             <div class="stat-card-val" id="m-pf">—</div>
           </div>
-          <canvas id="pf-donut" width="72" height="72" style="width:72px;height:72px;flex-shrink:0"></canvas>
+          <canvas id="pf-donut" width="56" height="56" style="width:56px;height:56px;flex-shrink:0"></canvas>
         </div>
       </div>
 
@@ -582,8 +582,8 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="stat-card-val" id="m-daywr">—</div>
           </div>
           <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
-            <canvas id="daywr-gauge" width="112" height="54" style="width:112px;height:54px"></canvas>
-            <div style="display:flex;gap:8px;margin-top:5px">
+            <canvas id="daywr-gauge" width="90" height="46" style="width:90px;height:46px"></canvas>
+            <div style="display:flex;gap:9px;margin-top:3px">
               <span class="gc green" id="g-day-wins">0</span>
               <span class="gc blue" id="g-day-be">0</span>
               <span class="gc red" id="g-day-losses">0</span>
@@ -603,14 +603,14 @@ table.tt tr:last-child td{border-bottom:none}
             </div>
             <div class="stat-card-val" id="m-avgwl-ratio">—</div>
           </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-            <div style="display:flex;height:9px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div style="display:flex;height:6px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
               <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:50%"></div>
               <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:50%"></div>
             </div>
             <div style="display:flex;gap:6px">
-              <span style="font-size:12px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
-              <span style="font-size:12px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
+              <span style="font-size:11px;font-weight:600;color:var(--green)" id="m-avgwin">—</span>
+              <span style="font-size:11px;font-weight:600;color:var(--red)" id="m-avgloss">—</span>
             </div>
           </div>
         </div>
@@ -1402,7 +1402,7 @@ function renderDashboard(key){
     // Reset profit factor bar + labels
     drawProfitFactorBar(0,0);
     const pfDonut=document.getElementById('pf-donut');
-    if(pfDonut){const ctx2=pfDonut.getContext('2d');if(ctx2)ctx2.clearRect(0,0,72,72);}
+    if(pfDonut){const ctx2=pfDonut.getContext('2d');if(ctx2)ctx2.clearRect(0,0,56,56);}
     // Reset avg win/loss bar + labels
     const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
     const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
@@ -1487,7 +1487,7 @@ function renderDashboardWithTrades(trades,label){
     drawGauge(0,0,0,'daywr-gauge');
     const dwEl2=document.getElementById('m-daywr');if(dwEl2)dwEl2.textContent='—';
     drawProfitFactorBar(0,0);
-    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,72,72);}
+    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,56,56);}
     const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
     const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
     renderCalendar(key,[]);
@@ -1732,7 +1732,7 @@ function drawGauge(wins,be,losses,canvasId){
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
   if(!ctx)return;
-  const W=112,H=54,cx=56,cy=48,r=40,thick=6;
+  const W=90,H=46,cx=45,cy=41,r=33,thick=5;
   ctx.clearRect(0,0,W,H);
   const total=wins+be+losses||1;
   const winAngle=(wins/total)*Math.PI;
@@ -1895,8 +1895,8 @@ function drawMiniCharts(trades){
       const total=grossWin+grossLoss;
       const winAngle=total>0?(grossWin/total)*Math.PI*2:Math.PI;
       const lossAngle=total>0?(grossLoss/total)*Math.PI*2:Math.PI;
-      const cx=36,cy=36,r=28,ri=19;
-      ctx.clearRect(0,0,72,72);
+      const cx=28,cy=28,r=22,ri=15;
+      ctx.clearRect(0,0,56,56);
       ctx.beginPath();ctx.moveTo(cx,cy);
       ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+winAngle);
       ctx.closePath();ctx.fillStyle='#1D9E75';ctx.fill();
