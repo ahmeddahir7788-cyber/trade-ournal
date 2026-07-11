@@ -91,6 +91,34 @@ nav button:hover i{color:var(--text)}
 
 /* METRICS */
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
+
+/* SUMMARY STAT CARDS (Total Profit / Net Profit / Profit Factor / Win Rate / Total Trades) */
+.snc-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem;align-items:stretch;position:relative}
+@media(max-width:900px){.snc-cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.snc-cards{grid-template-columns:repeat(2,1fr)}}
+.snc-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;box-shadow:0 2px 8px var(--shadow);min-height:96px}
+.snc-lbl{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.01em}
+.snc-val{font-size:22px;font-weight:700;color:var(--text);line-height:1.1}
+.snc-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.snc-change{font-size:12px;font-weight:600;color:var(--green)}
+.snc-spark{width:80px;height:28px;flex-shrink:0}
+
+/* Profit Growth toggle */
+.pg-toggle{display:flex;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:2px;gap:2px}
+.pg-btn{background:none;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer}
+.pg-btn.active{background:var(--blue);color:#fff}
+.pg-btn:not(.active):hover{background:var(--border)}
+
+/* Profit Distribution donut */
+.pd-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.pd-total{font-size:24px;font-weight:800;color:var(--text);line-height:1}
+.pd-total-lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.pd-legend{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.pd-legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.pd-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pd-legend-lbl{flex:1}
+.pd-legend-val{font-weight:700;color:var(--text)}
+
 /* NEW STAT CARDS */
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem;align-items:stretch}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
@@ -514,110 +542,57 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="dash-title" style="display:none"></div>
     <div id="dash-sub" style="display:none"></div>
 
-    <div class="stat-cards dashboard-block" data-block-id="stats">
+    <!-- Stat cards: Total Profit, Net Profit, Profit Factor, Win Rate, Total Trades -->
+    <div class="snc-cards dashboard-block" data-block-id="stats">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
-      <!-- Net P&L -->
-      <div class="stat-card sub-block" data-sub-id="netpl">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div>
-            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-              <span class="stat-card-lbl">Net P&amp;L</span>
-              <i class="ti ti-info-circle stat-info-icon"></i>
-              <span class="stat-card-count" id="m-total">0</span>
-            </div>
-            <div class="stat-card-val" id="m-pnl">$0</div>
-          </div>
+
+      <div class="snc-card">
+        <div class="snc-lbl">Total Profit</div>
+        <div class="snc-val" id="snc-totalprofit">$0</div>
+        <div class="snc-bottom">
+          <span class="snc-change" id="snc-totalprofit-chg">+0%</span>
+          <canvas class="snc-spark" id="spark-totalprofit" width="90" height="30"></canvas>
         </div>
       </div>
 
-      <!-- Trade win % -->
-      <div class="stat-card sub-block" data-sub-id="tradewr">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div>
-            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-              <span class="stat-card-lbl">Trade win %</span>
-              <i class="ti ti-info-circle stat-info-icon"></i>
-            </div>
-            <div class="stat-card-val" id="m-wr">—</div>
-          </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;margin-top:2px">
-            <canvas id="wr-gauge" width="80" height="48" style="width:80px;height:48px"></canvas>
-            <div style="display:flex;gap:3px;margin-top:1px">
-              <span class="gc green" id="g-wins">0</span>
-              <span class="gc blue" id="g-be">0</span>
-              <span class="gc red" id="g-losses">0</span>
-            </div>
-            <!-- hidden divs for JS compat -->
-            <div style="display:none"><div id="wr-green"></div><div id="wr-blue"></div><div id="wr-red"></div></div>
-          </div>
+      <div class="snc-card">
+        <div class="snc-lbl">Net Profit</div>
+        <div class="snc-val" id="snc-netprofit">$0</div>
+        <div class="snc-bottom">
+          <span class="snc-change" id="snc-netprofit-chg">+0%</span>
+          <canvas class="snc-spark" id="spark-netprofit" width="90" height="30"></canvas>
         </div>
       </div>
 
-      <!-- Profit factor -->
-      <div class="stat-card sub-block" data-sub-id="pf">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div>
-            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-              <span class="stat-card-lbl">Profit factor</span>
-              <i class="ti ti-info-circle stat-info-icon"></i>
-            </div>
-            <div class="stat-card-val" id="m-pf">—</div>
-          </div>
-          <canvas id="pf-donut" width="52" height="52" style="width:52px;height:52px;flex-shrink:0;margin-top:4px"></canvas>
+      <div class="snc-card">
+        <div class="snc-lbl">Profit Factor</div>
+        <div class="snc-val" id="snc-pf">—</div>
+        <div class="snc-bottom">
+          <span class="snc-change" id="snc-pf-label" style="color:var(--blue)">—</span>
+          <canvas class="snc-spark" id="spark-pf" width="90" height="30"></canvas>
         </div>
       </div>
 
-      <!-- Day win % -->
-      <div class="stat-card sub-block" data-sub-id="daywr">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div>
-            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-              <span class="stat-card-lbl">Day win %</span>
-              <i class="ti ti-info-circle stat-info-icon"></i>
-            </div>
-            <div class="stat-card-val" id="m-daywr">—</div>
-          </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;margin-top:2px">
-            <canvas id="daywr-gauge" width="80" height="48" style="width:80px;height:48px"></canvas>
-            <div style="display:flex;gap:3px;margin-top:1px">
-              <span class="gc green" id="g-day-wins">0</span>
-              <span class="gc blue" id="g-day-be">0</span>
-              <span class="gc red" id="g-day-losses">0</span>
-            </div>
-          </div>
+      <div class="snc-card">
+        <div class="snc-lbl">Win Rate</div>
+        <div class="snc-val" id="snc-winrate">0%</div>
+        <div class="snc-bottom">
+          <span class="snc-change" id="snc-winrate-chg">+0%</span>
+          <canvas class="snc-spark" id="spark-winrate" width="90" height="30"></canvas>
         </div>
       </div>
 
-      <!-- Avg win/loss trade -->
-      <div class="stat-card sub-block" data-sub-id="avgwl">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div>
-            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-              <span class="stat-card-lbl">Avg win/loss trade</span>
-              <i class="ti ti-info-circle stat-info-icon"></i>
-            </div>
-            <div class="stat-card-val" id="m-avgwl-ratio">—</div>
-          </div>
-          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:26px">
-            <div style="display:flex;height:8px;border-radius:100px;overflow:hidden;background:var(--border);width:80px">
-              <div id="avgwl-green" style="height:100%;background:#1D9E75;transition:width .4s;width:0%"></div>
-              <div id="avgwl-red" style="height:100%;background:#D85A30;transition:width .4s;width:0%"></div>
-            </div>
-            <div style="display:flex;gap:6px">
-              <span style="font-size:10px;font-weight:700;color:var(--green)" id="m-avgwin">—</span>
-              <span style="font-size:10px;font-weight:700;color:var(--red)" id="m-avgloss">—</span>
-            </div>
-          </div>
+      <div class="snc-card">
+        <div class="snc-lbl">Total Trades</div>
+        <div class="snc-val" id="snc-trades">0</div>
+        <div class="snc-bottom">
+          <span class="snc-change" id="snc-trades-chg">+0%</span>
+          <canvas class="snc-spark" id="spark-trades" width="90" height="30"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Trading Score + Equity Curve + Daily P&L -->
+    <!-- Trading Score + Profit Growth + Profit Distribution -->
     <div class="dashboard-block" data-block-id="middle" style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;margin-top:12px;align-items:stretch">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
 
@@ -647,41 +622,45 @@ table.tt tr:last-child td{border-bottom:none}
         <div id="score-breakdown" style="display:none"></div>
       </div>
 
-      <!-- Equity Curve -->
+      <!-- Profit Growth -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <h3 style="margin-bottom:12px">Equity Curve</h3>
-        <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="equity-chart"></canvas></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px">
+            <h3 style="margin:0">Profit Growth</h3>
+            <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="pg-toggle" id="pg-toggle">
+              <button class="pg-btn active" data-mode="daily" onclick="setProfitGrowthMode('daily')">Daily</button>
+              <button class="pg-btn" data-mode="weekly" onclick="setProfitGrowthMode('weekly')">Weekly</button>
+              <button class="pg-btn" data-mode="monthly" onclick="setProfitGrowthMode('monthly')">Monthly</button>
+            </div>
+            <button class="cal-nav-btn" onclick="downloadProfitGrowth()" title="Download chart"><i class="ti ti-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="profit-growth-chart"></canvas></div>
       </div>
 
-      <!-- Daily P&L -->
+      <!-- Profit Distribution -->
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <h3 style="margin-bottom:12px">Daily P&amp;L</h3>
-        <div class="chart-wrap" style="flex:1;min-height:200px"><canvas id="daily-pnl-chart"></canvas></div>
+        <h3 style="margin-bottom:12px">Profit Distribution</h3>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;flex:1">
+          <canvas id="profit-dist-donut" width="150" height="150"></canvas>
+          <div class="pd-center">
+            <div class="pd-total" id="pd-total">0</div>
+            <div class="pd-total-lbl">Trades</div>
+          </div>
+        </div>
+        <div class="pd-legend">
+          <div class="pd-legend-row"><span class="pd-dot" style="background:var(--green)"></span><span class="pd-legend-lbl">Winning Trades</span><span class="pd-legend-val" id="pd-win-count">0</span></div>
+          <div class="pd-legend-row"><span class="pd-dot" style="background:var(--red)"></span><span class="pd-legend-lbl">Losing Trades</span><span class="pd-legend-val" id="pd-loss-count">0</span></div>
+        </div>
       </div>
     </div>
 
-    <!-- Recent Trades + Calendar -->
-    <div class="dashboard-block" data-block-id="trades-calendar" style="display:grid;grid-template-columns:38% 1fr;gap:12px;margin-top:12px;align-items:stretch">
+    <!-- Calendar -->
+    <div class="dashboard-block" data-block-id="calendar" style="margin-top:12px">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
-
-      <!-- Recent Trades -->
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;min-width:0">
-        <h3 style="margin-bottom:12px">Recent Trades</h3>
-        <div style="flex:1;overflow-y:auto;max-height:420px">
-          <table style="width:100%;border-collapse:collapse">
-            <thead>
-              <tr>
-                <th style="text-align:left;padding:6px 4px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:.5px solid var(--border)">Date</th>
-                <th style="text-align:left;padding:6px 4px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:.5px solid var(--border)">Pair</th>
-                <th style="text-align:right;padding:6px 4px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:.5px solid var(--border)">P&amp;L</th>
-              </tr>
-            </thead>
-            <tbody id="recent-trades-table"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Calendar -->
       <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -699,73 +678,8 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
     </div>
-
-    <!-- Best Pair + Fear & Greed -->
-    <div class="dashboard-block" data-block-id="extras" style="display:flex;gap:12px;margin-top:12px">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
-      <!-- Best Pair -->
-      <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1;min-width:0">
-        <h3 style="margin-bottom:10px">Best Pair</h3>
-        <div id="best-worst-wrap" style="display:flex;flex-direction:column;flex:1;align-items:center;justify-content:center"></div>
-      </div>
-
-      <!-- Fear & Greed Index -->
-      <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;white-space:nowrap;overflow:hidden">
-          <i class="ti ti-gauge" style="font-size:15px;color:var(--text3);flex-shrink:0"></i>
-          <h3 style="margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fear &amp; Greed Index</h3>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:2px">
-          <svg id="fng-gauge" viewBox="0 0 120 66" style="width:100%;max-width:130px;height:auto"></svg>
-          <div id="fng-value" style="font-size:22px;font-weight:800;color:var(--text);line-height:1;margin-top:-6px">—</div>
-          <div id="fng-label" style="font-size:11px;color:var(--text3)">Loading…</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- P&L by Weekday -->
-    <div class="dashboard-block" data-block-id="weekday" style="margin-top:12px">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <h3 style="margin-bottom:12px">P&amp;L by Weekday</h3>
-        <div style="position:relative;height:220px"><canvas id="weekday-chart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Mini Calendar + Drawdown -->
-    <div class="dashboard-block" data-block-id="drawdown" style="display:grid;grid-template-columns:32% 1fr;gap:12px;margin-top:12px;align-items:stretch">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
-      <!-- Mini Calendar -->
-      <div class="card mini-cal-card" style="margin-bottom:0;min-width:0">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h3 style="margin:0">Calendar</h3>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
-            <span id="mini-cal-title" style="font-size:15px;white-space:nowrap"></span>
-            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
-          </div>
-        </div>
-        <div id="mini-cal-wrap" class="mini-cal-grid"></div>
-      </div>
-
-      <!-- Drawdown -->
-      <div class="card" style="margin-bottom:0;min-width:0">
-        <h3 style="margin-bottom:12px">Drawdown</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-          <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
-            <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">MAX</div>
-            <div id="dd-max" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
-          </div>
-          <div style="background:var(--surface2);border-radius:var(--r);padding:12px 16px">
-            <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:4px">CURRENT</div>
-            <div id="dd-current" style="font-size:20px;font-weight:700;color:var(--red)">—</div>
-          </div>
-        </div>
-        <div class="chart-wrap" style="height:210px"><canvas id="drawdown-chart"></canvas></div>
-        <div id="dd-trough" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
-      </div>
-    </div>
   </div>
+
 
   <!-- LOG TRADE -->
   <div id="page-log" class="page">
@@ -1407,178 +1321,219 @@ function go(id,btn){
 }
 
 
-// ── Dashboard render ──────────────────────────────────────────
+// ── Summary stat cards (Total Profit / Net Profit / Profit Factor / Win Rate / Total Trades) ──
+function computeMetrics(trades){
+  const n=trades.length;
+  const grossWin=trades.filter(t=>(t.pnl||0)>0).reduce((s,t)=>s+t.pnl,0);
+  const grossLoss=Math.abs(trades.filter(t=>(t.pnl||0)<0).reduce((s,t)=>s+t.pnl,0));
+  const net=trades.reduce((s,t)=>s+(t.pnl||0),0);
+  const pf=grossLoss>0?(grossWin/grossLoss):(grossWin>0?Infinity:0);
+  const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+  const losses=trades.filter(t=>t.outcome==='Loss').length;
+  const be=trades.filter(t=>t.outcome==='Break Even').length;
+  const decisive=n-be;
+  const wr=decisive>0?(wins/decisive*100):0;
+  return{n,grossWin,grossLoss,net,pf,wins,losses,be,wr};
+}
+
+function pctChange(cur,prev){
+  if(prev==null||prev===0||!isFinite(prev)||!isFinite(cur))return null;
+  return((cur-prev)/Math.abs(prev))*100;
+}
+
+function setStatCard(id,val,chg,opts){
+  opts=opts||{};
+  const valEl=document.getElementById('snc-'+id);
+  const chgEl=document.getElementById('snc-'+id+'-chg');
+  if(valEl){
+    if(opts.isPF)valEl.textContent=isFinite(val)?val.toFixed(2):'∞';
+    else if(opts.isPct)valEl.textContent=val.toFixed(2)+'%';
+    else if(opts.isInt)valEl.textContent=Math.round(val).toLocaleString();
+    else valEl.textContent='$'+Math.round(val).toLocaleString();
+  }
+  if(chgEl){
+    if(opts.isPF){
+      const goodness=!isFinite(val)?'Excellent':val>=2?'Excellent':val>=1.5?'Good':val>=1?'Fair':'Poor';
+      chgEl.textContent=goodness;
+      chgEl.style.color=(!isFinite(val)||val>=1.5)?'var(--blue)':val>=1?'var(--gold)':'var(--red)';
+    } else if(chg==null){
+      chgEl.textContent='';
+    } else {
+      chgEl.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';
+      chgEl.style.color=chg>=0?'var(--green)':'var(--red)';
+    }
+  }
+}
+
+function drawSparkline(canvasId,color,pts){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  if(!pts||pts.length<2)return;
+  const minV=Math.min(...pts,0),maxV=Math.max(...pts,0);
+  const range=(maxV-minV)||1;
+  const xs=pts.map((_,i)=>i/(pts.length-1)*W);
+  const ys=pts.map(v=>H-3-((v-minV)/range)*(H-6));
+  ctx.beginPath();ctx.moveTo(xs[0],ys[0]);
+  xs.forEach((x,i)=>{if(i>0)ctx.lineTo(x,ys[i]);});
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+}
+
+function renderNewStatCards(trades,key){
+  const m=computeMetrics(trades);
+  let prevM=null;
+  if(key){
+    const[y,mo]=key.split('-').map(Number);
+    const d=new Date(y,mo-2,1);
+    const prevKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    prevM=computeMetrics(getTradesForKey(prevKey));
+  }
+  setStatCard('totalprofit',m.grossWin,prevM?pctChange(m.grossWin,prevM.grossWin):null);
+  setStatCard('netprofit',m.net,prevM?pctChange(m.net,prevM.net):null);
+  setStatCard('pf',m.pf,null,{isPF:true});
+  setStatCard('winrate',m.wr,prevM?pctChange(m.wr,prevM.wr):null,{isPct:true});
+  setStatCard('trades',m.n,prevM?pctChange(m.n,prevM.n):null,{isInt:true});
+
+  const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  let cum=0;const pts=sorted.map(t=>{cum+=(t.pnl||0);return cum;});
+  const sparkPts=pts.length?[0,...pts]:[];
+  const sparkColors={totalprofit:'#1D9E75',netprofit:'#1D9E75',pf:'#378ADD',winrate:'#a78bfa',trades:'#f59e0b'};
+  Object.keys(sparkColors).forEach(id=>drawSparkline('spark-'+id,sparkColors[id],sparkPts));
+}
+
+// ── Profit Growth chart ──────────────────────────────────────
+let profitGrowthChart=null;
+let pgMode='daily';
+let pgTradesCache=[];
+
+function setProfitGrowthMode(mode){
+  pgMode=mode;
+  document.querySelectorAll('.pg-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  drawProfitGrowthChart(pgTradesCache);
+}
+
+function pgBucketKey(dateStr){
+  if(pgMode==='daily')return dateStr;
+  if(pgMode==='weekly'){
+    const d=new Date(dateStr+'T00:00:00');
+    const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
+    return mon.toISOString().slice(0,10);
+  }
+  return dateStr.slice(0,7);
+}
+
+function drawProfitGrowthChart(trades){
+  pgTradesCache=trades;
+  const canvas=document.getElementById('profit-growth-chart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  if(profitGrowthChart){profitGrowthChart.destroy();profitGrowthChart=null;}
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
+  const tc=dark?'#555':'#aaa';
+  if(!trades||!trades.length)return;
+  const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  const buckets={};
+  sorted.forEach(t=>{
+    const bk=pgBucketKey(t.date);
+    if(!buckets[bk])buckets[bk]=0;
+    buckets[bk]+=(t.pnl||0);
+  });
+  const keys=Object.keys(buckets).sort();
+  let cum=0;
+  const labels=['start',...keys];
+  const vals=[0,...keys.map(k=>{cum+=buckets[k];return Math.round(cum);})];
+  const chartH=canvas.clientHeight||260;
+  const lastVal=vals[vals.length-1]||0;
+  const lineColor=lastVal>=0?'#1D9E75':'#D85A30';
+  const grad=ctx.createLinearGradient(0,0,0,chartH);
+  if(lastVal>=0){
+    grad.addColorStop(0,'rgba(29,158,117,0.55)');
+    grad.addColorStop(0.5,'rgba(29,158,117,0.2)');
+    grad.addColorStop(1,'rgba(29,158,117,0.02)');
+  } else {
+    grad.addColorStop(0,'rgba(216,90,48,0.55)');
+    grad.addColorStop(0.5,'rgba(216,90,48,0.2)');
+    grad.addColorStop(1,'rgba(216,90,48,0.02)');
+  }
+  profitGrowthChart=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{data:vals,borderColor:lineColor,backgroundColor:grad,borderWidth:3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:lineColor,fill:true,tension:0.35}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:400,easing:'easeInOutQuart'},
+      resizeDelay:100,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:item=>'$'+item.parsed.y.toLocaleString()}}},
+      scales:{
+        x:{ticks:{font:{size:11},maxTicksLimit:8,color:tc,maxRotation:0},grid:{display:false},border:{display:false}},
+        y:{ticks:{font:{size:11},color:tc,callback:v=>'$'+v.toLocaleString()},grid:{color:gc},border:{display:false}}
+      }
+    }
+  });
+}
+
+function downloadProfitGrowth(){
+  const canvas=document.getElementById('profit-growth-chart');
+  if(!canvas)return;
+  const link=document.createElement('a');
+  link.download='profit-growth.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ── Profit Distribution donut ────────────────────────────────
+function drawProfitDistribution(trades){
+  const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
+  const losses=trades.filter(t=>t.outcome==='Loss').length;
+  const total=trades.length;
+  const totalEl=document.getElementById('pd-total');if(totalEl)totalEl.textContent=total;
+  const winEl=document.getElementById('pd-win-count');
+  if(winEl)winEl.textContent=wins+' ('+(total?Math.round(wins/total*100):0)+'%)';
+  const lossEl=document.getElementById('pd-loss-count');
+  if(lossEl)lossEl.textContent=losses+' ('+(total?Math.round(losses/total*100):0)+'%)';
+  const canvas=document.getElementById('profit-dist-donut');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=W/2-6,ri=r-18;
+  ctx.clearRect(0,0,W,H);
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  if(!total){
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=dark?'#2a2e37':'#e5e7eb';ctx.fill();
+  } else {
+    const winAngle=(wins/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+winAngle);ctx.closePath();ctx.fillStyle='#1D9E75';ctx.fill();
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,-Math.PI/2+winAngle,Math.PI*1.5);ctx.closePath();ctx.fillStyle='#D85A30';ctx.fill();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);ctx.fillStyle=dark?'#111318':'#ffffff';ctx.fill();
+}
+
 // ── Dashboard render ──────────────────────────────────────────
 function renderDashboard(key){
   currentDashKey=key;
-  // top bar always says Dashboard
   const tb4=document.getElementById('top-bar-section');
   if(tb4)tb4.textContent='Dashboard';
   const trades=getTradesForKey(key);
-  const s=statsOf(trades);
-
-  if(!s){
-    const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
-    // Reset gauge counts
-    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
-    drawGauge(0,0,0);
-    ['g-day-wins','g-day-be','g-day-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
-    drawGauge(0,0,0,'daywr-gauge');
-    const dwEl=document.getElementById('m-daywr');if(dwEl)dwEl.textContent='—';
-    // Reset profit factor bar + labels
-    drawProfitFactorBar(0,0);
-    const pfDonut=document.getElementById('pf-donut');
-    if(pfDonut){const ctx2=pfDonut.getContext('2d');if(ctx2)ctx2.clearRect(0,0,56,56);}
-    // Reset avg win/loss bar + labels
-    const aw=document.getElementById('m-avgwin');if(aw)aw.textContent='—';
-    const al=document.getElementById('m-avgloss');if(al)al.textContent='—';
-    const awg=document.getElementById('avgwl-green');if(awg)awg.style.width='0%';
-    const awr=document.getElementById('avgwl-red');if(awr)awr.style.width='0%';
-    // Reset mini bars
-    const mb=document.getElementById('mini-bars');if(mb)mb.innerHTML='';
-    const meq=document.getElementById('mini-eq');if(meq){const ctx=meq.getContext('2d');if(ctx)ctx.clearRect(0,0,meq.width,meq.height);}
-    const _ss=document.getElementById('session-stats');if(_ss)_ss.innerHTML='<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">No session data.</div>';
-    const swEl=document.getElementById('streak-stats');if(swEl)swEl.innerHTML='';
-    renderCalendar(key,[]);
-    renderMiniCalendar(key);
-    if(eqChart){eqChart.destroy();eqChart=null;}
-    if(dailyPnlChart){dailyPnlChart.destroy();dailyPnlChart=null;}
-    drawDrawdownChart();
-    renderRecentTradesTable();
-    return;
-  }
-  document.getElementById('m-total').textContent=s.n;
-  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');
-  if(pe){
-    if(displayMode==='percent'){
-      const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);
-      pe.textContent=rrPct(rrSum);
-    } else {
-      pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();
-    }
-    pe.className='stat-card-val';
-  }
-  const mpfEl2=document.getElementById('m-pf');if(mpfEl2)mpfEl2.textContent=s.pf!=null?s.pf:'—';
-  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
-  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
-  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
-  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
-  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
-  const aw=document.getElementById('m-avgwin');
-  const al=document.getElementById('m-avgloss');
-  const ratioEl=document.getElementById('m-avgwl-ratio');
-  if(displayMode==='percent'){
-    if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
-    if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
-    if(ratioEl)ratioEl.textContent=(lossRRs.length&&Math.abs(avgLossRR)>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
-  } else {
-    if(aw)aw.textContent=s.avgWin?'+$'+(s.avgWin>=1000?(s.avgWin/1000).toFixed(1)+'k':s.avgWin):'—';
-    if(al)al.textContent=s.avgLoss?'-$'+(s.avgLoss>=1000?(s.avgLoss/1000).toFixed(1)+'k':s.avgLoss):'—';
-    if(ratioEl)ratioEl.textContent=s.avgWinLossRatio||'—';
-  }
-  // Avg win/loss bar
-  const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
-  const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
-  const rlEl=document.getElementById('avgwl-red');if(rlEl)rlEl.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg*100)+'%';
-  // Gauge
-  const gw=document.getElementById('g-wins');if(gw)gw.textContent=s.wins;
-  const gb=document.getElementById('g-be');if(gb)gb.textContent=s.be;
-  const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
-  drawGauge(s.wins,s.be,s.losses);
-  renderDayWinCard(trades);
-
-  renderCalendar(key,trades);
-  renderMiniCalendar(key);
-  renderSessionStats(trades);
+  renderNewStatCards(trades,key);
   renderTradingScore(trades);
-  renderBestWorstPair(trades);
-  renderWeekdayChart(trades);
-  drawMiniCharts(trades);
-  drawCharts(trades);
-  drawDrawdownChart();
-  drawDailyPnlChart(trades);
-  renderRecentTradesTable();
+  drawProfitGrowthChart(trades);
+  drawProfitDistribution(trades);
+  renderCalendar(key,trades);
 }
 
 function renderDashboardWithTrades(trades,label){
-  // Render dashboard with an arbitrary set of trades (used by date range picker)
   const key=currentDashKey||curMonthKey();
-  const s=statsOf(trades);
   const tb=document.getElementById('top-bar-section');
   if(tb)tb.textContent='Dashboard';
-
-  if(!s){
-    const mtEl=document.getElementById('m-total');if(mtEl)mtEl.textContent='0';
-    ['m-wr','m-pnl','m-avgwl-ratio','m-pf'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
-    ['g-wins','g-be','g-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
-    drawGauge(0,0,0);
-    ['g-day-wins','g-day-be','g-day-losses'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});
-    drawGauge(0,0,0,'daywr-gauge');
-    const dwEl2=document.getElementById('m-daywr');if(dwEl2)dwEl2.textContent='—';
-    drawProfitFactorBar(0,0);
-    const pfDonut2=document.getElementById('pf-donut');if(pfDonut2){const c=pfDonut2.getContext('2d');if(c)c.clearRect(0,0,56,56);}
-    const aw0=document.getElementById('m-avgwin');if(aw0)aw0.textContent='—';
-    const al0=document.getElementById('m-avgloss');if(al0)al0.textContent='—';
-    const awg0=document.getElementById('avgwl-green');if(awg0)awg0.style.width='0%';
-    const awr0=document.getElementById('avgwl-red');if(awr0)awr0.style.width='0%';
-    renderCalendar(key,[]);
-    renderMiniCalendar(key);
-    renderTradingScore([]);
-    renderWeekdayChart([]);
-    drawMiniCharts([]);
-    if(eqChart){eqChart.destroy();eqChart=null;}
-    if(dailyPnlChart){dailyPnlChart.destroy();dailyPnlChart=null;}
-    drawDrawdownChart();
-    renderRecentTradesTable();
-    return;
-  }
-  document.getElementById('m-total').textContent=s.n;
-  const we=document.getElementById('m-wr');if(we){we.textContent=s.wr+'%';we.className='stat-card-val';}
-  const pe=document.getElementById('m-pnl');
-  if(pe){
-    if(displayMode==='percent'){const rrSum=trades.reduce((sum,t)=>sum+(t.rr||0),0);pe.textContent=rrPct(rrSum);}
-    else{pe.textContent=(s.tot>=0?'+':'')+'$'+Math.abs(Math.round(s.tot)).toLocaleString();}
-    pe.className='stat-card-val';
-  }
-  const mpfEl=document.getElementById('m-pf');if(mpfEl)mpfEl.textContent=s.pf!=null?s.pf:'—';
-  drawProfitFactorBar(s.grossWin||0,s.grossLoss||0);
-  const winRRs=trades.filter(t=>(t.outcome==='Win'||t.outcome==='Partial')&&t.rr!=null).map(t=>t.rr);
-  const lossRRs=trades.filter(t=>t.outcome==='Loss'&&t.rr!=null).map(t=>t.rr);
-  const avgWinRR=winRRs.length?winRRs.reduce((a,b)=>a+b,0)/winRRs.length:0;
-  const avgLossRR=lossRRs.length?lossRRs.reduce((a,b)=>a+b,0)/lossRRs.length:0;
-  const aw=document.getElementById('m-avgwin');
-  const al=document.getElementById('m-avgloss');
-  const ratioEl=document.getElementById('m-avgwl-ratio');
-  if(displayMode==='percent'){
-    if(aw)aw.textContent=winRRs.length?'+'+Math.abs(Math.round(avgWinRR*100)/100)+'R':'—';
-    if(al)al.textContent=lossRRs.length?'-'+Math.abs(Math.round(avgLossRR*100)/100)+'R':'—';
-    if(ratioEl)ratioEl.textContent=(lossRRs.length&&Math.abs(avgLossRR)>0)?(Math.abs(avgWinRR)/Math.abs(avgLossRR)).toFixed(2):'—';
-  } else {
-    if(aw)aw.textContent=s.avgWin?'+$'+s.avgWin:'—';
-    if(al)al.textContent=s.avgLoss?'-$'+s.avgLoss:'—';
-    if(ratioEl)ratioEl.textContent=s.avgWinLossRatio||'—';
-  }
-  const totalAvg=(parseFloat(s.avgWin)||0)+(parseFloat(s.avgLoss)||0)||1;
-  const gwEl=document.getElementById('avgwl-green');if(gwEl)gwEl.style.width=Math.round((parseFloat(s.avgWin)||0)/totalAvg*100)+'%';
-  const rlEl=document.getElementById('avgwl-red');if(rlEl)rlEl.style.width=Math.round((parseFloat(s.avgLoss)||0)/totalAvg*100)+'%';
-  const gw=document.getElementById('g-wins');if(gw)gw.textContent=s.wins;
-  const gb=document.getElementById('g-be');if(gb)gb.textContent=s.be;
-  const gl=document.getElementById('g-losses');if(gl)gl.textContent=s.losses;
-  drawGauge(s.wins,s.be,s.losses);
-  renderDayWinCard(trades);
-  renderCalendar(key,trades);
-  renderMiniCalendar(key);
+  renderNewStatCards(trades,null);
   renderTradingScore(trades);
-  renderBestWorstPair(trades);
-  renderWeekdayChart(trades);
-  drawMiniCharts(trades);
-  drawCharts(trades);
-  drawDrawdownChart();
-  drawDailyPnlChart(trades);
-  renderRecentTradesTable();
+  drawProfitGrowthChart(trades);
+  drawProfitDistribution(trades);
+  renderCalendar(key,trades);
 }
+
 
 function statsOf(trades){
   const n=trades.length;if(!n)return null;
@@ -2038,7 +1993,7 @@ function drawCharts(trades){
         try{const p=lbl.split('-');const d=new Date(lbl);const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];dateStr=days[d.getDay()]+', '+parseInt(p[2])+' '+mn[parseInt(p[1])-1]+', '+p[0];}catch(e){dateStr=lbl;}
       }
       const pnlColor=v>=0?'#1D9E75':'#D85A30';
-      const pnlStr=(v>=0?'+':'')+' $'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
+      const pnlStr=(v>=0?'+':' ')+' $'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
       el.innerHTML=`<span style="font-size:13px;font-weight:600;color:${dark?'#ccc':'#444'}">${dateStr}</span><span style="font-size:13px;font-weight:700;color:${pnlColor}">Net P&L ${pnlStr}</span>`;
     }
 
@@ -3990,9 +3945,7 @@ currentDashKey=curMonthKey();
 const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
 initDashSelectors();
 renderDashboard(currentDashKey);
-renderFearGreed();
 enableDragReorder(document.getElementById('page-dashboard'),'.dashboard-block','.drag-handle','data-block-id','tj_v10_order_dashboard');
-enableDragReorder(document.querySelector('.stat-cards'),'.sub-block','.sub-drag-handle','data-sub-id','tj_v10_order_statcards');
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
