@@ -93,8 +93,8 @@ nav button:hover i{color:var(--text)}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
 
 /* SUMMARY STAT CARDS (Total Profit / Net Profit / Profit Factor / Win Rate / Avg Win-Loss) */
-.snc-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.25rem;align-items:stretch;position:relative}
-@media(max-width:900px){.snc-cards{grid-template-columns:repeat(3,1fr)}}
+.snc-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:1.25rem;align-items:stretch;position:relative}
+@media(max-width:1100px){.snc-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.snc-cards{grid-template-columns:repeat(2,1fr)}}
 .snc-card{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;box-shadow:0 2px 8px var(--shadow);min-height:70px}
 .snc-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -592,6 +592,12 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="snc-lbl">Win Rate</div>
         <div class="snc-val" id="snc-winrate">0%</div>
         <canvas class="snc-spark" id="spark-winrate" width="90" height="22"></canvas>
+      </div>
+
+      <div class="snc-card">
+        <div class="snc-lbl">Day Win %</div>
+        <div class="snc-val" id="snc-daywr">0%</div>
+        <canvas class="snc-spark" id="spark-daywr" width="90" height="22"></canvas>
       </div>
 
       <div class="snc-card">
@@ -1392,6 +1398,10 @@ function renderNewStatCards(trades){
   setStatCard('pf',m.pf,{isPF:true});
   setStatCard('winrate',m.wr,{isPct:true});
 
+  // Day Win %
+  const ds=computeDayWinStats(trades);
+  const dwEl=document.getElementById('snc-daywr');if(dwEl)dwEl.textContent=trades.length?ds.wr+'%':'0%';
+
   // Avg Win / Loss card
   const ratioEl=document.getElementById('snc-avgwl-ratio');
   if(ratioEl)ratioEl.textContent=(m.avgLoss>0||m.avgWin>0)?(isFinite(m.avgWinLossRatio)?m.avgWinLossRatio.toFixed(2):'∞'):'—';
@@ -1404,7 +1414,7 @@ function renderNewStatCards(trades){
   const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   let cum=0;const pts=sorted.map(t=>{cum+=(t.pnl||0);return cum;});
   const sparkPts=pts.length?[0,...pts]:[];
-  const sparkColors={totalprofit:'#1D9E75',netprofit:'#1D9E75',pf:'#378ADD',winrate:'#a78bfa'};
+  const sparkColors={totalprofit:'#1D9E75',netprofit:'#1D9E75',pf:'#378ADD',winrate:'#a78bfa',daywr:'#f59e0b'};
   Object.keys(sparkColors).forEach(id=>drawSparkline('spark-'+id,sparkColors[id],sparkPts));
 }
 
