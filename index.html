@@ -655,33 +655,38 @@ table.tt tr:last-child td{border-bottom:none}
           <div id="score-breakdown" style="display:none"></div>
         </div>
 
-        <!-- Profit Distribution -->
-        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;flex:1">
-          <h3 style="margin-bottom:12px">Profit Distribution</h3>
-          <div style="position:relative;display:flex;align-items:center;justify-content:center;flex:1">
-            <canvas id="profit-dist-donut" width="130" height="130"></canvas>
-            <div class="pd-center">
-              <div class="pd-total" id="pd-total">0</div>
-              <div class="pd-total-lbl">Trades</div>
+        <!-- Profit Distribution + Fear & Greed, side by side and smaller -->
+        <div style="display:flex;gap:12px;flex:1">
+
+          <!-- Profit Distribution -->
+          <div class="card" style="margin-bottom:0;padding:12px;display:flex;flex-direction:column;flex:1;min-width:0">
+            <h3 style="margin-bottom:8px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Profit Distribution</h3>
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;flex:1">
+              <canvas id="profit-dist-donut" width="88" height="88"></canvas>
+              <div class="pd-center">
+                <div class="pd-total" id="pd-total" style="font-size:16px">0</div>
+                <div class="pd-total-lbl" style="font-size:9px">Trades</div>
+              </div>
+            </div>
+            <div class="pd-legend" style="margin-top:8px;gap:5px">
+              <div class="pd-legend-row" style="font-size:10px"><span class="pd-dot" style="background:var(--green)"></span><span class="pd-legend-lbl">Wins</span><span class="pd-legend-val" id="pd-win-count">0</span></div>
+              <div class="pd-legend-row" style="font-size:10px"><span class="pd-dot" style="background:var(--red)"></span><span class="pd-legend-lbl">Losses</span><span class="pd-legend-val" id="pd-loss-count">0</span></div>
             </div>
           </div>
-          <div class="pd-legend">
-            <div class="pd-legend-row"><span class="pd-dot" style="background:var(--green)"></span><span class="pd-legend-lbl">Winning Trades</span><span class="pd-legend-val" id="pd-win-count">0</span></div>
-            <div class="pd-legend-row"><span class="pd-dot" style="background:var(--red)"></span><span class="pd-legend-lbl">Losing Trades</span><span class="pd-legend-val" id="pd-loss-count">0</span></div>
-          </div>
-        </div>
 
-        <!-- Fear & Greed Index -->
-        <div class="card" style="margin-bottom:0;padding:14px;display:flex;flex-direction:column;flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;white-space:nowrap;overflow:hidden">
-            <i class="ti ti-gauge" style="font-size:15px;color:var(--text3);flex-shrink:0"></i>
-            <h3 style="margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fear &amp; Greed Index</h3>
+          <!-- Fear & Greed Index -->
+          <div class="card" style="margin-bottom:0;padding:12px;display:flex;flex-direction:column;flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;white-space:nowrap;overflow:hidden">
+              <i class="ti ti-gauge" style="font-size:13px;color:var(--text3);flex-shrink:0"></i>
+              <h3 style="margin:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Fear &amp; Greed</h3>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:1px">
+              <svg id="fng-gauge" viewBox="0 0 120 66" style="width:100%;max-width:96px;height:auto"></svg>
+              <div id="fng-value" style="font-size:18px;font-weight:800;color:var(--text);line-height:1;margin-top:-6px">—</div>
+              <div id="fng-label" style="font-size:10px;color:var(--text3)">Loading…</div>
+            </div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:2px">
-            <svg id="fng-gauge" viewBox="0 0 120 66" style="width:100%;max-width:130px;height:auto"></svg>
-            <div id="fng-value" style="font-size:22px;font-weight:800;color:var(--text);line-height:1;margin-top:-6px">—</div>
-            <div id="fng-label" style="font-size:11px;color:var(--text3)">Loading…</div>
-          </div>
+
         </div>
 
       </div>
@@ -1521,7 +1526,7 @@ function drawProfitDistribution(trades){
   const canvas=document.getElementById('profit-dist-donut');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=W/2-6,ri=r-18;
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=W/2-4,ri=r*0.62;
   ctx.clearRect(0,0,W,H);
   const dark=document.documentElement.getAttribute('data-theme')!=='light';
   if(!total){
