@@ -606,7 +606,7 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Trading Score + Profit Growth + Profit Distribution -->
     <!-- Calendar + Trading Score + Profit Distribution + Fear & Greed -->
-    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;margin-top:12px;align-items:stretch">
+    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;margin-top:12px;align-items:start">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
 
       <!-- Calendar -->
@@ -638,8 +638,9 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
           <div id="today-sub" style="font-size:9px;color:var(--text3);margin:2px 0 6px">Today</div>
           <div id="today-week-strip" style="display:flex;gap:2px;margin-bottom:6px"></div>
-          <div id="today-trades-summary" style="font-size:10px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:6px;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;min-height:0">No trades today</div>
-          <button onclick="document.getElementById('cal-card').scrollIntoView({behavior:'smooth',block:'center'})" style="margin-top:6px;background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:5px;font-size:9px;font-weight:600;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif">View Calendar</button>
+          <div id="today-trades-summary" style="font-size:10px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:8px 6px;text-align:center">No trades today</div>
+          <div style="flex:1;min-height:6px"></div>
+          <button onclick="document.getElementById('cal-card').scrollIntoView({behavior:'smooth',block:'center'})" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:5px;font-size:9px;font-weight:600;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif">View Calendar</button>
         </div>
 
         <!-- Trading Score -->
@@ -3231,6 +3232,38 @@ function openDayJournal(dateStr){
 // ── Trading Score ────────────────────────────────────────────
 let radarChart=null;
 
+function drawSkeletonRadar(canvas){
+  const dark=document.documentElement.getAttribute('data-theme')!=='light';
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Win %','Profit factor','Avg win/loss','Consistency','Max drawdown','Recovery factor'],
+      datasets:[{
+        data:[0,0,0,0,0,0],
+        backgroundColor:'rgba(120,80,240,0.05)',
+        borderColor:'rgba(140,100,255,0.25)',
+        borderWidth:1.5,
+        pointRadius:0,
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      scales:{r:{
+        min:0,max:100,
+        ticks:{display:false},
+        grid:{color:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)'},
+        pointLabels:{font:{size:9,family:'Inter'},color:dark?'#666':'#999'},
+        angleLines:{color:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)'}
+      }},
+      plugins:{legend:{display:false},tooltip:{enabled:false}}
+    }
+  });
+}
+
 function renderTradingScore(trades){
   const scoreVal=document.getElementById('score-val');
   const marker=document.getElementById('score-marker');
@@ -3242,7 +3275,7 @@ function renderTradingScore(trades){
     scoreVal.textContent='—';
     if(marker)marker.style.left='0%';
     if(breakdown)breakdown.innerHTML='';
-    if(radarChart){radarChart.destroy();radarChart=null;}
+    drawSkeletonRadar(canvas);
     return;
   }
 
