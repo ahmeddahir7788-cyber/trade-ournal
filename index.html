@@ -628,7 +628,7 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Right column: Today, Trading Score, Fear & Greed, Profit Distribution — 2x2 grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-width:0;overflow:hidden" id="right-col">
+      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:3fr 2fr;gap:12px;min-width:0;overflow:hidden" id="right-col">
 
         <!-- Today -->
         <div class="card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
@@ -1548,6 +1548,19 @@ function drawProfitDistribution(trades){
 }
 
 // ── Dashboard render ──────────────────────────────────────────
+function syncRightColHeight(){
+  const cal=document.getElementById('cal-card');
+  const col=document.getElementById('right-col');
+  if(!cal||!col)return;
+  // Clear first so the calendar's own natural height can be measured without
+  // being influenced by a previously-set right-col height.
+  col.style.height='';
+  requestAnimationFrame(()=>{
+    const h=cal.offsetHeight;
+    if(h>0)col.style.height=h+'px';
+  });
+}
+
 function renderTodayCard(){
   const now=new Date();
   const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1594,6 +1607,7 @@ function renderDashboard(key){
   drawProfitDistribution(trades);
   renderCalendar(key,trades);
   renderTodayCard();
+  syncRightColHeight();
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -1606,6 +1620,7 @@ function renderDashboardWithTrades(trades,label){
   drawProfitDistribution(trades);
   renderCalendar(key,trades);
   renderTodayCard();
+  syncRightColHeight();
 }
 
 
@@ -4044,6 +4059,7 @@ window.addEventListener('resize',function(){
     closeMobileSidebar();
     initSidebar();
   }
+  syncRightColHeight();
 });
 </script>
 <!-- DRP Panel - at body level to avoid stacking context issues -->
