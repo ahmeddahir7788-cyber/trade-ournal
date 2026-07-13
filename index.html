@@ -41,6 +41,10 @@ nav button.active{color:var(--blue);font-weight:500;background:none}
 nav button.active i{color:var(--blue)}
 nav button i{font-size:19px;flex-shrink:0;color:var(--text3);transition:color .15s}
 nav button:hover i{color:var(--text)}
+.nav-tile{width:30px;height:30px;min-width:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s}
+.nav-tile i{font-size:16px!important;color:#fff!important}
+nav button.active .nav-tile{transform:scale(1.08)}
+nav button:hover .nav-tile{transform:scale(1.05)}
 .nav-label{transition:opacity .2s;overflow:hidden}
 .sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
 .sidebar:hover .nav-label{opacity:1;width:auto}
@@ -523,13 +527,13 @@ table.tt tr:last-child td{border-bottom:none}
 </div>
   </div>
   <nav>
-    <button class="active" onclick="go('dashboard',this)"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
-    <button onclick="go('log',this)"><i class="ti ti-plus"></i><span class="nav-label">Add Trade</span></button>
-    <button onclick="go('trades',this)"><i class="ti ti-list"></i><span class="nav-label">Trades</span></button>
-    <button onclick="go('accounts',this)"><i class="ti ti-building-bank"></i><span class="nav-label">Accounts</span></button>
-    <button onclick="go('playbooks',this)"><i class="ti ti-notebook"></i><span class="nav-label">Playbooks</span></button>
-    <button onclick="go('reports',this)"><i class="ti ti-chart-pie"></i><span class="nav-label">Reports</span></button>
-    <button onclick="go('notebook',this)"><i class="ti ti-pencil"></i><span class="nav-label">Notebook</span></button>
+    <button class="active" onclick="go('dashboard',this)"><span class="nav-tile" style="background:#378ADD"><i class="ti ti-layout-dashboard"></i></span><span class="nav-label">Dashboard</span></button>
+    <button onclick="go('log',this)"><span class="nav-tile" style="background:#1D9E75"><i class="ti ti-plus"></i></span><span class="nav-label">Add Trade</span></button>
+    <button onclick="go('trades',this)"><span class="nav-tile" style="background:#7F77DD"><i class="ti ti-list"></i></span><span class="nav-label">Trades</span></button>
+    <button onclick="go('accounts',this)"><span class="nav-tile" style="background:#EF9F27"><i class="ti ti-building-bank"></i></span><span class="nav-label">Accounts</span></button>
+    <button onclick="go('playbooks',this)"><span class="nav-tile" style="background:#D85A30"><i class="ti ti-notebook"></i></span><span class="nav-label">Playbooks</span></button>
+    <button onclick="go('reports',this)"><span class="nav-tile" style="background:#D4537E"><i class="ti ti-chart-pie"></i></span><span class="nav-label">Reports</span></button>
+    <button onclick="go('notebook',this)"><span class="nav-tile" style="background:#639922"><i class="ti ti-pencil"></i></span><span class="nav-label">Notebook</span></button>
   </nav>
   <div class="sb-bottom">
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
