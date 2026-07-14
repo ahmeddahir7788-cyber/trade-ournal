@@ -854,6 +854,12 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="btn-blue" onclick="openPFModal()"><i class="ti ti-plus"></i> Add account</button>
     </div>
     <div id="pf-cards" class="pf-cards"></div>
+
+    <h3 style="margin:1.75rem 0 1rem;font-size:15px">Broker / Live Accounts</h3>
+    <div class="pf-filter-row" style="margin-bottom:1.25rem">
+      <div id="broker-summary" style="display:flex;align-items:center;gap:8px"></div>
+    </div>
+    <div id="broker-cards" class="pf-cards"></div>
   </div>
 
   <!-- PLAYBOOKS -->
@@ -962,10 +968,14 @@ table.tt tr:last-child td{border-bottom:none}
 <div class="overlay" id="pf-modal">
   <div class="modal" style="max-width:500px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-      <h2 id="pf-modal-title" style="margin-bottom:0">Add prop-firm account</h2>
+      <h2 id="pf-modal-title" style="margin-bottom:0">Add account</h2>
       <button onclick="closeOverlay('pf-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
     </div>
-    <div class="pf-form-grid">
+    <div class="pg-toggle" id="pf-type-toggle" style="margin-bottom:16px;width:fit-content">
+      <button type="button" class="pg-btn active" data-type="propfirm" onclick="setAccountType('propfirm')">Prop Firm</button>
+      <button type="button" class="pg-btn" data-type="broker" onclick="setAccountType('broker')">Broker / Live</button>
+    </div>
+    <div class="pf-form-grid" id="pf-fields-propfirm">
       <div class="field full"><label>Firm</label><input type="text" id="pf-firm" placeholder="e.g. FTMO, FundingPips..."/></div>
       <div class="field full"><label>Account Size ($)</label><input type="number" id="pf-size" placeholder="e.g. 100000" step="any"/></div>
       <div class="field"><label>Model</label>
@@ -977,6 +987,16 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="field"><label>Fee Paid ($)</label><input type="number" id="pf-fee" placeholder="e.g. 500" step="any"/></div>
       <div class="field"><label>Total Payout ($)</label><input type="number" id="pf-payout" placeholder="0" step="any"/></div>
       <div class="field"><label># Payouts</label><input type="number" id="pf-npayouts" placeholder="0" min="0"/></div>
+    </div>
+    <div class="pf-form-grid" id="pf-fields-broker" style="display:none">
+      <div class="field full"><label>Broker</label><input type="text" id="bk-broker" placeholder="e.g. IC Markets, OANDA..."/></div>
+      <div class="field"><label>Account Type</label>
+        <select id="bk-accttype"><option value="live">Live</option><option value="demo">Demo</option></select>
+      </div>
+      <div class="field"><label>Currency</label><input type="text" id="bk-currency" placeholder="e.g. USD" value="USD"/></div>
+      <div class="field"><label>Platform (optional)</label><input type="text" id="bk-platform" placeholder="e.g. MT4, MT5, cTrader..."/></div>
+      <div class="field"><label>Starting Balance ($)</label><input type="number" id="bk-start" placeholder="e.g. 5000" step="any"/></div>
+      <div class="field"><label>Current Balance ($)</label><input type="number" id="bk-current" placeholder="e.g. 5000" step="any"/></div>
     </div>
     <div class="mactions">
       <button class="mc" onclick="closeOverlay('pf-modal')">Cancel</button>
@@ -2602,41 +2622,84 @@ function exportCSV(){
 }
 
 // ── Accounts ──────────────────────────────────────────────────
+let currentAccountType='propfirm';
+
+function setAccountType(type){
+  currentAccountType=type;
+  document.querySelectorAll('#pf-type-toggle .pg-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
+  document.getElementById('pf-fields-propfirm').style.display=type==='propfirm'?'':'none';
+  document.getElementById('pf-fields-broker').style.display=type==='broker'?'':'none';
+  const titleEl=document.getElementById('pf-modal-title');
+  if(titleEl)titleEl.textContent=(pfEditId?'Edit ':'Add ')+(type==='broker'?'broker account':'prop-firm account');
+}
+
 function openPFModal(id){
   pfEditId=id||null;
-  document.getElementById('pf-modal-title').textContent=id?'Edit account':'Add prop-firm account';
   if(id){
     const a=db.propfirms.find(p=>p.id===id);if(!a)return;
-    document.getElementById('pf-firm').value=a.firm||'';
-    document.getElementById('pf-size').value=a.size||'';
-    document.getElementById('pf-model').value=a.model||'2-step';
-    document.getElementById('pf-status').value=a.status||'phase1';
-    document.getElementById('pf-fee').value=a.fee||'';
-    document.getElementById('pf-payout').value=a.payout||'';
-    document.getElementById('pf-npayouts').value=a.npayouts||0;
+    const type=a.type==='broker'?'broker':'propfirm';
+    setAccountType(type);
+    if(type==='broker'){
+      document.getElementById('bk-broker').value=a.broker||'';
+      document.getElementById('bk-accttype').value=a.accttype||'live';
+      document.getElementById('bk-currency').value=a.currency||'USD';
+      document.getElementById('bk-platform').value=a.platform||'';
+      document.getElementById('bk-start').value=a.startBalance||'';
+      document.getElementById('bk-current').value=a.currentBalance||'';
+    } else {
+      document.getElementById('pf-firm').value=a.firm||'';
+      document.getElementById('pf-size').value=a.size||'';
+      document.getElementById('pf-model').value=a.model||'2-step';
+      document.getElementById('pf-status').value=a.status||'phase1';
+      document.getElementById('pf-fee').value=a.fee||'';
+      document.getElementById('pf-payout').value=a.payout||'';
+      document.getElementById('pf-npayouts').value=a.npayouts||0;
+    }
   } else {
-    ['pf-firm','pf-size','pf-fee','pf-payout'].forEach(id=>document.getElementById(id).value='');
+    setAccountType('propfirm');
+    ['pf-firm','pf-size','pf-fee','pf-payout'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('pf-npayouts').value=0;
     document.getElementById('pf-model').value='2-step';
     document.getElementById('pf-status').value='phase1';
+    ['bk-broker','bk-platform','bk-start','bk-current'].forEach(fid=>document.getElementById(fid).value='');
+    document.getElementById('bk-currency').value='USD';
+    document.getElementById('bk-accttype').value='live';
   }
   document.getElementById('pf-modal').classList.add('open');
 }
 
 function savePFAccount(){
-  const firm=document.getElementById('pf-firm').value.trim();
-  if(!firm){alert('Please enter a firm name.');return;}
-  const acc={
-    id:pfEditId||Date.now(),firm,
-    size:parseFloat(document.getElementById('pf-size').value)||0,
-    model:document.getElementById('pf-model').value,
-    status:document.getElementById('pf-status').value,
-    fee:parseFloat(document.getElementById('pf-fee').value)||0,
-    payout:parseFloat(document.getElementById('pf-payout').value)||0,
-    npayouts:parseInt(document.getElementById('pf-npayouts').value)||0
-  };
-  if(pfEditId)db.propfirms=db.propfirms.map(p=>p.id===pfEditId?acc:p);
-  else db.propfirms.push(acc);
+  if(currentAccountType==='broker'){
+    const broker=document.getElementById('bk-broker').value.trim();
+    if(!broker){alert('Please enter a broker name.');return;}
+    const acc={
+      id:pfEditId||Date.now(),
+      type:'broker',
+      broker,
+      accttype:document.getElementById('bk-accttype').value,
+      currency:document.getElementById('bk-currency').value.trim()||'USD',
+      platform:document.getElementById('bk-platform').value.trim(),
+      startBalance:parseFloat(document.getElementById('bk-start').value)||0,
+      currentBalance:parseFloat(document.getElementById('bk-current').value)||0
+    };
+    if(pfEditId)db.propfirms=db.propfirms.map(p=>p.id===pfEditId?acc:p);
+    else db.propfirms.push(acc);
+  } else {
+    const firm=document.getElementById('pf-firm').value.trim();
+    if(!firm){alert('Please enter a firm name.');return;}
+    const acc={
+      id:pfEditId||Date.now(),
+      type:'propfirm',firm,
+      size:parseFloat(document.getElementById('pf-size').value)||0,
+      model:document.getElementById('pf-model').value,
+      status:document.getElementById('pf-status').value,
+      fee:parseFloat(document.getElementById('pf-fee').value)||0,
+      payout:parseFloat(document.getElementById('pf-payout').value)||0,
+      npayouts:parseInt(document.getElementById('pf-npayouts').value)||0
+    };
+    if(pfEditId)db.propfirms=db.propfirms.map(p=>p.id===pfEditId?acc:p);
+    else db.propfirms.push(acc);
+  }
   persist();closeOverlay('pf-modal');renderAccounts();
 }
 
@@ -2648,7 +2711,9 @@ function confirmPFDelete(){
 }
 
 function renderAccounts(){
-  const firms=db.propfirms;
+  const all=db.propfirms;
+  const firms=all.filter(a=>a.type!=='broker');
+  const brokers=all.filter(a=>a.type==='broker');
   const totalInvested=firms.reduce((s,a)=>s+a.fee,0);
   const totalPaidOut=firms.reduce((s,a)=>s+a.payout,0);
   const totalPayouts=firms.reduce((s,a)=>s+a.npayouts,0);
@@ -2677,42 +2742,79 @@ function renderAccounts(){
 
   const cards=document.getElementById('pf-cards');
   if(!firms.length){
-    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No accounts yet. Add your first prop firm account!</div>';
-    return;
+    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No prop-firm accounts yet. Add one above!</div>';
+  } else {
+    cards.innerHTML=firms.map(a=>{
+      const steps=PF_STEPS[a.model]||PF_STEPS['2-step'];
+      const statusToIdx={phase1:0,phase2:1,funded:steps.indexOf('Funded'),payout:steps.length-1,failed:-1};
+      const curIdx=a.status==='failed'?-1:(statusToIdx[a.status]??0);
+      const isFailed=a.status==='failed';
+      const timeline=steps.map((s,i)=>{
+        let cls='pf-step';
+        if(isFailed)cls+=' failed-s';
+        else if(i<curIdx)cls+=' done';
+        else if(i===curIdx)cls+=' current';
+        return`<div class="${cls}">${s}</div>`;
+      }).join('');
+      const net=a.payout-a.fee;
+      return`<div class="pf-card">
+        <div class="pf-card-top">
+          <div>
+            <div class="pf-firm-name">${a.firm}</div>
+            <div class="pf-firm-sub">${a.model}${a.size?' · $'+a.size.toLocaleString():''}</div>
+          </div>
+          <span class="pf-status-badge ${a.status}">${STATUS_LABEL[a.status]||a.status}</span>
+        </div>
+        <div class="pf-timeline">${timeline}</div>
+        <hr class="pf-divider"/>
+        ${a.fee?`<div class="pf-row"><span class="pr-l">Fee Paid</span><span class="pr-v" style="color:var(--red)">-$${a.fee.toLocaleString()}</span></div>`:''}
+        ${a.payout?`<div class="pf-row"><span class="pr-l">Total Payout</span><span class="pr-v" style="color:var(--green)">+$${a.payout.toLocaleString()}</span></div>`:''}
+        <div class="pf-row"><span class="pr-l">Net</span><span class="pr-v" style="color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':'-'}$${Math.abs(net).toLocaleString()}</span></div>
+        <div class="pf-card-actions">
+          <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
+          <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
+        </div>
+      </div>`;
+    }).join('');
   }
 
-  cards.innerHTML=firms.map(a=>{
-    const steps=PF_STEPS[a.model]||PF_STEPS['2-step'];
-    const statusToIdx={phase1:0,phase2:1,funded:steps.indexOf('Funded'),payout:steps.length-1,failed:-1};
-    const curIdx=a.status==='failed'?-1:(statusToIdx[a.status]??0);
-    const isFailed=a.status==='failed';
-    const timeline=steps.map((s,i)=>{
-      let cls='pf-step';
-      if(isFailed)cls+=' failed-s';
-      else if(i<curIdx)cls+=' done';
-      else if(i===curIdx)cls+=' current';
-      return`<div class="${cls}">${s}</div>`;
-    }).join('');
-    const net=a.payout-a.fee;
-    return`<div class="pf-card">
-      <div class="pf-card-top">
-        <div>
-          <div class="pf-firm-name">${a.firm}</div>
-          <div class="pf-firm-sub">${a.model}${a.size?' · $'+a.size.toLocaleString():''}</div>
-        </div>
-        <span class="pf-status-badge ${a.status}">${STATUS_LABEL[a.status]||a.status}</span>
-      </div>
-      <div class="pf-timeline">${timeline}</div>
-      <hr class="pf-divider"/>
-      ${a.fee?`<div class="pf-row"><span class="pr-l">Fee Paid</span><span class="pr-v" style="color:var(--red)">-$${a.fee.toLocaleString()}</span></div>`:''}
-      ${a.payout?`<div class="pf-row"><span class="pr-l">Total Payout</span><span class="pr-v" style="color:var(--green)">+$${a.payout.toLocaleString()}</span></div>`:''}
-      <div class="pf-row"><span class="pr-l">Net</span><span class="pr-v" style="color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':'-'}$${Math.abs(net).toLocaleString()}</span></div>
-      <div class="pf-card-actions">
-        <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
-        <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
-      </div>
-    </div>`;
-  }).join('');
+  // Broker / Live accounts section
+  const brokerWrap=document.getElementById('broker-cards');
+  if(brokerWrap){
+    const totalBalance=brokers.reduce((s,a)=>s+(a.currentBalance||0),0);
+    const totalPnl=brokers.reduce((s,a)=>s+((a.currentBalance||0)-(a.startBalance||0)),0);
+    const subEl=document.getElementById('broker-summary');
+    if(subEl){
+      subEl.innerHTML=brokers.length
+        ?`<span class="cms-label">Total balance:</span> <span class="cms-chip">$${totalBalance.toLocaleString()}</span> <span class="cms-chip${totalPnl<0?' cms-neg':''}">${totalPnl>=0?'+':'-'}$${Math.abs(Math.round(totalPnl)).toLocaleString()} P&amp;L</span>`
+        :'';
+    }
+    if(!brokers.length){
+      brokerWrap.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No broker/live accounts yet. Add one above!</div>';
+    } else {
+      brokerWrap.innerHTML=brokers.map(a=>{
+        const pnl=(a.currentBalance||0)-(a.startBalance||0);
+        const pnlPct=a.startBalance?(pnl/a.startBalance*100):0;
+        return`<div class="pf-card">
+          <div class="pf-card-top">
+            <div>
+              <div class="pf-firm-name">${a.broker}</div>
+              <div class="pf-firm-sub">${a.platform?a.platform+' · ':''}${a.currency||'USD'}</div>
+            </div>
+            <span class="pf-status-badge ${a.accttype==='demo'?'phase1':'funded'}">${a.accttype==='demo'?'Demo':'Live'}</span>
+          </div>
+          <hr class="pf-divider"/>
+          <div class="pf-row"><span class="pr-l">Starting Balance</span><span class="pr-v">$${(a.startBalance||0).toLocaleString()}</span></div>
+          <div class="pf-row"><span class="pr-l">Current Balance</span><span class="pr-v">$${(a.currentBalance||0).toLocaleString()}</span></div>
+          <div class="pf-row"><span class="pr-l">P&amp;L</span><span class="pr-v" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':'-'}$${Math.abs(Math.round(pnl)).toLocaleString()} (${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
+          <div class="pf-card-actions">
+            <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
+            <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
