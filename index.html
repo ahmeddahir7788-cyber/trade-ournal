@@ -98,7 +98,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
 
 /* SUMMARY STAT CARDS (Total Profit / Net Profit / Profit Factor / Win Rate / Avg Win-Loss) */
-.snc-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:1.25rem;align-items:stretch;position:relative}
+.snc-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem;margin-bottom:1rem;align-items:stretch;position:relative}
 @media(max-width:900px){.snc-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.snc-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .snc-card{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;box-shadow:0 2px 8px var(--shadow);min-height:70px}
@@ -610,7 +610,7 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Trading Score + Profit Growth + Profit Distribution -->
     <!-- Calendar + Trading Score + Profit Distribution + Fear & Greed -->
-    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;margin-top:12px;align-items:start">
+    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:start">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
 
       <!-- Calendar -->
@@ -632,7 +632,7 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <!-- Right column: Today, Trading Score, Fear & Greed, Profit Distribution — 2x2 grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:3fr 2fr;gap:12px;min-width:0;overflow:hidden" id="right-col">
+      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:3fr 2fr;gap:1rem;min-width:0;overflow:hidden" id="right-col">
 
         <!-- Today -->
         <div class="card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
@@ -706,7 +706,7 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
 
     <!-- Profit Growth -->
-    <div class="dashboard-block" data-block-id="growth" style="margin-top:12px">
+    <div class="dashboard-block" data-block-id="growth" style="margin-top:1rem">
       <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap">
