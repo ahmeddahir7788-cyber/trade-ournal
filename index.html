@@ -654,20 +654,20 @@ table.tt tr:last-child td{border-bottom:none}
             <i class="ti ti-info-circle" style="font-size:11px;color:var(--text3)"></i>
           </div>
           <div style="position:relative;flex:1;min-height:0">
-            <canvas id="radar-chart"></canvas>
+            <canvas id="radar-chart" style="filter:drop-shadow(0 0 5px rgba(216,90,48,0.35))"></canvas>
           </div>
-          <div style="display:flex;align-items:flex-end;gap:5px;margin-top:5px;padding-top:5px;border-top:.5px solid var(--border)">
-            <div style="flex-shrink:0">
-              <div style="font-size:8px;color:var(--text3);margin-bottom:1px">Score</div>
-              <div id="score-val" style="font-size:13px;font-weight:800;color:var(--text);line-height:1">—</div>
+          <div style="margin-top:5px;padding-top:5px;border-top:.5px solid var(--border)">
+            <div style="font-size:7px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1px">Score</div>
+            <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px">
+              <div id="score-val" style="font-size:16px;font-weight:800;color:var(--text);line-height:1">—</div>
+              <div style="font-size:8px;color:var(--text3)">/100</div>
             </div>
-            <div style="flex:1">
-              <div style="position:relative;height:5px;border-radius:100px;background:linear-gradient(90deg,#e74c3c,#f39c12,#f1c40f,#2ecc71,#1abc9c);margin-bottom:2px">
-                <div id="score-marker" style="position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #1abc9c;transform:translate(-50%,-50%);transition:left .5s;left:50%"></div>
-              </div>
-              <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--text3)">
-                <span>0</span><span>50</span><span>100</span>
-              </div>
+            <div style="position:relative;height:5px;border-radius:100px;background:var(--border)">
+              <div id="score-bar-fill" style="height:100%;border-radius:100px;background:#D85A30;width:0%;transition:width .5s"></div>
+              <div id="score-marker" style="position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #D85A30;transform:translate(-50%,-50%);transition:left .5s;left:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--text3);margin-top:2px">
+              <span>0</span><span>50</span><span>100</span>
             </div>
           </div>
           <div id="score-breakdown" style="display:none"></div>
@@ -3244,11 +3244,11 @@ function drawSkeletonRadar(canvas){
   radarChart=new Chart(ctx,{
     type:'radar',
     data:{
-      labels:['Win %','Profit factor','Avg win/loss','Consistency','Max drawdown','Recovery factor'],
+      labels:['Win %','Profit','Avg W/L','Max DD','Recovery','Consist.'],
       datasets:[{
         data:[0,0,0,0,0,0],
-        backgroundColor:'rgba(120,80,240,0.05)',
-        borderColor:'rgba(140,100,255,0.25)',
+        backgroundColor:'rgba(216,90,48,0.05)',
+        borderColor:'rgba(216,90,48,0.25)',
         borderWidth:1.5,
         pointRadius:0,
       }]
@@ -3278,6 +3278,8 @@ function renderTradingScore(trades){
   if(!trades||!trades.length){
     scoreVal.textContent='—';
     if(marker)marker.style.left='0%';
+    const barFill0=document.getElementById('score-bar-fill');
+    if(barFill0)barFill0.style.width='0%';
     if(breakdown)breakdown.innerHTML='';
     drawSkeletonRadar(canvas);
     return;
@@ -3329,7 +3331,9 @@ function renderTradingScore(trades){
   const total=(wrScore+pfScore+awlScore+consScore+ddScoreN+rfScoreN)/6;
   const rounded=Math.round(total*100)/100;
 
-  scoreVal.textContent=rounded.toFixed(2);
+  scoreVal.textContent=Math.round(total);
+  const barFill=document.getElementById('score-bar-fill');
+  if(barFill)barFill.style.width=Math.min(100,Math.max(0,total))+'%';
   if(marker)marker.style.left=Math.min(98,Math.max(2,total))+'%';
 
   // Breakdown rows
@@ -3354,20 +3358,20 @@ function renderTradingScore(trades){
 
   // Radar chart
   const dark=document.documentElement.getAttribute('data-theme')!=='light';
-  const data=[wrScore,pfScore,awlScore,consScore,ddScoreN,rfScoreN];
+  const data=[wrScore,pfScore,awlScore,ddScoreN,rfScoreN,consScore];
   if(radarChart){radarChart.destroy();radarChart=null;}
   const ctx=canvas.getContext('2d');
   if(!ctx)return;
   radarChart=new Chart(ctx,{
     type:'radar',
     data:{
-      labels:['Win %','Profit factor','Avg win/loss','Consistency','Max drawdown','Recovery factor'],
+      labels:['Win %','Profit','Avg W/L','Max DD','Recovery','Consist.'],
       datasets:[{
         data,
-        backgroundColor:'rgba(120,80,240,0.3)',
-        borderColor:'rgba(140,100,255,0.9)',
-        borderWidth:1.5,
-        pointBackgroundColor:'rgba(160,120,255,1)',
+        backgroundColor:'rgba(216,90,48,0.35)',
+        borderColor:'#D85A30',
+        borderWidth:2.5,
+        pointBackgroundColor:'#D85A30',
         pointRadius:2.5,
         pointHoverRadius:4,
       }]
