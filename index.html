@@ -573,7 +573,6 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Stat cards: Total Profit, Net Profit, Profit Factor, Win Rate, Total Trades -->
     <div class="snc-cards dashboard-block" data-block-id="stats">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
 
       <div class="snc-card">
         <div class="snc-lbl">Net PnL</div>
@@ -611,7 +610,6 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Trading Score + Profit Growth + Profit Distribution -->
     <!-- Calendar + Trading Score + Profit Distribution + Fear & Greed -->
     <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:start">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
 
       <!-- Calendar -->
       <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
@@ -707,7 +705,6 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Profit Growth -->
     <div class="dashboard-block" data-block-id="growth" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:stretch">
-      <div class="drag-handle" title="Drag to move this section"><i class="ti ti-grip-vertical"></i></div>
       <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:6px">
@@ -4217,7 +4214,6 @@ const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='
 initDashSelectors();
 renderDashboard(currentDashKey);
 renderFearGreed();
-enableDragReorder(document.getElementById('page-dashboard'),'.dashboard-block','.drag-handle','data-block-id','tj_v10_order_dashboard');
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
