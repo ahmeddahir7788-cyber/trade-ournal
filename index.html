@@ -746,13 +746,64 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="field"><label>Pair</label>
           <select id="f-sym">
             <option value="" disabled selected>— Select pair —</option>
-            <option value="EURUSD">EUR/USD</option>
-            <option value="GBPUSD">GBP/USD</option>
-            <option value="XAUUSD">XAU/USD (Gold)</option>
-            <option value="XAGUSD">XAG/USD (Silver)</option>
-            <option value="NQ">NQ (Nasdaq)</option>
-            <option value="YM">YM (Dow Jones)</option>
-            <option value="ES">ES (S&amp;P 500)</option>
+            <optgroup label="Forex — Majors">
+              <option value="EURUSD">EUR/USD</option>
+              <option value="GBPUSD">GBP/USD</option>
+              <option value="USDJPY">USD/JPY</option>
+              <option value="USDCHF">USD/CHF</option>
+              <option value="USDCAD">USD/CAD</option>
+              <option value="AUDUSD">AUD/USD</option>
+              <option value="NZDUSD">NZD/USD</option>
+            </optgroup>
+            <optgroup label="Forex — Crosses">
+              <option value="EURGBP">EUR/GBP</option>
+              <option value="EURJPY">EUR/JPY</option>
+              <option value="EURCHF">EUR/CHF</option>
+              <option value="EURAUD">EUR/AUD</option>
+              <option value="EURCAD">EUR/CAD</option>
+              <option value="EURNZD">EUR/NZD</option>
+              <option value="GBPJPY">GBP/JPY</option>
+              <option value="GBPCHF">GBP/CHF</option>
+              <option value="GBPAUD">GBP/AUD</option>
+              <option value="GBPCAD">GBP/CAD</option>
+              <option value="GBPNZD">GBP/NZD</option>
+              <option value="AUDJPY">AUD/JPY</option>
+              <option value="AUDCAD">AUD/CAD</option>
+              <option value="AUDCHF">AUD/CHF</option>
+              <option value="AUDNZD">AUD/NZD</option>
+              <option value="NZDJPY">NZD/JPY</option>
+              <option value="NZDCAD">NZD/CAD</option>
+              <option value="NZDCHF">NZD/CHF</option>
+              <option value="CADJPY">CAD/JPY</option>
+              <option value="CADCHF">CAD/CHF</option>
+              <option value="CHFJPY">CHF/JPY</option>
+            </optgroup>
+            <optgroup label="Indices">
+              <option value="NQ">NQ — Nasdaq 100</option>
+              <option value="ES">ES — S&amp;P 500</option>
+              <option value="YM">YM — Dow Jones</option>
+              <option value="RTY">RTY — Russell 2000</option>
+              <option value="DAX">DAX — Germany 40</option>
+              <option value="FTSE">FTSE — UK 100</option>
+              <option value="NI225">NI225 — Nikkei 225</option>
+            </optgroup>
+            <optgroup label="Metals">
+              <option value="GC">GC — Gold</option>
+              <option value="SI">SI — Silver</option>
+              <option value="HG">HG — Copper</option>
+              <option value="PL">PL — Platinum</option>
+            </optgroup>
+            <optgroup label="Oils / Energy">
+              <option value="CL">CL — Crude Oil WTI</option>
+              <option value="BZ">BZ — Brent Crude</option>
+              <option value="RB">RB — RBOB Gasoline</option>
+              <option value="HO">HO — Heating Oil</option>
+              <option value="NG">NG — Natural Gas</option>
+            </optgroup>
+            <optgroup label="Crypto">
+              <option value="BTC">BTC — Bitcoin</option>
+              <option value="ETH">ETH — Ethereum</option>
+            </optgroup>
           </select>
         </div>
         <div class="field"><label>Session</label>
@@ -828,9 +879,6 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="fbar">
         <select id="f-fsym" onchange="renderDetailTable()">
           <option value="">All pairs</option>
-          <option value="EURUSD">EUR/USD</option><option value="GBPUSD">GBP/USD</option>
-          <option value="XAUUSD">XAU/USD</option><option value="XAGUSD">XAG/USD</option>
-          <option value="NQ">NQ</option><option value="YM">YM</option><option value="ES">ES</option>
         </select>
         <select id="f-fsess" onchange="renderDetailTable()"><option value="">All sessions</option><option value="London">London</option><option value="NewYork">New York</option><option value="Asia">Asia</option></select>
         <select id="f-fdir" onchange="renderDetailTable()"><option value="">All directions</option><option>Long</option><option>Short</option></select>
@@ -1127,13 +1175,64 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="field"><label>Pair</label>
         <select id="et-sym">
           <option value="" disabled>Select pair</option>
-          <option value="EURUSD">EUR/USD</option>
-          <option value="GBPUSD">GBP/USD</option>
-          <option value="XAUUSD">XAU/USD (Gold)</option>
-          <option value="XAGUSD">XAG/USD (Silver)</option>
-          <option value="NQ">NQ (Nasdaq)</option>
-          <option value="YM">YM (Dow Jones)</option>
-          <option value="ES">ES (S&amp;P 500)</option>
+          <optgroup label="Forex — Majors">
+            <option value="EURUSD">EUR/USD</option>
+            <option value="GBPUSD">GBP/USD</option>
+            <option value="USDJPY">USD/JPY</option>
+            <option value="USDCHF">USD/CHF</option>
+            <option value="USDCAD">USD/CAD</option>
+            <option value="AUDUSD">AUD/USD</option>
+            <option value="NZDUSD">NZD/USD</option>
+          </optgroup>
+          <optgroup label="Forex — Crosses">
+            <option value="EURGBP">EUR/GBP</option>
+            <option value="EURJPY">EUR/JPY</option>
+            <option value="EURCHF">EUR/CHF</option>
+            <option value="EURAUD">EUR/AUD</option>
+            <option value="EURCAD">EUR/CAD</option>
+            <option value="EURNZD">EUR/NZD</option>
+            <option value="GBPJPY">GBP/JPY</option>
+            <option value="GBPCHF">GBP/CHF</option>
+            <option value="GBPAUD">GBP/AUD</option>
+            <option value="GBPCAD">GBP/CAD</option>
+            <option value="GBPNZD">GBP/NZD</option>
+            <option value="AUDJPY">AUD/JPY</option>
+            <option value="AUDCAD">AUD/CAD</option>
+            <option value="AUDCHF">AUD/CHF</option>
+            <option value="AUDNZD">AUD/NZD</option>
+            <option value="NZDJPY">NZD/JPY</option>
+            <option value="NZDCAD">NZD/CAD</option>
+            <option value="NZDCHF">NZD/CHF</option>
+            <option value="CADJPY">CAD/JPY</option>
+            <option value="CADCHF">CAD/CHF</option>
+            <option value="CHFJPY">CHF/JPY</option>
+          </optgroup>
+          <optgroup label="Indices">
+            <option value="NQ">NQ — Nasdaq 100</option>
+            <option value="ES">ES — S&amp;P 500</option>
+            <option value="YM">YM — Dow Jones</option>
+            <option value="RTY">RTY — Russell 2000</option>
+            <option value="DAX">DAX — Germany 40</option>
+            <option value="FTSE">FTSE — UK 100</option>
+            <option value="NI225">NI225 — Nikkei 225</option>
+          </optgroup>
+          <optgroup label="Metals">
+            <option value="GC">GC — Gold</option>
+            <option value="SI">SI — Silver</option>
+            <option value="HG">HG — Copper</option>
+            <option value="PL">PL — Platinum</option>
+          </optgroup>
+          <optgroup label="Oils / Energy">
+            <option value="CL">CL — Crude Oil WTI</option>
+            <option value="BZ">BZ — Brent Crude</option>
+            <option value="RB">RB — RBOB Gasoline</option>
+            <option value="HO">HO — Heating Oil</option>
+            <option value="NG">NG — Natural Gas</option>
+          </optgroup>
+          <optgroup label="Crypto">
+            <option value="BTC">BTC — Bitcoin</option>
+            <option value="ETH">ETH — Ethereum</option>
+          </optgroup>
         </select>
       </div>
       <div class="field"><label>Session</label>
@@ -1229,7 +1328,24 @@ table.tt tr:last-child td{border-bottom:none}
 <script>
 // ── Constants ─────────────────────────────────────────────────
 const MONTHS_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const PAIRS={EURUSD:'EUR/USD',GBPUSD:'GBP/USD',XAUUSD:'XAU/USD',XAGUSD:'XAG/USD',NQ:'NQ',YM:'YM',ES:'ES'};
+const PAIRS={
+  // Forex majors
+  EURUSD:'EUR/USD',GBPUSD:'GBP/USD',USDJPY:'USD/JPY',USDCHF:'USD/CHF',USDCAD:'USD/CAD',AUDUSD:'AUD/USD',NZDUSD:'NZD/USD',
+  // Forex crosses
+  EURGBP:'EUR/GBP',EURJPY:'EUR/JPY',EURCHF:'EUR/CHF',EURAUD:'EUR/AUD',EURCAD:'EUR/CAD',EURNZD:'EUR/NZD',
+  GBPJPY:'GBP/JPY',GBPCHF:'GBP/CHF',GBPAUD:'GBP/AUD',GBPCAD:'GBP/CAD',GBPNZD:'GBP/NZD',
+  AUDJPY:'AUD/JPY',AUDCAD:'AUD/CAD',AUDCHF:'AUD/CHF',AUDNZD:'AUD/NZD',
+  NZDJPY:'NZD/JPY',NZDCAD:'NZD/CAD',NZDCHF:'NZD/CHF',
+  CADJPY:'CAD/JPY',CADCHF:'CAD/CHF',CHFJPY:'CHF/JPY',
+  // Indices
+  NQ:'NQ',ES:'ES',YM:'YM',RTY:'RTY',DAX:'DAX',FTSE:'FTSE',NI225:'NI225',
+  // Metals
+  GC:'GC',SI:'SI',HG:'HG',PL:'PL',
+  // Oils / energy
+  CL:'CL',BZ:'BZ',RB:'RB',HO:'HO',NG:'NG',
+  // Crypto
+  BTC:'BTC',ETH:'ETH'
+};
 const SESS_LABELS={London:'London',NewYork:'New York',Asia:'Asia'};
 const SESS_C_DARK={London:{bg:'#1a2a3a',color:'#60a5fa',bar:'#378ADD'},NewYork:{bg:'#0f2a1e',color:'#34d399',bar:'#1D9E75'},Asia:{bg:'#2a0f0f',color:'#f87171',bar:'#D85A30'}};
 const SESS_C_LIGHT={London:{bg:'#dbeafe',color:'#1d4ed8',bar:'#378ADD'},NewYork:{bg:'#d1fae5',color:'#065f46',bar:'#1D9E75'},Asia:{bg:'#fee2e2',color:'#991b1b',bar:'#D85A30'}};
@@ -1393,7 +1509,7 @@ function go(id,btn){
   }
   if(id==='reports')initReportsPage();
   if(id==='notebook')initNotebook();
-  if(id==='trades'){initTradeYearSel();renderMonthCards();}
+  if(id==='trades'){initTradeYearSel();renderMonthCards();populateSymbolFilterDropdown();}
   if(id==='accounts')renderAccounts();
   if(id==='playbooks')renderPlaybooks();
 }
@@ -2543,6 +2659,15 @@ function saveTrade(){
 }
 
 // ── Trades page ───────────────────────────────────────────────
+function populateSymbolFilterDropdown(){
+  const sel=document.getElementById('f-fsym');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">All pairs</option>'+
+    Object.keys(PAIRS).map(sym=>`<option value="${sym}">${PAIRS[sym]}</option>`).join('');
+  if(current&&PAIRS[current])sel.value=current;
+}
+
 function initTradeYearSel(){
   const curY=new Date().getFullYear().toString();
   const years=[...new Set([curY,...allYears()])].sort((a,b)=>b-a);
