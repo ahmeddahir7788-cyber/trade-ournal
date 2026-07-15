@@ -641,8 +641,13 @@ table.tt tr:last-child td{border-bottom:none}
           <div id="today-sub" style="font-size:9px;color:var(--text3);margin:2px 0 6px">Today</div>
           <div id="today-week-strip" style="display:flex;gap:2px;margin-bottom:6px"></div>
           <div id="today-trades-summary" style="font-size:10px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:8px 6px;text-align:center">No trades today</div>
+          <a href="https://www.forexfactory.com/calendar?day=today" target="_blank" rel="noopener" style="margin-top:6px;display:flex;align-items:center;gap:6px;background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:6px 8px;text-decoration:none;color:var(--text2)">
+            <i class="ti ti-flag-filled" style="font-size:12px;color:var(--red);flex-shrink:0"></i>
+            <span style="font-size:9px;font-weight:600">High-impact news today</span>
+            <i class="ti ti-external-link" style="font-size:11px;margin-left:auto;color:var(--text3)"></i>
+          </a>
           <div style="flex:1;min-height:6px"></div>
-          <button onclick="document.getElementById('cal-card').scrollIntoView({behavior:'smooth',block:'center'})" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:5px;font-size:9px;font-weight:600;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif">View Calendar</button>
+          <button onclick="window.open('https://www.forexfactory.com/','_blank')" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:5px;font-size:9px;font-weight:600;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif">View Calendar</button>
         </div>
 
         <!-- Trading Score -->
