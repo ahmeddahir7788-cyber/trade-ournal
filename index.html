@@ -1238,6 +1238,7 @@ const PF_STEPS={'1-step':['Phase 1','Funded','Payout'],'2-step':['Phase 1','Phas
 
 // ── State ─────────────────────────────────────────────────────
 // db.trades: { "2026-06": [{id,date,symbol,session,direction,outcome,pnl,rr},...], ... }
+if(typeof Chart!=='undefined'){Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);}
 let db={trades:{},propfirms:[],playbooks:[]};
 let eqChart=null;
 let ddChart=null;
@@ -1431,8 +1432,15 @@ function setStatCard(id,val,opts){
 function drawSparkline(canvasId,color,pts){
   const canvas=document.getElementById(canvasId);
   if(!canvas)return;
+  const dpr=Math.max(window.devicePixelRatio||1,2);
+  const cssW=canvas.clientWidth||90,cssH=canvas.clientHeight||22;
+  if(canvas.width!==Math.round(cssW*dpr)||canvas.height!==Math.round(cssH*dpr)){
+    canvas.width=Math.round(cssW*dpr);
+    canvas.height=Math.round(cssH*dpr);
+  }
   const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const W=cssW,H=cssH;
   ctx.clearRect(0,0,W,H);
   if(!pts||pts.length<2)return;
   const minV=Math.min(...pts,0),maxV=Math.max(...pts,0);
@@ -1568,7 +1576,7 @@ function drawProfitDistribution(trades){
   if(lossEl)lossEl.textContent=losses+' ('+(total?Math.round(losses/total*100):0)+'%)';
   const canvas=document.getElementById('profit-dist-donut');
   if(!canvas)return;
-  const dpr=window.devicePixelRatio||1;
+  const dpr=Math.max(window.devicePixelRatio||1,2);
   const cssW=canvas.clientWidth||70,cssH=canvas.clientHeight||70;
   if(canvas.width!==Math.round(cssW*dpr)||canvas.height!==Math.round(cssH*dpr)){
     canvas.width=Math.round(cssW*dpr);
