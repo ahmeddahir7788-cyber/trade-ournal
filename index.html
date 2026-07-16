@@ -845,14 +845,14 @@ table.tt tr:last-child td{border-bottom:none}
           </select>
         </div>
         <div class="field"><label>Outcome</label>
-          <select id="f-out">
+          <select id="f-out" onchange="syncPnlSign('f')">
             <option value="" disabled selected>Select outcome...</option>
             <option value="Win">Win</option>
             <option value="Loss">Loss</option>
             <option value="Break Even">Break Even</option>
           </select>
         </div>
-        <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any"/></div>
+        <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')"/></div>
         <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
         <div class="field">
           <label>Screenshots</label>
@@ -1281,14 +1281,14 @@ table.tt tr:last-child td{border-bottom:none}
         </select>
       </div>
       <div class="field"><label>Outcome</label>
-        <select id="et-out">
+        <select id="et-out" onchange="syncPnlSign('et')">
           <option value="" disabled>Select outcome</option>
           <option value="Win">Win</option>
           <option value="Loss">Loss</option>
           <option value="Break Even">Break Even</option>
         </select>
       </div>
-      <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any"/></div>
+      <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any" oninput="syncPnlSign('et')"/></div>
       <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
       <div class="field">
         <label>Screenshots</label>
@@ -2636,6 +2636,19 @@ function openScreenshotsManager(prefix){
 function closeScreenshotsManager(){
   document.getElementById('screenshots-modal').classList.remove('open');
   window.smPrefix=null;
+}
+
+// ── Auto-sign P&L based on outcome (Loss forces negative, Win forces positive) ──
+function syncPnlSign(prefix){
+  const outEl=document.getElementById(prefix+'-out');
+  const pnlEl=document.getElementById(prefix+'-pnl');
+  if(!outEl||!pnlEl)return;
+  const outcome=outEl.value;
+  if(pnlEl.value.trim()===''||pnlEl.value==='-')return;
+  const val=parseFloat(pnlEl.value);
+  if(isNaN(val))return;
+  if(outcome==='Loss'&&val>0)pnlEl.value=-val;
+  else if(outcome==='Win'&&val<0)pnlEl.value=-val;
 }
 
 // ── Pair picker (collapsible market categories) ────────────────
