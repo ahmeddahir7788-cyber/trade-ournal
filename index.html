@@ -134,6 +134,22 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 
 /* Profit Growth toggle */
 .pg-toggle{display:flex;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:2px;gap:2px}
+
+/* Pair picker (collapsible market categories) */
+.pair-picker{position:relative}
+.pair-picker-btn{width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.pair-picker-btn.err{border-color:var(--red)!important}
+.pair-picker-btn i{font-size:14px;color:var(--text3);flex-shrink:0}
+.pair-picker-btn .pp-placeholder{color:var(--text3)}
+.pair-picker-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:340px;overflow-y:auto;padding:6px}
+.pp-cat-header{width:100%;background:none;border:none;display:flex;align-items:center;gap:8px;padding:9px 8px;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;border-radius:8px;font-family:'Inter',sans-serif}
+.pp-cat-header:hover{background:var(--surface2)}
+.pp-chevron{transition:transform .15s;font-size:13px!important;color:var(--text3)!important}
+.pp-cat-list{display:none;flex-direction:column;padding:2px 4px 6px 26px}
+.pp-cat-list.open{display:flex}
+.pp-opt{padding:7px 10px;font-size:13px;color:var(--text);border-radius:7px;cursor:pointer}
+.pp-opt:hover{background:var(--surface2)}
+.pp-opt.selected{background:rgba(55,138,221,0.15);color:var(--blue);font-weight:600}
 .pg-btn{background:none;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer}
 .pg-btn.active{background:var(--blue);color:#fff}
 .pg-btn:not(.active):hover{background:var(--border)}
@@ -744,7 +760,14 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="fg">
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
         <div class="field"><label>Pair</label>
-          <select id="f-sym">
+          <div class="pair-picker">
+            <button type="button" class="pair-picker-btn" id="f-sym-btn" onclick="togglePairPicker('f')">
+              <span id="f-sym-label" class="pp-placeholder">— Select pair —</span>
+              <i class="ti ti-chevron-down"></i>
+            </button>
+            <div class="pair-picker-panel" id="f-sym-panel" style="display:none"></div>
+          </div>
+          <select id="f-sym" style="display:none">
             <option value="" disabled selected>— Select pair —</option>
             <optgroup label="Forex — Majors">
               <option value="EURUSD">EUR/USD</option>
@@ -1173,7 +1196,14 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="fg">
       <div class="field"><label>Date</label><input type="date" id="et-date"/></div>
       <div class="field"><label>Pair</label>
-        <select id="et-sym">
+        <div class="pair-picker">
+          <button type="button" class="pair-picker-btn" id="et-sym-btn" onclick="togglePairPicker('et')">
+            <span id="et-sym-label" class="pp-placeholder">— Select pair —</span>
+            <i class="ti ti-chevron-down"></i>
+          </button>
+          <div class="pair-picker-panel" id="et-sym-panel" style="display:none"></div>
+        </div>
+        <select id="et-sym" style="display:none">
           <option value="" disabled>Select pair</option>
           <optgroup label="Forex — Majors">
             <option value="EURUSD">EUR/USD</option>
@@ -1346,6 +1376,14 @@ const PAIRS={
   // Crypto
   BTC:'BTC',ETH:'ETH'
 };
+const PAIR_CATEGORIES=[
+  {label:'Forex — Majors',syms:['EURUSD','GBPUSD','USDJPY','USDCHF','USDCAD','AUDUSD','NZDUSD']},
+  {label:'Forex — Crosses',syms:['EURGBP','EURJPY','EURCHF','EURAUD','EURCAD','EURNZD','GBPJPY','GBPCHF','GBPAUD','GBPCAD','GBPNZD','AUDJPY','AUDCAD','AUDCHF','AUDNZD','NZDJPY','NZDCAD','NZDCHF','CADJPY','CADCHF','CHFJPY']},
+  {label:'Indices',syms:['NQ','ES','YM','RTY','DAX','FTSE','NI225']},
+  {label:'Metals',syms:['GC','SI','HG','PL']},
+  {label:'Oils / Energy',syms:['CL','BZ','RB','HO','NG']},
+  {label:'Crypto',syms:['BTC','ETH']}
+];
 const SESS_LABELS={London:'London',NewYork:'New York',Asia:'Asia'};
 const SESS_C_DARK={London:{bg:'#1a2a3a',color:'#60a5fa',bar:'#378ADD'},NewYork:{bg:'#0f2a1e',color:'#34d399',bar:'#1D9E75'},Asia:{bg:'#2a0f0f',color:'#f87171',bar:'#D85A30'}};
 const SESS_C_LIGHT={London:{bg:'#dbeafe',color:'#1d4ed8',bar:'#378ADD'},NewYork:{bg:'#d1fae5',color:'#065f46',bar:'#1D9E75'},Asia:{bg:'#fee2e2',color:'#991b1b',bar:'#D85A30'}};
@@ -2482,6 +2520,7 @@ function initLogPage(){
   document.getElementById('f-pnl').value='';
   document.getElementById('f-rr').value='';
   document.getElementById('f-sym').value='';
+  resetPairPicker('f');
   document.getElementById('f-sess').value='';
   document.getElementById('f-dir').value='';
   document.getElementById('f-out').value='';
@@ -2599,6 +2638,69 @@ function closeScreenshotsManager(){
   window.smPrefix=null;
 }
 
+// ── Pair picker (collapsible market categories) ────────────────
+function renderPairPickerPanel(prefix){
+  const panel=document.getElementById(prefix+'-sym-panel');
+  if(!panel)return;
+  const current=document.getElementById(prefix+'-sym').value;
+  panel.innerHTML=PAIR_CATEGORIES.map((cat,ci)=>{
+    const hasSelected=cat.syms.includes(current);
+    return`<div class="pp-cat">
+      <button type="button" class="pp-cat-header" onclick="togglePairCategory('${prefix}',${ci})">
+        <i class="ti ti-chevron-right pp-chevron" id="${prefix}-chev-${ci}" style="transform:rotate(${hasSelected?90:0}deg)"></i>
+        <span>${cat.label}</span>
+      </button>
+      <div class="pp-cat-list${hasSelected?' open':''}" id="${prefix}-catlist-${ci}">
+        ${cat.syms.map(sym=>`<div class="pp-opt${sym===current?' selected':''}" onclick="selectPair('${prefix}','${sym}')">${PAIRS[sym]}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePairCategory(prefix,ci){
+  const list=document.getElementById(prefix+'-catlist-'+ci);
+  const chev=document.getElementById(prefix+'-chev-'+ci);
+  if(!list)return;
+  const isOpen=list.classList.contains('open');
+  list.classList.toggle('open',!isOpen);
+  if(chev)chev.style.transform=isOpen?'rotate(0deg)':'rotate(90deg)';
+}
+
+function togglePairPicker(prefix){
+  const panel=document.getElementById(prefix+'-sym-panel');
+  if(!panel)return;
+  const isOpen=panel.style.display==='block';
+  document.querySelectorAll('.pair-picker-panel').forEach(p=>p.style.display='none');
+  if(!isOpen){
+    renderPairPickerPanel(prefix);
+    panel.style.display='block';
+  }
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.pair-picker')){
+    document.querySelectorAll('.pair-picker-panel').forEach(p=>p.style.display='none');
+  }
+});
+
+function selectPair(prefix,sym){
+  const hiddenSel=document.getElementById(prefix+'-sym');
+  if(hiddenSel){hiddenSel.value=sym;hiddenSel.classList.remove('err');}
+  const label=document.getElementById(prefix+'-sym-label');
+  if(label){label.textContent=PAIRS[sym]||sym;label.classList.remove('pp-placeholder');}
+  const btn=document.getElementById(prefix+'-sym-btn');
+  if(btn)btn.classList.remove('err');
+  const panel=document.getElementById(prefix+'-sym-panel');
+  if(panel)panel.style.display='none';
+}
+
+function resetPairPicker(prefix){
+  const hiddenSel=document.getElementById(prefix+'-sym');
+  if(hiddenSel)hiddenSel.value='';
+  const label=document.getElementById(prefix+'-sym-label');
+  if(label){label.textContent='— Select pair —';label.classList.add('pp-placeholder');}
+}
+
 function saveTrade(){
   const pnlEl=document.getElementById('f-pnl');
   const rrEl=document.getElementById('f-rr');
@@ -2608,9 +2710,10 @@ function saveTrade(){
   const outEl=document.getElementById('f-out');
   const errEl=document.getElementById('err-msg');
   [pnlEl,rrEl,symEl,sessEl,dirEl,outEl].forEach(el=>el.classList.remove('err'));
+  const fSymBtn=document.getElementById('f-sym-btn');if(fSymBtn)fSymBtn.classList.remove('err');
   errEl.style.display='none';
   const errs=[];
-  if(!symEl.value){symEl.classList.add('err');errs.push('Pair');}
+  if(!symEl.value){symEl.classList.add('err');if(fSymBtn)fSymBtn.classList.add('err');errs.push('Pair');}
   if(!sessEl.value){sessEl.classList.add('err');errs.push('Session');}
   if(!dirEl.value){dirEl.classList.add('err');errs.push('Direction');}
   if(!outEl.value){outEl.classList.add('err');errs.push('Outcome');}
@@ -2648,6 +2751,7 @@ function saveTrade(){
   // Reset form fields to empty
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
+  resetPairPicker('f');
   fImages=[];renderImagePreview('f');
   document.getElementById('f-notes').value='';
   if(pbSel)pbSel.value='';
@@ -3386,6 +3490,8 @@ function openEditTrade(key,id){
   editTradeKey=key;editTradeId=id;
   document.getElementById('et-date').value=t.date;
   document.getElementById('et-sym').value=t.symbol;
+  const etLabel=document.getElementById('et-sym-label');
+  if(etLabel){etLabel.textContent=PAIRS[t.symbol]||t.symbol;etLabel.classList.remove('pp-placeholder');}
   document.getElementById('et-sess').value=t.session;
   document.getElementById('et-dir').value=t.direction;
   document.getElementById('et-out').value=t.outcome;
