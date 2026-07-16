@@ -101,7 +101,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .snc-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem;margin-bottom:1rem;align-items:stretch;position:relative}
 @media(max-width:900px){.snc-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.snc-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.snc-card{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;box-shadow:0 2px 8px var(--shadow);min-height:70px}
+.snc-card{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;box-shadow:0 2px 8px var(--shadow);min-height:70px;position:relative}
 .snc-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .snc-val{font-size:18px;font-weight:700;color:var(--text);line-height:1.1}
 .snc-spark{width:100%;height:22px;display:block}
@@ -590,31 +590,36 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Stat cards: Total Profit, Net Profit, Profit Factor, Win Rate, Total Trades -->
     <div class="snc-cards dashboard-block" data-block-id="stats">
 
-      <div class="snc-card">
+      <div class="snc-card sub-block" data-sub-id="netpnl">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div class="snc-lbl">Net PnL</div>
         <div class="snc-val" id="snc-netpnl">$0</div>
         <canvas class="snc-spark" id="spark-netpnl" width="90" height="22"></canvas>
       </div>
 
-      <div class="snc-card">
+      <div class="snc-card sub-block" data-sub-id="pf">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div class="snc-lbl">Profit Factor</div>
         <div class="snc-val" id="snc-pf">—</div>
         <canvas class="snc-spark" id="spark-pf" width="90" height="22"></canvas>
       </div>
 
-      <div class="snc-card">
+      <div class="snc-card sub-block" data-sub-id="winrate">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div class="snc-lbl">Win Rate</div>
         <div class="snc-val" id="snc-winrate">0%</div>
         <canvas class="snc-spark" id="spark-winrate" width="90" height="22"></canvas>
       </div>
 
-      <div class="snc-card">
+      <div class="snc-card sub-block" data-sub-id="daywr">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div class="snc-lbl">Day Win %</div>
         <div class="snc-val" id="snc-daywr">0%</div>
         <canvas class="snc-spark" id="spark-daywr" width="90" height="22"></canvas>
       </div>
 
-      <div class="snc-card">
+      <div class="snc-card sub-block" data-sub-id="avgwl">
+        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
         <div class="snc-lbl">Avg Win / Loss</div>
         <div class="snc-val" id="snc-avgwl-ratio">—</div>
         <canvas class="snc-spark" id="spark-avgwl" width="90" height="22"></canvas>
@@ -853,7 +858,7 @@ table.tt tr:last-child td{border-bottom:none}
           </select>
         </div>
         <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')"/></div>
-        <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any"/></div>
+        <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any" oninput="syncPnlSign('f')"/></div>
         <div class="field">
           <label>Screenshots</label>
           <button type="button" id="f-img-btn" class="screenshots-icon-btn" onclick="openScreenshotsManager('f')" title="Add screenshots">
@@ -1289,7 +1294,7 @@ table.tt tr:last-child td{border-bottom:none}
         </select>
       </div>
       <div class="field"><label>P&amp;L ($)</label><input type="number" id="et-pnl" step="any" oninput="syncPnlSign('et')"/></div>
-      <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any"/></div>
+      <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="et-rr" step="any" oninput="syncPnlSign('et')"/></div>
       <div class="field">
         <label>Screenshots</label>
         <button type="button" id="et-img-btn" class="screenshots-icon-btn" onclick="openScreenshotsManager('et')" title="Add screenshots">
@@ -2638,17 +2643,27 @@ function closeScreenshotsManager(){
   window.smPrefix=null;
 }
 
-// ── Auto-sign P&L based on outcome (Loss forces negative, Win forces positive) ──
+// ── Auto-sign P&L and RR based on outcome (Loss forces negative, Win forces positive) ──
 function syncPnlSign(prefix){
   const outEl=document.getElementById(prefix+'-out');
   const pnlEl=document.getElementById(prefix+'-pnl');
-  if(!outEl||!pnlEl)return;
+  const rrEl=document.getElementById(prefix+'-rr');
+  if(!outEl)return;
   const outcome=outEl.value;
-  if(pnlEl.value.trim()===''||pnlEl.value==='-')return;
-  const val=parseFloat(pnlEl.value);
-  if(isNaN(val))return;
-  if(outcome==='Loss'&&val>0)pnlEl.value=-val;
-  else if(outcome==='Win'&&val<0)pnlEl.value=-val;
+  if(pnlEl&&pnlEl.value.trim()!==''&&pnlEl.value!=='-'){
+    const val=parseFloat(pnlEl.value);
+    if(!isNaN(val)){
+      if(outcome==='Loss'&&val>0)pnlEl.value=-val;
+      else if(outcome==='Win'&&val<0)pnlEl.value=-val;
+    }
+  }
+  if(rrEl&&rrEl.value.trim()!==''&&rrEl.value!=='-'){
+    const rrVal=parseFloat(rrEl.value);
+    if(!isNaN(rrVal)){
+      if(outcome==='Loss'&&rrVal>0)rrEl.value=-rrVal;
+      else if(outcome==='Win'&&rrVal<0)rrEl.value=-rrVal;
+    }
+  }
 }
 
 // ── Pair picker (collapsible market categories) ────────────────
@@ -2739,6 +2754,8 @@ function saveTrade(){
   const rawPnl=Math.abs(parseFloat(pnlEl.value));
   const outcome=outEl.value;
   const finalPnl=outcome==='Loss'?-rawPnl:rawPnl;
+  const rrRaw=rrEl.value.trim()===''?null:Math.abs(parseFloat(rrEl.value));
+  const finalRR=rrRaw==null?null:(outcome==='Loss'?-rrRaw:rrRaw);
   const pbSel=document.getElementById('f-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
   db.trades[key].push({
@@ -2748,7 +2765,7 @@ function saveTrade(){
     direction:dirEl.value,
     outcome,
     pnl:finalPnl,
-    rr:parseFloat(rrEl.value),
+    rr:finalRR,
     images:fImages.slice(),
     notes:document.getElementById('f-notes').value.trim(),
     playbookId,
@@ -3533,7 +3550,7 @@ function saveEditTrade(){
     direction:document.getElementById('et-dir').value,
     outcome:document.getElementById('et-out').value,
     pnl:(()=>{const v=Math.abs(parseFloat(document.getElementById('et-pnl').value)||0);const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
-    rr:parseFloat(document.getElementById('et-rr').value)||null,
+    rr:(()=>{const raw=document.getElementById('et-rr').value;if(raw.trim()==='')return null;const v=Math.abs(parseFloat(raw));const o=document.getElementById('et-out').value;return o==='Loss'?-v:v;})(),
     images:etImages.slice(),
     notes:document.getElementById('et-notes').value.trim(),
     playbookId,
@@ -4489,6 +4506,7 @@ const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='
 initDashSelectors();
 renderDashboard(currentDashKey);
 renderFearGreed();
+enableDragReorder(document.querySelector('.snc-cards'),'.sub-block','.sub-drag-handle','data-sub-id','tj_v10_order_statcards');
 // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
 document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
 document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
