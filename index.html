@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* Hide scrollbar everywhere */
@@ -15,6 +17,19 @@
 *{-ms-overflow-style:none;scrollbar-width:none}
 [data-theme="dark"]{--bg:#000000;--surface:#111318;--surface2:#1a1d26;--card:#111318;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0f0f0;--text2:#aaa;--text3:#666;--shadow:rgba(0,0,0,0.6)}
 [data-theme="light"]{--bg:#f0f2f5;--surface:#ffffff;--surface2:#f5f7fa;--card:#ffffff;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#111;--text2:#555;--text3:#999;--shadow:rgba(0,0,0,0.08)}
+/* Dark mode: soft white glow behind cards instead of a black drop shadow (which is invisible on a black page) */
+[data-theme="dark"] .card,
+[data-theme="dark"] .dash-chart-card,
+[data-theme="dark"] .dash-stat-card,
+[data-theme="dark"] .score-hero-card,
+[data-theme="dark"] .snc-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .metric,
+[data-theme="dark"] .month-card,
+[data-theme="dark"] .pf-metric,
+[data-theme="dark"] .pf-card{
+  box-shadow:0 0 40px rgba(255,255,255,0.14),0 1px 4px rgba(0,0,0,0.4);
+}
 :root{--green:#1D9E75;--red:#D85A30;--blue:#378ADD;--gold:#f59e0b;--purple:#a78bfa;--r:10px;--rlg:14px}
 html{overflow-x:clip;width:100%}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s;overflow-x:clip;max-width:100vw;width:100%;overscroll-behavior-x:none;touch-action:pan-y}
@@ -80,6 +95,62 @@ nav button:hover .nav-tile{transform:scale(1.05)}
   .content{padding:1rem .85rem 1rem}
   .top-bar-right{flex-wrap:wrap;gap:6px;justify-content:flex-end}
 }
+
+/* MOBILE BOTTOM NAV — primary navigation on phones/tablets instead of the hover sidebar */
+.mobile-bottom-nav{display:none}
+@media(max-width:768px){
+  body{padding-bottom:64px}
+  .mobile-bottom-nav{
+    display:flex; flex-direction:row!important; position:fixed; left:0; right:0; bottom:0; z-index:150;
+    background:var(--surface); border-top:.5px solid var(--border);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow:0 -2px 10px rgba(0,0,0,.15);
+  }
+  .mbn-btn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; color:var(--text3); font-family:'Inter',sans-serif;
+    font-size:10px; padding:6px 2px; cursor:pointer; border-radius:10px;
+  }
+  .mbn-btn i{font-size:20px; color:var(--mbn-color,var(--text3))}
+  .mbn-btn.active{color:var(--mbn-color,var(--blue))}
+  .mbn-btn.active i{color:var(--mbn-color,var(--blue))}
+  .mbn-btn.mbn-add{color:#fff}
+  .mbn-btn.mbn-add .mbn-add-circle{
+    width:34px;height:34px;border-radius:50%;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;margin-bottom:1px;
+  }
+  .mbn-btn.mbn-add .mbn-add-circle i{color:#fff}
+}
+.more-sheet-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:160}
+.more-sheet-backdrop.open{display:block}
+.more-sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:161;
+  background:var(--surface); border-top-left-radius:16px; border-top-right-radius:16px;
+  padding:10px 8px calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(100%); transition:transform .25s ease;
+}
+.more-sheet.open{transform:translateY(0)}
+.more-sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:100px;margin:4px auto 14px}
+.more-sheet button{
+  width:100%; display:flex; align-items:center; gap:14px; padding:13px 16px;
+  background:none; border:none; color:var(--text); font-size:15px; font-family:'Inter',sans-serif;
+  border-radius:10px; text-align:left; cursor:pointer;
+}
+.more-sheet button:hover{background:var(--surface2)}
+.more-sheet button i{font-size:19px; width:22px; color:var(--text3)}
+.more-pin-row{
+  width:100%; display:flex; align-items:center; gap:14px; padding:11px 16px;
+  border-radius:10px; cursor:pointer;
+}
+.more-pin-row:hover{background:var(--surface2)}
+.more-pin-row i.mpr-icon{font-size:19px; width:22px}
+.more-pin-row span.mpr-label{flex:1; font-size:15px; color:var(--text); text-align:left}
+.mpr-pin{
+  width:30px; height:30px; border-radius:8px; border:none; background:none;
+  display:flex; align-items:center; justify-content:center; color:var(--text3); flex-shrink:0;
+}
+.mpr-pin.pinned{color:var(--blue); background:rgba(55,138,221,.12)}
+.mpr-pin i{font-size:16px}
 .ph-left h1{font-size:20px;font-weight:600;margin-bottom:4px}
 .ph-left p{font-size:13px;color:var(--text2)}
 .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -112,6 +183,71 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .snc-avgwl-labels{display:flex;justify-content:space-between;font-size:10px;font-weight:700}
 .snc-avgwl-labels span:first-child{color:var(--green)}
 .snc-avgwl-labels span:last-child{color:var(--red)}
+
+/* ── New dashboard hero / score / chart layout ───────────────── */
+.dash-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:1rem}
+.dash-hero-date{font-size:13px;color:var(--text2);margin-bottom:2px}
+.dash-hero-title{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+.btn-startday{background:var(--text);color:var(--bg);border:none;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-startday:hover{opacity:.86}
+.btn-startday i{font-size:15px}
+
+.dash-hero-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero-select-wrap{position:relative;display:flex;align-items:center}
+.hero-select-wrap i{position:absolute;right:12px;pointer-events:none;font-size:12px;color:var(--text3)}
+.hero-select,select.hero-select{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:9px 32px 9px 16px;font-size:13px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none;cursor:pointer;white-space:nowrap}
+.hero-select:focus{outline:none}
+.btn-addtrade{background:linear-gradient(90deg,#4f6bff,#7c5cf0);color:#fff;border:none;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-addtrade:hover{opacity:.9}
+.btn-addtrade i{font-size:15px}
+
+.dash-top-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.55fr);gap:1rem;align-items:stretch;margin-bottom:1rem}
+.dash-left-col{display:flex;flex-direction:column;gap:1rem;min-width:0}
+
+.score-hero-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow)}
+.score-hero-lbl{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:6px}
+.score-hero-val{font-size:32px;font-weight:700;color:var(--text);line-height:1;margin-bottom:14px;letter-spacing:-0.01em}
+.score-hero-track{position:relative;height:10px;border-radius:100px;background:linear-gradient(90deg,#e0523c 0%,#f2a93b 35%,#f4d64a 55%,#8fd45a 78%,#1fb872 100%)}
+.score-hero-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--text);box-shadow:0 1px 4px rgba(0,0,0,.25);transform:translate(-50%,-50%);transition:left .5s;left:0%}
+.score-hero-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:8px}
+
+.dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
+.snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
+.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.9rem 1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:10px;justify-content:center;min-height:92px}
+.dash-stat-icon{width:30px;height:30px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
+.dash-stat-icon i{font-size:15px;color:var(--text2)}
+.dash-stat-lbl{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.dash-stat-lbl i{font-size:11px;color:var(--text3)}
+.dash-stat-val{font-size:19px;font-weight:700;color:var(--text)}
+
+.dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
+.dash-chart-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
+.dash-chart-title i{font-size:13px;color:var(--text3)}
+
+.score-combo-card{gap:0}
+.score-combo-bottom{margin-top:12px;padding-top:14px;border-top:.5px solid var(--border)}
+.score-combo-bottom .score-hero-lbl{text-transform:uppercase;letter-spacing:.04em;font-size:10px;font-weight:700}
+.score-combo-bottom .score-hero-val{font-size:26px;margin-bottom:10px}
+
+.dash-row2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1.15fr);gap:1rem;align-items:stretch;margin-bottom:1rem}
+
+.dash-tabs{display:flex;gap:16px;border-bottom:.5px solid var(--border);margin-bottom:8px}
+.dash-tab{background:none;border:none;padding:0 0 9px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;position:relative}
+.dash-tab.active{color:var(--text)}
+.dash-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--text)}
+.dash-trades-table{width:100%;border-collapse:collapse}
+.dash-trades-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:4px;border-bottom:.5px solid var(--border)}
+.dash-trades-table th:last-child{text-align:right}
+.dash-trades-scroll{overflow-y:auto;max-height:280px}
+
+@media(max-width:1100px){
+  .dash-top-grid{grid-template-columns:1fr}
+  .dash-row2{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .dash-stat-grid{grid-template-columns:1fr}
+  .dash-hero-title{font-size:21px}
+}
 
 /* Net PnL: wins minus losses row */
 .snc-wl-row{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
@@ -168,6 +304,16 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem;align-items:stretch}
 @media(max-width:900px){.stat-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
+
+/* Dashboard rows: stack to a single column on phones instead of squeezing side-by-side */
+@media(max-width:860px){
+  [data-block-id="top"]{grid-template-columns:1fr!important}
+  #right-col{grid-template-columns:1fr 1fr!important;grid-template-rows:auto auto!important;overflow:visible!important}
+  [data-block-id="growth"]{grid-template-columns:1fr!important}
+}
+@media(max-width:520px){
+  #right-col{grid-template-columns:1fr!important}
+}
 .stat-card{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:12px 12px;display:flex;flex-direction:column;gap:0;box-shadow:0 2px 8px var(--shadow);position:relative;overflow:hidden}
 .stat-card-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:112px}
 .stat-info-icon{font-size:12px;color:var(--text3);opacity:.7}
@@ -412,7 +558,9 @@ table.tt tr:last-child td{border-bottom:none}
 .empty i{font-size:32px;display:block;margin-bottom:10px}
 
 /* ACCOUNTS */
-.pf-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:1.5rem}
+.pf-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
+@media(max-width:900px){.pf-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pf-summary{grid-template-columns:1fr}}
 .pf-metric{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:20px 22px;box-shadow:0 1px 4px var(--shadow)}
 .pf-metric .pm-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .pf-metric .pm-val{font-size:30px;font-weight:700;margin-bottom:4px}
@@ -552,10 +700,62 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="go('notebook',this)"><span class="nav-tile" style="background:#639922"><i class="ti ti-pencil"></i></span><span class="nav-label">Notebook</span></button>
   </nav>
   <div class="sb-bottom">
+    <button onclick="openProfileModal()">
+      <span class="profile-avatar-display" style="width:22px;height:22px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;overflow:hidden"><span>?</span></span>
+      <span class="sb-bottom-label profile-name-display">Profile</span>
+    </button>
     <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
+    <button onclick="signOut()"><i class="ti ti-logout"></i><span class="sb-bottom-label">Sign Out</span></button>
   </div>
 </aside>
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- Mobile bottom navigation (phones/small tablets) -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <button class="mbn-btn active" data-mbn="dashboard" style="--mbn-color:#378ADD" onclick="go('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Home</button>
+  <span id="mbn-slot-1"></span>
+  <button class="mbn-btn mbn-add" onclick="go('log',this)"><span class="mbn-add-circle"><i class="ti ti-plus"></i></span>Add</button>
+  <span id="mbn-slot-2"></span>
+  <button class="mbn-btn" style="--mbn-color:#D4537E" onclick="openMoreSheet()"><i class="ti ti-dots"></i>More</button>
+</nav>
+
+<div class="more-sheet-backdrop" id="more-sheet-backdrop" onclick="closeMoreSheet()"></div>
+<div class="more-sheet" id="more-sheet">
+  <div class="more-sheet-handle"></div>
+  <div style="font-size:11px;color:var(--text3);padding:2px 16px 10px;text-transform:uppercase;letter-spacing:.04em">Pin up to 2 to your bottom bar</div>
+  <div id="more-sheet-pinnable"></div>
+  <div style="height:1px;background:var(--border);margin:8px 12px"></div>
+  <button onclick="closeMoreSheet();openProfileModal()"><i class="ti ti-user-circle"></i>Profile</button>
+  <button onclick="closeMoreSheet();toggleTheme()"><i id="theme-icon-mobile" class="ti ti-sun"></i>Dark Mode</button>
+  <button onclick="closeMoreSheet();signOut()"><i class="ti ti-logout"></i>Sign Out</button>
+</div>
+
+
+<!-- Profile / Settings modal -->
+<div class="overlay" id="profile-modal-overlay">
+  <div class="modal" style="max-width:380px">
+    <h3 style="margin-bottom:16px">Your Profile</h3>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
+      <div id="profile-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--text2);overflow:hidden;margin-bottom:10px;border:2px solid var(--border)">
+        <span id="profile-avatar-initial">?</span>
+      </div>
+      <label class="btn-ghost" style="cursor:pointer">
+        <i class="ti ti-camera"></i> Change photo
+        <input type="file" accept="image/*" id="profile-avatar-input" style="display:none" onchange="handleAvatarUpload(event)"/>
+      </label>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Display name</label>
+      <input type="text" id="profile-name-input" placeholder="Your name"/>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px" id="profile-email-display"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-ghost" onclick="closeProfileModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveProfile()" id="profile-save-btn">Save</button>
+    </div>
+  </div>
+</div>
+
 
 <div class="app-body" id="app-body">
 <div class="top-bar" id="top-bar">
@@ -563,15 +763,6 @@ table.tt tr:last-child td{border-bottom:none}
     <span class="top-bar-section" id="top-bar-section">Dashboard</span>
   </div>
   <div class="top-bar-right" id="top-bar-right">
-    <!-- Dashboard period selector - single smart select -->
-    <!-- Date Range Picker -->
-    <div id="drp-wrap" style="display:none;position:relative">
-      <button id="drp-btn" onclick="toggleDRP()" style="display:flex;align-items:center;gap:7px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:7px 12px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:Inter,sans-serif">
-        <i class="ti ti-calendar" style="font-size:14px"></i>
-        <span id="drp-label">All Time</span>
-        <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i>
-      </button>
-    </div>
     <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
       <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
@@ -587,50 +778,65 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="dash-title" style="display:none"></div>
     <div id="dash-sub" style="display:none"></div>
 
-    <!-- Stat cards: Total Profit, Net Profit, Profit Factor, Win Rate, Total Trades -->
-    <div class="snc-cards dashboard-block" data-block-id="stats">
-
-      <div class="snc-card sub-block" data-sub-id="netpnl">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div class="snc-lbl">Net PnL</div>
-        <div class="snc-val" id="snc-netpnl">$0</div>
-        <canvas class="snc-spark" id="spark-netpnl" width="90" height="22"></canvas>
+    <!-- Welcome hero -->
+    <div class="dash-hero">
+      <div>
+        <div class="dash-hero-title">Welcome Back, <span class="profile-name-display">Trader</span></div>
       </div>
-
-      <div class="snc-card sub-block" data-sub-id="pf">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div class="snc-lbl">Profit Factor</div>
-        <div class="snc-val" id="snc-pf">—</div>
-        <canvas class="snc-spark" id="spark-pf" width="90" height="22"></canvas>
-      </div>
-
-      <div class="snc-card sub-block" data-sub-id="winrate">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div class="snc-lbl">Win Rate</div>
-        <div class="snc-val" id="snc-winrate">0%</div>
-        <canvas class="snc-spark" id="spark-winrate" width="90" height="22"></canvas>
-      </div>
-
-      <div class="snc-card sub-block" data-sub-id="daywr">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div class="snc-lbl">Day Win %</div>
-        <div class="snc-val" id="snc-daywr">0%</div>
-        <canvas class="snc-spark" id="spark-daywr" width="90" height="22"></canvas>
-      </div>
-
-      <div class="snc-card sub-block" data-sub-id="avgwl">
-        <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-        <div class="snc-lbl">Avg Win / Loss</div>
-        <div class="snc-val" id="snc-avgwl-ratio">—</div>
-        <canvas class="snc-spark" id="spark-avgwl" width="90" height="22"></canvas>
+      <div class="dash-hero-controls">
+        <div class="hero-select-wrap">
+          <select id="dash-account-filter" class="hero-select" onchange="applyDashAccountFilter(this.value)">
+            <option value="">All Accounts</option>
+          </select>
+          <i class="ti ti-chevron-down"></i>
+        </div>
+        <div id="drp-wrap" style="display:none;position:relative">
+          <button id="drp-btn" onclick="toggleDRP()" class="hero-select" style="display:flex;align-items:center;gap:7px;cursor:pointer">
+            <span id="drp-label">All Time</span>
+            <i class="ti ti-chevron-down"></i>
+          </button>
+        </div>
+        <button class="btn-addtrade" onclick="go('log',this)"><i class="ti ti-plus"></i> Add Trade</button>
       </div>
     </div>
 
-
-
-    <!-- Trading Score + Profit Growth + Profit Distribution -->
-    <!-- Calendar + Trading Score + Profit Distribution + Fear & Greed -->
-    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:start">
+    <!-- Stat cards (left)  /  Calendar (right) -->
+    <div class="dash-top-grid dashboard-block" data-block-id="hero-top">
+      <div class="dash-left-col">
+        <!-- Stat cards: Net PnL, Trade Win%, Profit Factor, Day Win%, Avg Win/Loss, Account Balance -->
+        <div class="snc-cards dash-stat-grid" data-block-id="stats">
+          <div class="dash-stat-card sub-block" data-sub-id="netpnl">
+            <div class="dash-stat-icon"><i class="ti ti-chart-bar"></i></div>
+            <div class="dash-stat-lbl">Net P&amp;L <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-netpnl">$0</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="winrate">
+            <div class="dash-stat-icon"><i class="ti ti-gauge"></i></div>
+            <div class="dash-stat-lbl">Trade win% <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-winrate">0%</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="pf">
+            <div class="dash-stat-icon"><i class="ti ti-chart-donut-3"></i></div>
+            <div class="dash-stat-lbl">Profit factor <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-pf">—</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="daywr">
+            <div class="dash-stat-icon"><i class="ti ti-target-arrow"></i></div>
+            <div class="dash-stat-lbl">Day win <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-daywr">0%</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="avgwl">
+            <div class="dash-stat-icon"><i class="ti ti-scale"></i></div>
+            <div class="dash-stat-lbl">Avg Win/Loss <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-avgwl-ratio">—</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="balance">
+            <div class="dash-stat-icon"><i class="ti ti-building-bank"></i></div>
+            <div class="dash-stat-lbl">Account balance <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-balance">$0</div>
+          </div>
+        </div>
+      </div>
 
       <!-- Calendar -->
       <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
@@ -649,111 +855,64 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
       </div>
+    </div>
 
-      <!-- Right column: Today, Trading Score, Fear & Greed, Profit Distribution — 2x2 grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:3fr 2fr;gap:1rem;min-width:0;overflow:hidden" id="right-col">
+    <!-- Net Daily P&L / Overall score (combined radar + gauge) / Recent trades -->
+    <div class="dash-row2 dashboard-block" data-block-id="hero-row2">
+      <div class="dash-chart-card">
+        <div class="dash-chart-title">Net Daily P&amp;L <i class="ti ti-info-circle"></i></div>
+        <div class="chart-wrap" style="flex:1;min-height:240px"><canvas id="daily-pnl-chart"></canvas></div>
+      </div>
 
-        <!-- Today -->
-        <div class="card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
-          <div style="display:flex;align-items:baseline;gap:5px">
-            <span id="today-daynum" style="font-size:19px;font-weight:800;color:var(--text);line-height:1">1</span>
-            <span id="today-month" style="font-size:11px;font-weight:700;color:var(--text)">Month</span>
+      <div class="dash-chart-card score-combo-card">
+        <div class="dash-chart-title">Overall Score <i class="ti ti-info-circle"></i></div>
+        <div style="position:relative;flex:1;min-height:220px"><canvas id="radar-chart-hero"></canvas></div>
+        <div class="score-combo-bottom">
+          <div class="score-hero-lbl">Overall Score</div>
+          <div class="score-hero-val" id="hero-score-val">—</div>
+          <div class="score-hero-track">
+            <div class="score-hero-thumb" id="hero-score-thumb"></div>
           </div>
-          <div id="today-sub" style="font-size:9px;color:var(--text3);margin:2px 0 6px">Today</div>
-          <div id="today-week-strip" style="display:flex;gap:2px;margin-bottom:6px"></div>
-          <div id="today-trades-summary" style="font-size:10px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:8px 6px;text-align:center">No trades today</div>
-          <a href="https://www.forexfactory.com/calendar?day=today" target="_blank" rel="noopener" style="margin-top:6px;display:flex;align-items:center;gap:6px;background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:6px 8px;text-decoration:none;color:var(--text2)">
-            <i class="ti ti-flag-filled" style="font-size:12px;color:var(--red);flex-shrink:0"></i>
-            <span style="font-size:9px;font-weight:600">High-impact news today</span>
-            <i class="ti ti-external-link" style="font-size:11px;margin-left:auto;color:var(--text3)"></i>
-          </a>
-          <div style="flex:1;min-height:6px"></div>
-          <button onclick="window.open('https://www.forexfactory.com/','_blank')" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:5px;font-size:9px;font-weight:600;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif">View Calendar</button>
+          <div class="score-hero-scale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>
         </div>
+      </div>
 
-        <!-- Trading Score -->
-        <div class="card" id="score-card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
-            <h3 style="margin:0;font-size:11px">Trading Score</h3>
-            <i class="ti ti-info-circle" style="font-size:11px;color:var(--text3)"></i>
-          </div>
-          <div style="position:relative;flex:1;min-height:0">
-            <canvas id="radar-chart"></canvas>
-          </div>
-          <div style="margin-top:5px;padding-top:5px;border-top:.5px solid var(--border)">
-            <div style="font-size:7px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1px">Score</div>
-            <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px">
-              <div id="score-val" style="font-size:16px;font-weight:800;color:var(--text);line-height:1">—</div>
-              <div style="font-size:8px;color:var(--text3)">/100</div>
-            </div>
-            <div style="position:relative;height:5px;border-radius:100px;background:var(--border)">
-              <div id="score-bar-fill" style="height:100%;border-radius:100px;background:#D85A30;width:0%;transition:width .5s"></div>
-              <div id="score-marker" style="position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #D85A30;transform:translate(-50%,-50%);transition:left .5s;left:0%"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--text3);margin-top:2px">
-              <span>0</span><span>50</span><span>100</span>
-            </div>
-          </div>
-          <div id="score-breakdown" style="display:none"></div>
+      <div class="dash-chart-card">
+        <div class="dash-tabs">
+          <button class="dash-tab active" id="tab-recent-trades" onclick="switchDashTradesTab('recent')">Recent trades</button>
+          <button class="dash-tab" id="tab-open-positions" onclick="switchDashTradesTab('open')">Open Positions</button>
         </div>
-
-        <!-- Fear & Greed Index -->
-        <div class="card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;white-space:nowrap;overflow:hidden">
-            <i class="ti ti-gauge" style="font-size:12px;color:var(--text3);flex-shrink:0"></i>
-            <h3 style="margin:0;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Trading Sentiment</h3>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:0;min-height:0">
-            <svg id="fng-gauge" viewBox="0 0 120 66" style="width:100%;max-width:88px;height:auto"></svg>
-            <div id="fng-value" style="font-size:16px;font-weight:800;color:var(--text);line-height:1;margin-top:-6px">—</div>
-            <div id="fng-label" style="font-size:9px;color:var(--text3)">Loading…</div>
-          </div>
+        <div class="dash-trades-scroll" id="dash-trades-panel-recent">
+          <table class="dash-trades-table">
+            <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
+            <tbody id="recent-trades-table"></tbody>
+          </table>
         </div>
-
-        <!-- Profit Distribution -->
-        <div class="card" style="margin-bottom:0;padding:10px;display:flex;flex-direction:column;min-width:0;min-height:0">
-          <h3 style="margin-bottom:4px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Profit Distribution</h3>
-          <div style="position:relative;display:flex;align-items:center;justify-content:center;flex:1;min-height:0">
-            <canvas id="profit-dist-donut" width="70" height="70" style="width:70px;height:70px"></canvas>
-            <div class="pd-center">
-              <div class="pd-total" id="pd-total" style="font-size:18px">0</div>
-            </div>
-          </div>
-          <div class="pd-legend" style="margin-top:4px;gap:2px">
-            <div class="pd-legend-row" style="font-size:9px"><span class="pd-dot" style="background:var(--green)"></span><span class="pd-legend-lbl">Wins</span><span class="pd-legend-val" id="pd-win-count">0</span></div>
-            <div class="pd-legend-row" style="font-size:9px"><span class="pd-dot" style="background:var(--red)"></span><span class="pd-legend-lbl">Losses</span><span class="pd-legend-val" id="pd-loss-count">0</span></div>
-          </div>
+        <div class="dash-trades-scroll" id="dash-trades-panel-open" style="display:none">
+          <div style="padding:1rem 0;color:var(--text3);font-size:13px">No open positions right now.</div>
         </div>
-
       </div>
     </div>
 
-    <!-- Profit Growth -->
-    <div class="dashboard-block" data-block-id="growth" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:stretch">
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px">
-            <h3 style="margin:0">Profit Growth</h3>
-            <i class="ti ti-info-circle" style="font-size:14px;color:var(--text3)"></i>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="pg-toggle" id="pg-toggle">
-              <button class="pg-btn active" data-mode="daily" onclick="setProfitGrowthMode('daily')">Daily</button>
-              <button class="pg-btn" data-mode="weekly" onclick="setProfitGrowthMode('weekly')">Weekly</button>
-              <button class="pg-btn" data-mode="monthly" onclick="setProfitGrowthMode('monthly')">Monthly</button>
-            </div>
-            <button class="cal-nav-btn" onclick="downloadProfitGrowth()" title="Download chart"><i class="ti ti-download"></i></button>
-          </div>
-        </div>
-        <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="profit-growth-chart"></canvas></div>
+    <!-- Trading Score + Profit Growth + Profit Distribution -->
+    <!-- Daily Net Cumulative P&L (moved here) + Trading Score mini + Profit Distribution + Fear & Greed -->
+    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:stretch">
+
+      <!-- Daily Net Cumulative P&L -->
+      <div class="dash-chart-card" style="min-width:0">
+        <div class="dash-chart-title">Daily Net Cumulative P&amp;L <i class="ti ti-info-circle"></i></div>
+        <div class="chart-wrap" style="flex:1;min-height:300px;position:relative"><canvas id="equity-chart"></canvas></div>
       </div>
 
-      <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
-          <h3 style="margin:0">P&amp;L by Weekday</h3>
-          <span style="font-size:11px;color:var(--text3)">$ · all time</span>
+      <!-- Right column: P&L by Weekday -->
+      <div style="min-width:0" id="right-col">
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;height:100%">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
+            <h3 style="margin:0">P&amp;L by Weekday</h3>
+            <span style="font-size:11px;color:var(--text3)">$ · all time</span>
+          </div>
+          <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="weekday-chart"></canvas></div>
         </div>
-        <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="weekday-chart"></canvas></div>
       </div>
     </div>
   </div>
@@ -864,6 +1023,11 @@ table.tt tr:last-child td{border-bottom:none}
             <option value="">No playbook</option>
           </select>
         </div>
+        <div class="field"><label>Account (optional)</label>
+          <select id="f-account">
+            <option value="">No account</option>
+          </select>
+        </div>
       </div>
       <div id="f-checklist-wrap" style="display:none;margin-bottom:16px">
         <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
@@ -913,19 +1077,24 @@ table.tt tr:last-child td{border-bottom:none}
   <div id="page-accounts" class="page">
     <div class="pf-summary">
       <div class="pf-metric">
-        <div class="pm-lbl">Total Invested</div>
-        <div class="pm-val" id="pf-invested" style="color:var(--red)">$0.00</div>
+        <div class="pm-lbl" id="pf-invested-lbl">Total Balance</div>
+        <div class="pm-val" id="pf-invested">$0.00</div>
         <div class="pm-sub" id="pf-invested-sub">Across 0 accounts</div>
       </div>
       <div class="pf-metric">
-        <div class="pm-lbl">Total Paid Out</div>
-        <div class="pm-val" style="color:var(--green)" id="pf-paidout">$0.00</div>
-        <div class="pm-sub" id="pf-paidout-sub">0 payouts received</div>
+        <div class="pm-lbl" id="pf-paidout-lbl">Active Accounts</div>
+        <div class="pm-val" id="pf-paidout">0</div>
+        <div class="pm-sub" id="pf-paidout-sub">0 active accounts</div>
       </div>
       <div class="pf-metric" id="pf-net-card">
         <div class="pm-lbl" id="pf-net-lbl">↗ NET RESULT</div>
         <div class="pm-val" id="pf-net">$0.00</div>
         <div class="pm-sub" id="pf-net-sub">In profit overall</div>
+      </div>
+      <div class="pf-metric" id="pf-payouts-card" onclick="openPayoutHistory()" style="cursor:pointer">
+        <div class="pm-lbl">💰 PAYOUTS</div>
+        <div class="pm-val" id="pf-payouts-total">$0.00</div>
+        <div class="pm-sub" id="pf-payouts-sub">0 payouts · tap to view</div>
       </div>
     </div>
     <div class="pf-filter-row">
@@ -933,12 +1102,6 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="btn-blue" onclick="openPFModal()"><i class="ti ti-plus"></i> Add account</button>
     </div>
     <div id="pf-cards" class="pf-cards"></div>
-
-    <h3 style="margin:1.75rem 0 1rem;font-size:15px">Broker / Live Accounts</h3>
-    <div class="pf-filter-row" style="margin-bottom:1.25rem">
-      <div id="broker-summary" style="display:flex;align-items:center;gap:8px"></div>
-    </div>
-    <div id="broker-cards" class="pf-cards"></div>
   </div>
 
   <!-- PLAYBOOKS -->
@@ -1045,41 +1208,63 @@ table.tt tr:last-child td{border-bottom:none}
 
 <!-- ACCOUNTS MODAL -->
 <div class="overlay" id="pf-modal">
-  <div class="modal" style="max-width:500px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-      <h2 id="pf-modal-title" style="margin-bottom:0">Add account</h2>
-      <button onclick="closeOverlay('pf-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
-    </div>
-    <div class="pg-toggle" id="pf-type-toggle" style="margin-bottom:16px;width:fit-content">
-      <button type="button" class="pg-btn active" data-type="propfirm" onclick="setAccountType('propfirm')">Prop Firm</button>
-      <button type="button" class="pg-btn" data-type="broker" onclick="setAccountType('broker')">Broker / Live</button>
-    </div>
-    <div class="pf-form-grid" id="pf-fields-propfirm">
-      <div class="field full"><label>Firm</label><input type="text" id="pf-firm" placeholder="e.g. FTMO, FundingPips..."/></div>
-      <div class="field full"><label>Account Size ($)</label><input type="number" id="pf-size" placeholder="e.g. 100000" step="any"/></div>
-      <div class="field"><label>Model</label>
-        <select id="pf-model"><option value="1-step">1-step</option><option value="2-step">2-step</option><option value="3-step">3-step</option><option value="instant">Instant Funding</option></select>
+  <div class="modal" style="max-width:480px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem">
+      <div>
+        <h2 id="pf-modal-title" style="margin-bottom:4px">Add Trading Account</h2>
+        <p id="pf-modal-sub" style="font-size:13px;color:var(--text2);margin:0">Add a new tracking profile for your trades.</p>
       </div>
-      <div class="field"><label>Status</label>
-        <select id="pf-status"><option value="phase1">Phase 1</option><option value="phase2">Phase 2</option><option value="funded">Funded</option><option value="payout">Payout</option><option value="failed">Failed</option></select>
-      </div>
-      <div class="field"><label>Fee Paid ($)</label><input type="number" id="pf-fee" placeholder="e.g. 500" step="any"/></div>
-      <div class="field"><label>Total Payout ($)</label><input type="number" id="pf-payout" placeholder="0" step="any"/></div>
-      <div class="field"><label># Payouts</label><input type="number" id="pf-npayouts" placeholder="0" min="0"/></div>
+      <button onclick="closeOverlay('pf-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1;flex-shrink:0">×</button>
     </div>
-    <div class="pf-form-grid" id="pf-fields-broker" style="display:none">
-      <div class="field full"><label>Broker</label><input type="text" id="bk-broker" placeholder="e.g. IC Markets, OANDA..."/></div>
-      <div class="field"><label>Account Type</label>
-        <select id="bk-accttype"><option value="live">Live</option><option value="demo">Demo</option></select>
+    <div class="pf-form-grid">
+      <div class="field full"><label>Account Name</label><input type="text" id="acc-name" placeholder="e.g. My Main FTMO"/></div>
+      <div class="field" id="acc-broker-field"><label>Broker</label><input type="text" id="acc-broker" placeholder="e.g. IC Markets"/></div>
+      <div class="field" id="acc-type-field"><label>Type</label>
+        <select id="acc-type" onchange="updateAccountModalFields()">
+          <option value="personal-live">Personal Live</option>
+          <option value="personal-demo">Personal Demo</option>
+          <option value="propfirm-challenge">Prop Challenge</option>
+          <option value="propfirm-funded">Prop Funded</option>
+        </select>
       </div>
-      <div class="field"><label>Currency</label><input type="text" id="bk-currency" placeholder="e.g. USD" value="USD"/></div>
-      <div class="field"><label>Platform (optional)</label><input type="text" id="bk-platform" placeholder="e.g. MT4, MT5, cTrader..."/></div>
-      <div class="field"><label>Starting Balance ($)</label><input type="number" id="bk-start" placeholder="e.g. 5000" step="any"/></div>
-      <div class="field"><label>Current Balance ($)</label><input type="number" id="bk-current" placeholder="e.g. 5000" step="any"/></div>
+      <div class="field full"><label>Status</label>
+        <select id="acc-status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="passed">Passed</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+
+      <div class="field" id="acc-firmname-field" style="display:none"><label>Prop Firm Name</label><input type="text" id="acc-firmname" placeholder="e.g. FTMO, Topstep"/></div>
+      <div class="field" id="acc-model-field" style="display:none"><label>Challenge Model</label>
+        <select id="acc-model" onchange="updateAccountModalFields()">
+          <option value="1-step">1-Step</option>
+          <option value="2-step">2-Step</option>
+          <option value="3-step">3-Step</option>
+        </select>
+      </div>
+      <div class="field" id="acc-phase-field" style="display:none"><label>Current Phase</label><input type="number" id="acc-phase" min="1" step="1" placeholder="1"/></div>
+      <div class="field" id="acc-maxloss-field" style="display:none"><label>Max Loss</label><input type="number" id="acc-maxloss" placeholder="e.g. 500" step="any"/></div>
+      <div class="field" id="acc-maxdailyloss-field" style="display:none"><label>Max Daily Loss</label><input type="number" id="acc-maxdailyloss" placeholder="e.g. 250" step="any"/></div>
+      <div class="field full" id="acc-target-field" style="display:none"><label>Profit Target <span style="font-weight:400;color:var(--text3)">(for the current phase)</span></label><input type="number" id="acc-target" placeholder="e.g. 1000" step="any"/></div>
+
+      <div class="field"><label>Initial Balance</label><input type="number" id="acc-balance" placeholder="10000" step="any"/></div>
+      <div class="field"><label>Currency</label>
+        <select id="acc-currency">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="JPY">JPY</option>
+          <option value="AUD">AUD</option>
+          <option value="CAD">CAD</option>
+          <option value="CHF">CHF</option>
+        </select>
+      </div>
     </div>
     <div class="mactions">
       <button class="mc" onclick="closeOverlay('pf-modal')">Cancel</button>
-      <button class="mp" onclick="savePFAccount()">Save account</button>
+      <button class="mp" onclick="savePFAccount()">Save Account</button>
     </div>
   </div>
 </div>
@@ -1093,6 +1278,38 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="mc" onclick="closeOverlay('pf-del-modal')">Cancel</button>
       <button class="md" onclick="confirmPFDelete()">Delete</button>
     </div>
+  </div>
+</div>
+
+<!-- RECORD PAYOUT MODAL -->
+<div class="overlay" id="payout-modal">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 style="margin-bottom:0">Record Payout</h2>
+      <button onclick="closeOverlay('payout-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
+    </div>
+    <p id="payout-account-name" style="font-size:13px;color:var(--text2);margin:-8px 0 16px"></p>
+    <div class="pf-form-grid">
+      <div class="field full"><label>Payout Amount ($)</label><input type="number" id="payout-amount" placeholder="e.g. 800" step="any" oninput="updatePayoutPctHint()"/></div>
+      <div class="field full"><label>Your Split % <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input type="number" id="payout-pct" placeholder="e.g. 80" step="any"/></div>
+      <div class="field full"><label>Date</label><input type="date" id="payout-date"/></div>
+      <div class="field full" style="font-size:12px;color:var(--text3)" id="payout-pct-hint"></div>
+    </div>
+    <div class="mactions">
+      <button class="mc" onclick="closeOverlay('payout-modal')">Cancel</button>
+      <button class="mp" onclick="savePayout()">Save Payout</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYOUT HISTORY MODAL -->
+<div class="overlay" id="payout-history-modal">
+  <div class="modal" style="max-width:480px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 style="margin-bottom:0">Payout History</h2>
+      <button onclick="closeOverlay('payout-history-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
+    </div>
+    <div id="payout-history-list"></div>
   </div>
 </div>
 
@@ -1294,6 +1511,11 @@ table.tt tr:last-child td{border-bottom:none}
           <option value="">No playbook</option>
         </select>
       </div>
+      <div class="field"><label>Account (optional)</label>
+        <select id="et-account">
+          <option value="">No account</option>
+        </select>
+      </div>
     </div>
     <div id="et-checklist-wrap" style="display:none;margin-bottom:16px">
       <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
@@ -1407,10 +1629,105 @@ function mkKey(y,m){return y+'-'+String(m).padStart(2,'0')}
 function keyLabel(k){const[y,m]=k.split('-');return MONTHS_FULL[+m-1]+' '+y}
 function allKeys(){return Object.keys(db.trades).sort((a,b)=>b.localeCompare(a))}
 function allYears(){return [...new Set(allKeys().map(k=>k.slice(0,4)))].sort((a,b)=>b-a)}
-function getTradesForKey(k){return db.trades[k]||[]}
+function getTradesForKey(k){
+  let trades=db.trades[k]||[];
+  if(dashAccountFilter)trades=trades.filter(t=>String(t.accountId)===String(dashAccountFilter));
+  return trades;
+}
+let dashAccountFilter='';
+
+// ── Auth state ────────────────────────────────────────────────
+let currentUser=null;
+
+async function checkAuth(){
+  const{data:{session}}=await supabaseClient.auth.getSession();
+  if(!session){
+    window.location.href='login.html';
+    return false;
+  }
+  currentUser=session.user;
+  return true;
+}
+
+function signOut(){
+  supabaseClient.auth.signOut().then(()=>{window.location.href='login.html';});
+}
+
+// Generic upsert-then-delete-diff sync for simple {id,...} tables
+async function syncTable(tableName,rows){
+  if(!currentUser)return;
+  if(rows.length){
+    const{error}=await supabaseClient.from(tableName).upsert(rows);
+    if(error)console.error(tableName,'upsert error',error);
+  }
+  const ids=rows.map(r=>r.id);
+  let del=supabaseClient.from(tableName).delete().eq('user_id',currentUser.id);
+  del=ids.length?del.not('id','in','('+ids.join(',')+')'):del;
+  const{error:delErr}=await del;
+  if(delErr)console.error(tableName,'delete error',delErr);
+}
+
+async function syncDayNotes(rows,dates){
+  if(!currentUser)return;
+  if(rows.length){
+    const{error}=await supabaseClient.from('day_notes').upsert(rows,{onConflict:'user_id,date'});
+    if(error)console.error('day_notes upsert error',error);
+  }
+  let del=supabaseClient.from('day_notes').delete().eq('user_id',currentUser.id);
+  del=dates.length?del.not('date','in','('+dates.map(d=>`"${d}"`).join(',')+')'):del;
+  const{error:delErr}=await del;
+  if(delErr)console.error('day_notes delete error',delErr);
+}
 
 // ── Persist ───────────────────────────────────────────────────
-function persist(){try{localStorage.setItem('tj_v10',JSON.stringify(db));return true;}catch(e){return false;}}
+async function persist(){
+  if(!currentUser)return false;
+  try{
+    const nowIso=new Date().toISOString();
+
+    const allTrades=[];
+    Object.keys(db.trades).forEach(monthKey=>{
+      (db.trades[monthKey]||[]).forEach(t=>{
+        const{id,date,symbol,direction,outcome,pnl,rr,...rest}=t;
+        allTrades.push({id,user_id:currentUser.id,month_key:monthKey,date,symbol,direction,outcome,pnl:pnl||0,rr:(rr===undefined?null:rr),data:rest,updated_at:nowIso});
+      });
+    });
+    await syncTable('trades',allTrades);
+
+    const accountRows=(db.propfirms||[]).map(a=>({id:a.id,user_id:currentUser.id,data:a,updated_at:nowIso}));
+    await syncTable('accounts',accountRows);
+
+    const playbookRows=(db.playbooks||[]).map(p=>({id:p.id,user_id:currentUser.id,data:p,updated_at:nowIso}));
+    await syncTable('playbooks',playbookRows);
+
+    const noteRows=(db.notes||[]).map(n=>({id:n.id,user_id:currentUser.id,data:n,updated_at:nowIso}));
+    await syncTable('notebook_entries',noteRows);
+
+    const allDates=[...new Set([...Object.keys(db.dayNotes||{}),...Object.keys(db.dayImages||{})])];
+    const dayNoteRows=allDates.map(date=>({user_id:currentUser.id,date,note:(db.dayNotes||{})[date]||null,images:(db.dayImages||{})[date]||[]}));
+    await syncDayNotes(dayNoteRows,allDates);
+
+    return true;
+  }catch(e){
+    console.error('persist error',e);
+    return false;
+  }
+}
+
+async function persistUserSettings(){
+  if(!currentUser)return false;
+  try{
+    const{error}=await supabaseClient.from('user_settings').upsert({
+      user_id:currentUser.id,
+      settings:db.userSettings||{}
+    },{onConflict:'user_id'});
+    if(error)console.error('user_settings upsert error',error);
+    return!error;
+  }catch(e){
+    console.error('persistUserSettings error',e);
+    return false;
+  }
+}
 
 // ── Display Mode ($ / %) ─────────────────────────────────────────
 // In percent mode, every money figure is replaced by the trade's RR shown as a %.
@@ -1447,14 +1764,66 @@ function setDisplayMode(mode){
   }
 }
 
-function loadDB(){
-  try{const r=localStorage.getItem('tj_v10');if(r)db=JSON.parse(r)}catch(e){}
-  if(!db.trades)db.trades={};
-  if(!db.propfirms)db.propfirms=[];
-  if(!db.dayNotes)db.dayNotes={};
-  if(!db.dayImages)db.dayImages={};
-  if(!db.calShots)db.calShots={};
-  if(!db.playbooks)db.playbooks=[];
+// Converts an account saved under the old Prop Firm / Broker split into
+// the current unified account shape (name, broker, type, status, initialBalance, currency).
+// Accounts already in the new shape (v:2) pass through unchanged.
+function migrateAccount(a){
+  if(!a)return a;
+  if(a.v===2)return a;
+  if(a.type==='broker'){
+    return{
+      id:a.id,v:2,
+      name:a.broker||'Account',
+      broker:a.broker||'',
+      type:a.accttype==='demo'?'personal-demo':'personal-live',
+      status:'active',
+      initialBalance:a.startBalance||0,
+      currency:a.currency||'USD'
+    };
+  }
+  return{
+    id:a.id,v:2,
+    name:a.firm||'Prop Firm Account',
+    broker:a.firm||'',
+    type:(a.status==='funded'||a.status==='payout')?'propfirm-funded':'propfirm-challenge',
+    status:a.status==='failed'?'failed':'active',
+    initialBalance:a.size||0,
+    currency:'USD'
+  };
+}
+
+async function loadDB(){
+  db={trades:{},propfirms:[],playbooks:[],notes:[],dayNotes:{},dayImages:{},calShots:{},userSettings:{}};
+  if(!currentUser)return;
+
+  try{
+    const[tradesRes,accountsRes,playbooksRes,notesRes,dayNotesRes,settingsRes]=await Promise.all([
+      supabaseClient.from('trades').select('*').eq('user_id',currentUser.id),
+      supabaseClient.from('accounts').select('*').eq('user_id',currentUser.id),
+      supabaseClient.from('playbooks').select('*').eq('user_id',currentUser.id),
+      supabaseClient.from('notebook_entries').select('*').eq('user_id',currentUser.id),
+      supabaseClient.from('day_notes').select('*').eq('user_id',currentUser.id),
+      supabaseClient.from('user_settings').select('*').eq('user_id',currentUser.id)
+    ]);
+
+    (tradesRes.data||[]).forEach(row=>{
+      const trade={id:row.id,date:row.date,symbol:row.symbol,direction:row.direction,outcome:row.outcome,
+        pnl:parseFloat(row.pnl)||0,rr:row.rr==null?null:parseFloat(row.rr),...(row.data||{})};
+      if(!db.trades[row.month_key])db.trades[row.month_key]=[];
+      db.trades[row.month_key].push(trade);
+    });
+    db.propfirms=(accountsRes.data||[]).map(row=>row.data).map(migrateAccount);
+    db.playbooks=(playbooksRes.data||[]).map(row=>row.data);
+    db.notes=(notesRes.data||[]).map(row=>row.data);
+    (dayNotesRes.data||[]).forEach(row=>{
+      if(row.note)db.dayNotes[row.date]=row.note;
+      if(row.images&&row.images.length)db.dayImages[row.date]=row.images;
+    });
+    db.userSettings=(settingsRes.data&&settingsRes.data[0]&&settingsRes.data[0].settings)||{};
+  }catch(e){
+    console.error('loadDB error',e);
+  }
+
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
   // Clean phantom trades (trades with missing required fields)
   Object.keys(db.trades).forEach(k=>{
@@ -1480,6 +1849,164 @@ function toggleTheme(){
   if(lbl)lbl.textContent=n==='dark'?'Dark Mode':'Light Mode';
   localStorage.setItem('tj_v10_theme',n);
   refreshCurrentDashboardView();
+}
+
+// ── Mobile bottom nav ────────────────────────────────────────
+// ── Mobile bottom nav ────────────────────────────────────────
+const MBN_OPTIONS=[
+  {id:'trades',label:'Trades',icon:'ti-list',color:'#7F77DD'},
+  {id:'accounts',label:'Accounts',icon:'ti-building-bank',color:'#EF9F27'},
+  {id:'playbooks',label:'Playbooks',icon:'ti-notebook',color:'#D85A30'},
+  {id:'reports',label:'Reports',icon:'ti-chart-pie',color:'#639922'},
+  {id:'notebook',label:'Notebook',icon:'ti-pencil',color:'#22A6B3'}
+];
+const MBN_DEFAULT_SLOTS=['trades','accounts'];
+
+function getMbnSlots(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('tj_v10_mbn_slots'));
+    if(Array.isArray(saved)&&saved.length)return saved.filter(id=>MBN_OPTIONS.some(o=>o.id===id)).slice(0,2);
+  }catch(e){}
+  return MBN_DEFAULT_SLOTS.slice();
+}
+function saveMbnSlots(slots){
+  try{localStorage.setItem('tj_v10_mbn_slots',JSON.stringify(slots));}catch(e){}
+}
+
+function renderMobileBottomNav(){
+  const slots=getMbnSlots();
+  const activeId=document.querySelector('.page.active')?.id.replace('page-','')||'dashboard';
+  [1,2].forEach((n,i)=>{
+    const el=document.getElementById('mbn-slot-'+n);
+    if(!el)return;
+    const opt=MBN_OPTIONS.find(o=>o.id===slots[i]);
+    if(!opt){el.innerHTML='';return;}
+    el.innerHTML=`<button class="mbn-btn${activeId===opt.id?' active':''}" data-mbn="${opt.id}" style="--mbn-color:${opt.color}" onclick="go('${opt.id}',this)"><i class="ti ${opt.icon}"></i>${opt.label}</button>`;
+  });
+}
+
+function renderMoreSheetPinnable(){
+  const wrap=document.getElementById('more-sheet-pinnable');
+  if(!wrap)return;
+  const slots=getMbnSlots();
+  wrap.innerHTML=MBN_OPTIONS.map(opt=>{
+    const pinned=slots.includes(opt.id);
+    return `<div class="more-pin-row">
+      <i class="ti ${opt.icon} mpr-icon" style="color:${opt.color}"></i>
+      <span class="mpr-label" onclick="closeMoreSheet();go('${opt.id}')">${opt.label}</span>
+      <button class="mpr-pin${pinned?' pinned':''}" onclick="toggleMbnPin('${opt.id}')" title="${pinned?'Remove from bottom bar':'Add to bottom bar'}">
+        <i class="ti ${pinned?'ti-star-filled':'ti-star'}"></i>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function toggleMbnPin(id){
+  let slots=getMbnSlots();
+  if(slots.includes(id)){
+    slots=slots.filter(s=>s!==id);
+  } else {
+    if(slots.length>=2)slots.shift(); // drop the oldest pin to make room
+    slots.push(id);
+  }
+  saveMbnSlots(slots);
+  renderMobileBottomNav();
+  renderMoreSheetPinnable();
+}
+
+function syncMobileNavActive(id){
+  document.querySelectorAll('.mbn-btn[data-mbn]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mbn===id);
+  });
+}
+function openMoreSheet(){
+  document.getElementById('more-sheet-backdrop').classList.add('open');
+  document.getElementById('more-sheet').classList.add('open');
+}
+function closeMoreSheet(){
+  document.getElementById('more-sheet-backdrop').classList.remove('open');
+  document.getElementById('more-sheet').classList.remove('open');
+}
+
+// ── Profile / Settings ───────────────────────────────────────
+let pendingAvatarDataUrl=null;
+
+function getProfile(){
+  return (db.userSettings && db.userSettings.profile) || {};
+}
+
+function refreshProfileDisplay(){
+  const profile=getProfile();
+  const name=profile.name || (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Trader');
+  const initial=(name||'?').trim().charAt(0).toUpperCase();
+  document.querySelectorAll('.profile-name-display').forEach(el=>el.textContent=name);
+  document.querySelectorAll('.profile-avatar-display').forEach(el=>{
+    if(profile.avatar){
+      el.innerHTML=`<img src="${profile.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    } else {
+      el.innerHTML=`<span>${initial}</span>`;
+    }
+  });
+}
+
+function openProfileModal(){
+  const profile=getProfile();
+  document.getElementById('profile-name-input').value=profile.name || '';
+  document.getElementById('profile-email-display').textContent=currentUser ? currentUser.email : '';
+  const initEl=document.getElementById('profile-avatar-initial');
+  const previewEl=document.getElementById('profile-avatar-preview');
+  pendingAvatarDataUrl=profile.avatar || null;
+  if(profile.avatar){
+    previewEl.innerHTML=`<img src="${profile.avatar}" style="width:100%;height:100%;object-fit:cover"/>`;
+  } else {
+    const name=profile.name || (currentUser && currentUser.email ? currentUser.email.split('@')[0] : '?');
+    previewEl.innerHTML=`<span id="profile-avatar-initial">${(name||'?').trim().charAt(0).toUpperCase()}</span>`;
+  }
+  document.getElementById('profile-modal-overlay').classList.add('open');
+}
+function closeProfileModal(){
+  document.getElementById('profile-modal-overlay').classList.remove('open');
+}
+
+function handleAvatarUpload(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  if(file.size > 2*1024*1024){
+    alert('Please choose an image smaller than 2MB.');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      // Downscale to keep things small in the database
+      const maxSize=200;
+      const scale=Math.min(1, maxSize/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width*scale;
+      canvas.height=img.height*scale;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      pendingAvatarDataUrl=canvas.toDataURL('image/jpeg',0.85);
+      document.getElementById('profile-avatar-preview').innerHTML=`<img src="${pendingAvatarDataUrl}" style="width:100%;height:100%;object-fit:cover"/>`;
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile(){
+  const name=document.getElementById('profile-name-input').value.trim();
+  if(!db.userSettings)db.userSettings={};
+  if(!db.userSettings.profile)db.userSettings.profile={};
+  db.userSettings.profile.name=name;
+  if(pendingAvatarDataUrl)db.userSettings.profile.avatar=pendingAvatarDataUrl;
+  const btn=document.getElementById('profile-save-btn');
+  btn.disabled=true;btn.textContent='Saving…';
+  await persistUserSettings();
+  btn.disabled=false;btn.textContent='Save';
+  refreshProfileDisplay();
+  closeProfileModal();
 }
 
 function refreshCurrentDashboardView(){
@@ -1512,6 +2039,22 @@ function onDashYearChange(){}
 function onDashMonthChange(){}
 function onPeriodChange(){}
 
+function renderTopBarTitle(id){
+  const tb=document.getElementById('top-bar-section');
+  if(!tb)return;
+  if(id==='dashboard'){
+    tb.innerHTML=`<span class="profile-avatar-display" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text2);overflow:hidden;flex-shrink:0"><span>?</span></span>
+      <span class="profile-name-display">Trader</span>
+      <button onclick="openProfileModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:2px;display:flex;align-items:center" title="Edit profile">
+        <i class="ti ti-settings" style="font-size:16px;display:inline-block!important"></i>
+      </button>`;
+    refreshProfileDisplay();
+  } else {
+    const labels={log:'Add Trade',trades:'Trades',accounts:'Accounts',playbooks:'Playbooks',reports:'Reports',notebook:'Notebook'};
+    tb.textContent=labels[id]||id;
+  }
+}
+
 // ── Navigation ────────────────────────────────────────────────
 function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1519,11 +2062,8 @@ function go(id,btn){
   const page=document.getElementById('page-'+id);
   if(page)page.classList.add('active');
   if(btn)btn.classList.add('active');
-  const tb=document.getElementById('top-bar-section');
-  if(tb){
-    const labels={dashboard:'Dashboard',log:'Add Trade',trades:'Trades',accounts:'Accounts',playbooks:'Playbooks',reports:'Reports',notebook:'Notebook'};
-    tb.textContent=labels[id]||id;
-  }
+  syncMobileNavActive(id);
+  renderTopBarTitle(id);
   const dmWrap=document.getElementById('dm-toggle-topbar');
   const drpWrap=document.getElementById('drp-wrap');
   const drpPanel=document.getElementById('drp-panel');
@@ -1542,6 +2082,7 @@ function go(id,btn){
   if(id==='trades'){initTradeYearSel();renderMonthCards();populateSymbolFilterDropdown();}
   if(id==='accounts')renderAccounts();
   if(id==='playbooks')renderPlaybooks();
+  if(id==='log'){populatePlaybookDropdown('f');populateAccountDropdown('f');}
 }
 
 
@@ -1611,6 +2152,14 @@ function renderNewStatCards(trades){
   // Avg Win / Loss
   const ratioEl=document.getElementById('snc-avgwl-ratio');
   if(ratioEl)ratioEl.textContent=(m.avgLoss>0||m.avgWin>0)?(isFinite(m.avgWinLossRatio)?m.avgWinLossRatio.toFixed(2):'∞'):'—';
+
+  // Account Balance — sum of every non-failed tracked account's initial balance + its trades' P&L
+  const balEl=document.getElementById('snc-balance');
+  if(balEl){
+    checkAccountAutoFund();
+    const totalBal=(db.propfirms||[]).filter(a=>a.status!=='failed').reduce((s,a)=>s+accountBalance(a).balance,0);
+    balEl.textContent='$'+totalBal.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
 
   const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
   let cum=0;const pts=sorted.map(t=>{cum+=(t.pnl||0);return cum;});
@@ -1794,33 +2343,49 @@ function renderTodayCard(){
 
 function renderDashboard(key){
   currentDashKey=key;
-  const tb4=document.getElementById('top-bar-section');
-  if(tb4)tb4.textContent='Dashboard';
+  renderTopBarTitle('dashboard');
   const trades=getTradesForKey(key);
+  renderDashHero();
   renderNewStatCards(trades);
   renderTradingScore(trades);
-  drawProfitGrowthChart(trades);
-  drawProfitDistribution(trades);
+  drawCharts(trades);
+  drawDailyPnlChart(trades);
+  renderRecentTradesTable();
   renderCalendar(key,trades);
   renderTodayCard();
   renderWeekdayChart(Object.values(db.trades).flat());
-  renderFearGreed();
-  syncRightColHeight();
 }
 
 function renderDashboardWithTrades(trades,label){
   const key=currentDashKey||curMonthKey();
-  const tb=document.getElementById('top-bar-section');
-  if(tb)tb.textContent='Dashboard';
+  renderTopBarTitle('dashboard');
+  renderDashHero();
   renderNewStatCards(trades);
   renderTradingScore(trades);
-  drawProfitGrowthChart(trades);
-  drawProfitDistribution(trades);
+  drawCharts(trades);
+  drawDailyPnlChart(trades);
+  renderRecentTradesTable();
   renderCalendar(key,trades);
   renderTodayCard();
   renderWeekdayChart(Object.values(db.trades).flat());
-  renderFearGreed();
-  syncRightColHeight();
+}
+
+// ── New hero section: date + welcome, and Recent trades / Open Positions tab switch ──
+function renderDashHero(){
+  const dEl=document.getElementById('dash-hero-date');
+  if(dEl){
+    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const d=new Date();
+    dEl.textContent=days[d.getDay()]+', '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
+  }
+}
+
+function switchDashTradesTab(tab){
+  document.getElementById('tab-recent-trades').classList.toggle('active',tab==='recent');
+  document.getElementById('tab-open-positions').classList.toggle('active',tab==='open');
+  document.getElementById('dash-trades-panel-recent').style.display=tab==='recent'?'':'none';
+  document.getElementById('dash-trades-panel-open').style.display=tab==='open'?'':'none';
 }
 
 
@@ -2225,17 +2790,11 @@ function drawCharts(trades){
     if(eqChart){eqChart.destroy();eqChart=null;}
     const chartH=c1.canvas.clientHeight||240;
     const lastVal=vals[vals.length-1]||0;
-    const lineColor=lastVal>=0?'#1D9E75':'#D85A30';
+    const lineColor='#7c5cf0';
     const grad=c1.createLinearGradient(0,0,0,chartH);
-    if(lastVal>=0){
-      grad.addColorStop(0,'rgba(29,158,117,0.6)');
-      grad.addColorStop(0.5,'rgba(29,158,117,0.25)');
-      grad.addColorStop(1,'rgba(29,158,117,0.02)');
-    } else {
-      grad.addColorStop(0,'rgba(216,90,48,0.6)');
-      grad.addColorStop(0.5,'rgba(216,90,48,0.25)');
-      grad.addColorStop(1,'rgba(216,90,48,0.02)');
-    }
+    grad.addColorStop(0,'rgba(124,92,240,0.55)');
+    grad.addColorStop(0.5,'rgba(124,92,240,0.22)');
+    grad.addColorStop(1,'rgba(124,92,240,0.02)');
 
     // Crosshair plugin
     const crosshairPlugin={
@@ -2262,7 +2821,7 @@ function drawCharts(trades){
     // External top-bar tooltip like TradeZella
     const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     function externalTooltip(context){
-      const wrap=document.getElementById('equity-chart').closest('.card');
+      const wrap=document.getElementById('equity-chart').closest('.dash-chart-card');
       let el=wrap?wrap.querySelector('.eq-topbar'):null;
       if(!el&&wrap){
         el=document.createElement('div');
@@ -2747,6 +3306,8 @@ function saveTrade(){
   const finalRR=rrRaw==null?null:(outcome==='Loss'?-rrRaw:rrRaw);
   const pbSel=document.getElementById('f-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
+  const acctSel=document.getElementById('f-account');
+  const accountId=acctSel&&acctSel.value?acctSel.value:null;
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
@@ -2758,6 +3319,7 @@ function saveTrade(){
     images:fImages.slice(),
     notes:document.getElementById('f-notes').value.trim(),
     playbookId,
+    accountId,
     checklistResults:playbookId?readChecklistResults('f'):[]
   });
   db.trades[key].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
@@ -2774,8 +3336,10 @@ function saveTrade(){
   fImages=[];renderImagePreview('f');
   document.getElementById('f-notes').value='';
   if(pbSel)pbSel.value='';
+  if(acctSel)acctSel.value='';
   renderTradeChecklist('f');
   updateLogHint();
+  checkAccountAutoFund();
   if(currentDashKey===key)refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
   msg.style.display='inline';setTimeout(()=>msg.style.display='none',2000);
@@ -2897,202 +3461,328 @@ function exportCSV(){
 }
 
 // ── Accounts ──────────────────────────────────────────────────
-let currentAccountType='propfirm';
 
-function setAccountType(type){
-  currentAccountType=type;
-  document.querySelectorAll('#pf-type-toggle .pg-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
-  document.getElementById('pf-fields-propfirm').style.display=type==='propfirm'?'':'none';
-  document.getElementById('pf-fields-broker').style.display=type==='broker'?'':'none';
-  const titleEl=document.getElementById('pf-modal-title');
-  if(titleEl)titleEl.textContent=(pfEditId?'Edit ':'Add ')+(type==='broker'?'broker account':'prop-firm account');
+const ACCOUNT_TYPE_LABEL={'personal-live':'Personal Live','personal-demo':'Personal Demo','propfirm-challenge':'Prop Firm Challenge','propfirm-funded':'Prop Firm Funded'};
+const ACCOUNT_STATUS_LABEL={active:'Active',inactive:'Inactive',passed:'Passed',failed:'Failed'};
+
+// Older account records (from before the unified account model) get converted
+// on load — see migrateAccount() in loadDB().
+// Balance only counts trades placed since the account's current phase began
+// (phaseStartTradeId) — prop-firm challenges reset to the initial balance every
+// time a new phase (or funded stage) starts, since it isn't real money moving.
+function accountBalance(a){
+  let trades=Object.values(db.trades).flat().filter(t=>t.accountId&&String(t.accountId)===String(a.id));
+  if(a.phaseStartTradeId)trades=trades.filter(t=>t.id>a.phaseStartTradeId);
+  const pnl=trades.reduce((s,t)=>s+(t.pnl||0),0);
+  return{balance:(a.initialBalance||0)+pnl,pnl};
+}
+
+const MODEL_PHASES={'1-step':1,'2-step':2,'3-step':3};
+
+function accountsTradesToday(accountId){
+  const t=today();
+  return Object.values(db.trades).flat().filter(x=>x.accountId&&String(x.accountId)===String(accountId)&&x.date===t);
+}
+
+// Runs the automatic prop-firm account state machine:
+//  - Breach check: if today's loss exceeds Max Daily Loss, or the account's total
+//    drawdown from its initial balance exceeds Max Loss, the account is marked Failed.
+//  - Progress check: once a Prop Challenge account's balance reaches its Profit Target,
+//    it advances to the next phase (clearing the target so a new one must be set) or,
+//    on the model's final phase, is promoted to Prop Funded. Either way the balance
+//    resets to the initial balance for the new phase/stage.
+function checkAccountAutoFund(){
+  let changed=false;
+  (db.propfirms||[]).forEach(a=>{
+    const isProp=a.type==='propfirm-challenge'||a.type==='propfirm-funded';
+    if(!isProp||a.status==='failed')return;
+    const {balance}=accountBalance(a);
+
+    // Breach checks
+    if(a.maxDailyLoss>0){
+      const dayPnl=accountsTradesToday(a.id).reduce((s,t)=>s+(t.pnl||0),0);
+      if(dayPnl<=-Math.abs(a.maxDailyLoss)){
+        a.status='failed';changed=true;return;
+      }
+    }
+    if(a.maxLoss>0){
+      const drawdown=(a.initialBalance||0)-balance;
+      if(drawdown>=Math.abs(a.maxLoss)){
+        a.status='failed';changed=true;return;
+      }
+    }
+
+    // Phase progression (Challenge only)
+    if(a.type==='propfirm-challenge'&&a.profitTarget>0){
+      if(balance-(a.initialBalance||0)>=a.profitTarget){
+        const totalPhases=MODEL_PHASES[a.model]||2;
+        if((a.currentPhase||1)<totalPhases){
+          a.currentPhase=(a.currentPhase||1)+1;
+          a.profitTarget=0;
+        } else {
+          a.type='propfirm-funded';
+          a.status='active';
+        }
+        a.phaseStartTradeId=Date.now();
+        changed=true;
+      }
+    }
+  });
+  if(changed)persist();
+  return changed;
+}
+
+function updateAccountModalFields(){
+  const type=document.getElementById('acc-type').value;
+  const isProp=type==='propfirm-challenge'||type==='propfirm-funded';
+  const isChallenge=type==='propfirm-challenge';
+  document.getElementById('acc-broker-field').style.display=isProp?'none':'';
+  document.getElementById('acc-type-field').className=isProp?'field full':'field';
+  ['acc-firmname-field','acc-maxloss-field','acc-maxdailyloss-field'].forEach(id=>{
+    document.getElementById(id).style.display=isProp?'':'none';
+  });
+  document.getElementById('acc-model-field').style.display=isChallenge?'':'none';
+  document.getElementById('acc-phase-field').style.display=isChallenge?'':'none';
+  document.getElementById('acc-target-field').style.display=isChallenge?'':'none';
 }
 
 function openPFModal(id){
   pfEditId=id||null;
+  const titleEl=document.getElementById('pf-modal-title');
+  const subEl=document.getElementById('pf-modal-sub');
+  if(titleEl)titleEl.textContent=pfEditId?'Edit Trading Account':'Add Trading Account';
+  if(subEl)subEl.textContent=pfEditId?'Update this tracking profile.':'Add a new tracking profile for your trades.';
   if(id){
-    const a=db.propfirms.find(p=>p.id===id);if(!a)return;
-    const type=a.type==='broker'?'broker':'propfirm';
-    setAccountType(type);
-    if(type==='broker'){
-      document.getElementById('bk-broker').value=a.broker||'';
-      document.getElementById('bk-accttype').value=a.accttype||'live';
-      document.getElementById('bk-currency').value=a.currency||'USD';
-      document.getElementById('bk-platform').value=a.platform||'';
-      document.getElementById('bk-start').value=a.startBalance||'';
-      document.getElementById('bk-current').value=a.currentBalance||'';
-    } else {
-      document.getElementById('pf-firm').value=a.firm||'';
-      document.getElementById('pf-size').value=a.size||'';
-      document.getElementById('pf-model').value=a.model||'2-step';
-      document.getElementById('pf-status').value=a.status||'phase1';
-      document.getElementById('pf-fee').value=a.fee||'';
-      document.getElementById('pf-payout').value=a.payout||'';
-      document.getElementById('pf-npayouts').value=a.npayouts||0;
-    }
+    const a=(db.propfirms||[]).find(p=>String(p.id)===String(id));if(!a)return;
+    document.getElementById('acc-name').value=a.name||'';
+    document.getElementById('acc-broker').value=a.broker||'';
+    document.getElementById('acc-type').value=a.type||'personal-live';
+    document.getElementById('acc-status').value=a.status||'active';
+    document.getElementById('acc-firmname').value=a.firmName||'';
+    document.getElementById('acc-model').value=a.model||'2-step';
+    document.getElementById('acc-phase').value=a.currentPhase||1;
+    document.getElementById('acc-maxloss').value=a.maxLoss||'';
+    document.getElementById('acc-maxdailyloss').value=a.maxDailyLoss||'';
+    document.getElementById('acc-target').value=a.profitTarget||'';
+    document.getElementById('acc-balance').value=a.initialBalance||0;
+    document.getElementById('acc-currency').value=a.currency||'USD';
   } else {
-    setAccountType('propfirm');
-    ['pf-firm','pf-size','pf-fee','pf-payout'].forEach(fid=>document.getElementById(fid).value='');
-    document.getElementById('pf-npayouts').value=0;
-    document.getElementById('pf-model').value='2-step';
-    document.getElementById('pf-status').value='phase1';
-    ['bk-broker','bk-platform','bk-start','bk-current'].forEach(fid=>document.getElementById(fid).value='');
-    document.getElementById('bk-currency').value='USD';
-    document.getElementById('bk-accttype').value='live';
+    document.getElementById('acc-name').value='';
+    document.getElementById('acc-broker').value='';
+    document.getElementById('acc-type').value='personal-live';
+    document.getElementById('acc-status').value='active';
+    document.getElementById('acc-firmname').value='';
+    document.getElementById('acc-model').value='2-step';
+    document.getElementById('acc-phase').value=1;
+    document.getElementById('acc-maxloss').value='';
+    document.getElementById('acc-maxdailyloss').value='';
+    document.getElementById('acc-target').value='';
+    document.getElementById('acc-balance').value='';
+    document.getElementById('acc-currency').value='USD';
   }
+  updateAccountModalFields();
   document.getElementById('pf-modal').classList.add('open');
 }
 
 function savePFAccount(){
-  if(currentAccountType==='broker'){
-    const broker=document.getElementById('bk-broker').value.trim();
-    if(!broker){alert('Please enter a broker name.');return;}
-    const acc={
-      id:pfEditId||Date.now(),
-      type:'broker',
-      broker,
-      accttype:document.getElementById('bk-accttype').value,
-      currency:document.getElementById('bk-currency').value.trim()||'USD',
-      platform:document.getElementById('bk-platform').value.trim(),
-      startBalance:parseFloat(document.getElementById('bk-start').value)||0,
-      currentBalance:parseFloat(document.getElementById('bk-current').value)||0
-    };
-    if(pfEditId)db.propfirms=db.propfirms.map(p=>p.id===pfEditId?acc:p);
-    else db.propfirms.push(acc);
+  const name=document.getElementById('acc-name').value.trim();
+  if(!name){alert('Please enter an account name.');return;}
+  const prevAcc=pfEditId?(db.propfirms||[]).find(p=>String(p.id)===String(pfEditId)):null;
+  const initialBalance=parseFloat(document.getElementById('acc-balance').value)||0;
+  const currentPhase=parseInt(document.getElementById('acc-phase').value)||1;
+  // phaseStartTradeId marks when the current phase began — only trades placed after this
+  // point count toward the balance, since a new phase resets to the initial balance.
+  // Reset it whenever this is a new account or the phase number was just changed
+  // (manually here, or automatically by checkAccountAutoFund on target hit).
+  let phaseStartTradeId;
+  if(!prevAcc){
+    phaseStartTradeId=0;
+  } else if(prevAcc.currentPhase!==currentPhase){
+    phaseStartTradeId=Date.now();
   } else {
-    const firm=document.getElementById('pf-firm').value.trim();
-    if(!firm){alert('Please enter a firm name.');return;}
-    const acc={
-      id:pfEditId||Date.now(),
-      type:'propfirm',firm,
-      size:parseFloat(document.getElementById('pf-size').value)||0,
-      model:document.getElementById('pf-model').value,
-      status:document.getElementById('pf-status').value,
-      fee:parseFloat(document.getElementById('pf-fee').value)||0,
-      payout:parseFloat(document.getElementById('pf-payout').value)||0,
-      npayouts:parseInt(document.getElementById('pf-npayouts').value)||0
-    };
-    if(pfEditId)db.propfirms=db.propfirms.map(p=>p.id===pfEditId?acc:p);
-    else db.propfirms.push(acc);
+    phaseStartTradeId=prevAcc.phaseStartTradeId||0;
   }
-  persist();closeOverlay('pf-modal');renderAccounts();
+  const acc={
+    id:pfEditId||Date.now(),
+    v:2,
+    name,
+    broker:document.getElementById('acc-broker').value.trim(),
+    type:document.getElementById('acc-type').value,
+    status:document.getElementById('acc-status').value,
+    firmName:document.getElementById('acc-firmname').value.trim(),
+    model:document.getElementById('acc-model').value,
+    currentPhase,
+    phaseStartTradeId,
+    maxLoss:parseFloat(document.getElementById('acc-maxloss').value)||0,
+    maxDailyLoss:parseFloat(document.getElementById('acc-maxdailyloss').value)||0,
+    profitTarget:parseFloat(document.getElementById('acc-target').value)||0,
+    initialBalance,
+    currency:document.getElementById('acc-currency').value,
+    payouts:prevAcc?.payouts||[]
+  };
+  if(pfEditId)db.propfirms=db.propfirms.map(p=>String(p.id)===String(pfEditId)?acc:p);
+  else db.propfirms.push(acc);
+  persist();closeOverlay('pf-modal');checkAccountAutoFund();renderAccounts();
+  populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
 }
 
 function askPFDelete(id){pfDeleteId=id;document.getElementById('pf-del-modal').classList.add('open');}
 function confirmPFDelete(){
   if(!pfDeleteId)return;
-  db.propfirms=db.propfirms.filter(p=>p.id!==pfDeleteId);
+  db.propfirms=db.propfirms.filter(p=>String(p.id)!==String(pfDeleteId));
   pfDeleteId=null;persist();closeOverlay('pf-del-modal');renderAccounts();
+  populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
+}
+
+function accountStageLabel(a){
+  const isProp=a.type==='propfirm-challenge'||a.type==='propfirm-funded';
+  if(a.status==='failed')return{text:isProp?'Breached':'Failed',cls:'failed'};
+  if(a.type==='propfirm-funded')return{text:'Funded',cls:'funded'};
+  if(a.type==='propfirm-challenge')return{text:'Phase '+(a.currentPhase||1),cls:'phase1'};
+  return{text:ACCOUNT_STATUS_LABEL[a.status]||a.status,cls:a.status==='active'?'funded':'phase1'};
 }
 
 function renderAccounts(){
-  const all=db.propfirms;
-  const firms=all.filter(a=>a.type!=='broker');
-  const brokers=all.filter(a=>a.type==='broker');
-  const totalInvested=firms.reduce((s,a)=>s+a.fee,0);
-  const totalPaidOut=firms.reduce((s,a)=>s+a.payout,0);
-  const totalPayouts=firms.reduce((s,a)=>s+a.npayouts,0);
-  const net=totalPaidOut-totalInvested;
-  const activeCount=firms.filter(a=>a.status!=='failed').length;
-  const failedCount=firms.filter(a=>a.status==='failed').length;
+  checkAccountAutoFund();
+  const all=db.propfirms||[];
+  const withBal=all.map(a=>({...a,...accountBalance(a)}));
+  const totalBalance=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.balance,0);
+  const totalPnl=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.pnl,0);
+  const activeCount=all.filter(a=>a.status==='active').length;
 
-  document.getElementById('pf-invested').textContent='$'+totalInvested.toFixed(2);
-  document.getElementById('pf-invested-sub').textContent='Across '+firms.length+' account'+(firms.length===1?'':'s');
-  document.getElementById('pf-paidout').textContent='$'+totalPaidOut.toFixed(2);
-  document.getElementById('pf-paidout-sub').textContent=totalPayouts+' payout'+(totalPayouts===1?'':'s')+' received';
+  document.getElementById('pf-invested').textContent='$'+totalBalance.toLocaleString(undefined,{maximumFractionDigits:0});
+  document.getElementById('pf-invested-lbl').textContent='Total Balance';
+  document.getElementById('pf-invested-sub').textContent='Across '+all.length+' account'+(all.length===1?'':'s');
   const netEl=document.getElementById('pf-net');
-  netEl.textContent=(net>=0?'+':'-')+'$'+Math.abs(net).toFixed(2);
-  netEl.style.color=net>=0?'var(--green)':'var(--red)';
-  document.getElementById('pf-net-lbl').textContent=net>=0?'↗ NET RESULT':'↘ NET RESULT';
-  document.getElementById('pf-net-sub').textContent=net>=0?'In profit overall':'Down — invested more than paid out so far';
-  document.getElementById('pf-net-card').className='pf-metric '+(net>=0?'net-pos':'net-neg');
+  netEl.textContent=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString(undefined,{maximumFractionDigits:0});
+  netEl.style.color=totalPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('pf-net-lbl').textContent=totalPnl>=0?'↗ NET RESULT':'↘ NET RESULT';
+  document.getElementById('pf-net-sub').textContent=totalPnl>=0?'In profit overall':'Down overall so far';
+  document.getElementById('pf-net-card').className='pf-metric '+(totalPnl>=0?'net-pos':'net-neg');
+  document.getElementById('pf-paidout-lbl').textContent='Active Accounts';
+  document.getElementById('pf-paidout').textContent=activeCount;
+  document.getElementById('pf-paidout-sub').textContent=activeCount+' active account'+(activeCount===1?'':'s');
 
   const statusCounts={};
-  firms.forEach(a=>{statusCounts[a.status]=(statusCounts[a.status]||0)+1;});
-  let pillsHtml=`<span class="pf-pill p-active">● ${activeCount} Active</span><span class="pf-pill p-failed">● ${failedCount} Failed</span>`;
-  Object.entries(statusCounts).forEach(([s,c])=>{
-    if(s!=='failed')pillsHtml+=`<span class="pf-pill p-phase">${c} ${STATUS_LABEL[s]||s}</span>`;
-  });
-  document.getElementById('pf-pills').innerHTML=pillsHtml;
+  all.forEach(a=>{statusCounts[a.status]=(statusCounts[a.status]||0)+1;});
+  document.getElementById('pf-pills').innerHTML=Object.entries(statusCounts)
+    .map(([s,c])=>`<span class="pf-pill ${s==='active'?'p-active':s==='failed'?'p-failed':'p-phase'}">${c} ${ACCOUNT_STATUS_LABEL[s]||s}</span>`).join('');
 
   const cards=document.getElementById('pf-cards');
-  if(!firms.length){
-    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No prop-firm accounts yet. Add one above!</div>';
+  if(!all.length){
+    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No trading accounts yet. Add one above!</div>';
   } else {
-    cards.innerHTML=firms.map(a=>{
-      const steps=PF_STEPS[a.model]||PF_STEPS['2-step'];
-      const statusToIdx={phase1:0,phase2:1,funded:steps.indexOf('Funded'),payout:steps.length-1,failed:-1};
-      const curIdx=a.status==='failed'?-1:(statusToIdx[a.status]??0);
-      const isFailed=a.status==='failed';
-      const timeline=steps.map((s,i)=>{
-        let cls='pf-step';
-        if(isFailed)cls+=' failed-s';
-        else if(i<curIdx)cls+=' done';
-        else if(i===curIdx)cls+=' current';
-        return`<div class="${cls}">${s}</div>`;
-      }).join('');
-      const net=a.payout-a.fee;
+    cards.innerHTML=withBal.map(a=>{
+      const pnlPct=a.initialBalance?(a.pnl/a.initialBalance*100):0;
+      const isProp=a.type==='propfirm-challenge'||a.type==='propfirm-funded';
+      const subParts=isProp?[a.firmName,a.type==='propfirm-challenge'?('Phase '+(a.currentPhase||1)):null].filter(Boolean):[a.broker].filter(Boolean);
+      subParts.push(ACCOUNT_TYPE_LABEL[a.type]||a.type);
+      const targetProgress=(a.type==='propfirm-challenge'&&a.status!=='failed')
+        ?(a.profitTarget>0
+          ?`<div class="pf-row"><span class="pr-l">Progress to Target</span><span class="pr-v">${a.currency||'USD'} ${a.pnl.toLocaleString(undefined,{maximumFractionDigits:0})} / ${a.profitTarget.toLocaleString()}</span></div>`
+          :`<div style="font-size:11px;color:var(--gold);margin-top:4px">Set a profit target for Phase ${a.currentPhase||1}</div>`)
+        :'';
+      const riskInfo=isProp&&a.status!=='failed'&&(a.maxLoss||a.maxDailyLoss)
+        ?`<div class="pf-row"><span class="pr-l">Max Loss / Daily</span><span class="pr-v">${a.maxLoss?a.maxLoss.toLocaleString():'—'} / ${a.maxDailyLoss?a.maxDailyLoss.toLocaleString():'—'}</span></div>`
+        :'';
+      const payoutsTotal=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+      const payoutsRow=payoutsTotal>0
+        ?`<div class="pf-row"><span class="pr-l">Paid Out</span><span class="pr-v" style="color:var(--gold)">$${payoutsTotal.toLocaleString()}</span></div>`
+        :'';
+      const stage=accountStageLabel(a);
+      const payoutBtn=(a.type==='propfirm-funded'&&a.status!=='failed')
+        ?`<button class="pf-btn" onclick="openPayoutModal(${a.id})" style="color:var(--gold);border-color:var(--gold)"><i class="ti ti-cash"></i> Payout</button>`
+        :'';
       return`<div class="pf-card">
         <div class="pf-card-top">
           <div>
-            <div class="pf-firm-name">${a.firm}</div>
-            <div class="pf-firm-sub">${a.model}${a.size?' · $'+a.size.toLocaleString():''}</div>
+            <div class="pf-firm-name">${a.name}</div>
+            <div class="pf-firm-sub">${subParts.join(' · ')}</div>
           </div>
-          <span class="pf-status-badge ${a.status}">${STATUS_LABEL[a.status]||a.status}</span>
+          <span class="pf-status-badge ${stage.cls}">${stage.text}</span>
         </div>
-        <div class="pf-timeline">${timeline}</div>
         <hr class="pf-divider"/>
-        ${a.fee?`<div class="pf-row"><span class="pr-l">Fee Paid</span><span class="pr-v" style="color:var(--red)">-$${a.fee.toLocaleString()}</span></div>`:''}
-        ${a.payout?`<div class="pf-row"><span class="pr-l">Total Payout</span><span class="pr-v" style="color:var(--green)">+$${a.payout.toLocaleString()}</span></div>`:''}
-        <div class="pf-row"><span class="pr-l">Net</span><span class="pr-v" style="color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':'-'}$${Math.abs(net).toLocaleString()}</span></div>
+        <div class="pf-row"><span class="pr-l">Initial Balance</span><span class="pr-v">${a.currency||'USD'} ${(a.initialBalance||0).toLocaleString()}</span></div>
+        <div class="pf-row"><span class="pr-l">Current Balance</span><span class="pr-v">${a.currency||'USD'} ${a.balance.toLocaleString(undefined,{maximumFractionDigits:2})}</span></div>
+        <div class="pf-row"><span class="pr-l">P&amp;L</span><span class="pr-v" style="color:${a.pnl>=0?'var(--green)':'var(--red)'}">${a.pnl>=0?'+':'-'}$${Math.abs(Math.round(a.pnl)).toLocaleString()} (${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
+        ${targetProgress}
+        ${riskInfo}
+        ${payoutsRow}
+        ${a.status==='failed'?'<div style="font-size:11px;color:var(--text3);margin-top:4px">Excluded from total balance</div>':''}
         <div class="pf-card-actions">
           <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
+          ${payoutBtn}
           <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
         </div>
       </div>`;
     }).join('');
   }
 
-  // Broker / Live accounts section
-  const brokerWrap=document.getElementById('broker-cards');
-  if(brokerWrap){
-    const totalBalance=brokers.reduce((s,a)=>s+(a.currentBalance||0),0);
-    const totalPnl=brokers.reduce((s,a)=>s+((a.currentBalance||0)-(a.startBalance||0)),0);
-    const subEl=document.getElementById('broker-summary');
-    if(subEl){
-      subEl.innerHTML=brokers.length
-        ?`<span class="cms-label">Total balance:</span> <span class="cms-chip">$${totalBalance.toLocaleString()}</span> <span class="cms-chip${totalPnl<0?' cms-neg':''}">${totalPnl>=0?'+':'-'}$${Math.abs(Math.round(totalPnl)).toLocaleString()} P&amp;L</span>`
-        :'';
-    }
-    if(!brokers.length){
-      brokerWrap.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No broker/live accounts yet. Add one above!</div>';
-    } else {
-      brokerWrap.innerHTML=brokers.map(a=>{
-        const pnl=(a.currentBalance||0)-(a.startBalance||0);
-        const pnlPct=a.startBalance?(pnl/a.startBalance*100):0;
-        return`<div class="pf-card">
-          <div class="pf-card-top">
-            <div>
-              <div class="pf-firm-name">${a.broker}</div>
-              <div class="pf-firm-sub">${a.platform?a.platform+' · ':''}${a.currency||'USD'}</div>
-            </div>
-            <span class="pf-status-badge ${a.accttype==='demo'?'phase1':'funded'}">${a.accttype==='demo'?'Demo':'Live'}</span>
-          </div>
-          <hr class="pf-divider"/>
-          <div class="pf-row"><span class="pr-l">Starting Balance</span><span class="pr-v">$${(a.startBalance||0).toLocaleString()}</span></div>
-          <div class="pf-row"><span class="pr-l">Current Balance</span><span class="pr-v">$${(a.currentBalance||0).toLocaleString()}</span></div>
-          <div class="pf-row"><span class="pr-l">P&amp;L</span><span class="pr-v" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':'-'}$${Math.abs(Math.round(pnl)).toLocaleString()} (${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
-          <div class="pf-card-actions">
-            <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
-            <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
+  // Payouts summary box
+  const allPayouts=[];
+  all.forEach(a=>(a.payouts||[]).forEach(p=>allPayouts.push({...p,accountName:a.name})));
+  const totalPayouts=allPayouts.reduce((s,p)=>s+(p.amount||0),0);
+  const payoutsTotalEl=document.getElementById('pf-payouts-total');
+  if(payoutsTotalEl)payoutsTotalEl.textContent='$'+totalPayouts.toLocaleString(undefined,{maximumFractionDigits:0});
+  const payoutsSubEl=document.getElementById('pf-payouts-sub');
+  if(payoutsSubEl)payoutsSubEl.textContent=allPayouts.length+' payout'+(allPayouts.length===1?'':'s')+' · tap to view';
 }
 
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
+
+let payoutAccountId=null;
+function openPayoutModal(accountId){
+  payoutAccountId=accountId;
+  const a=(db.propfirms||[]).find(p=>String(p.id)===String(accountId));
+  if(!a)return;
+  document.getElementById('payout-account-name').textContent='From: '+a.name+' (current P&L: '+(a.pnl>=0?'+':'-')+'$'+Math.abs(Math.round(a.pnl||0)).toLocaleString()+')';
+  document.getElementById('payout-amount').value='';
+  document.getElementById('payout-pct').value='';
+  document.getElementById('payout-date').value=today();
+  document.getElementById('payout-pct-hint').textContent='';
+  document.getElementById('payout-modal').classList.add('open');
+}
+
+function updatePayoutPctHint(){
+  const a=(db.propfirms||[]).find(p=>String(p.id)===String(payoutAccountId));
+  const amt=parseFloat(document.getElementById('payout-amount').value)||0;
+  const hint=document.getElementById('payout-pct-hint');
+  if(a&&a.pnl>0&&amt>0)hint.textContent='= '+(amt/a.pnl*100).toFixed(1)+'% of this account\'s current profit';
+  else hint.textContent='';
+}
+
+function savePayout(){
+  const amount=parseFloat(document.getElementById('payout-amount').value)||0;
+  if(amount<=0){alert('Enter a payout amount.');return;}
+  const pct=parseFloat(document.getElementById('payout-pct').value)||null;
+  const date=document.getElementById('payout-date').value||today();
+  const a=(db.propfirms||[]).find(p=>String(p.id)===String(payoutAccountId));
+  if(!a)return;
+  a.payouts=a.payouts||[];
+  a.payouts.push({id:Date.now(),amount,pct,date});
+  persist();closeOverlay('payout-modal');renderAccounts();
+}
+
+function openPayoutHistory(){
+  const all=db.propfirms||[];
+  const allPayouts=[];
+  all.forEach(a=>(a.payouts||[]).forEach(p=>allPayouts.push({...p,accountName:a.name,accountId:a.id})));
+  allPayouts.sort((x,y)=>y.date.localeCompare(x.date)||y.id-x.id);
+  const list=document.getElementById('payout-history-list');
+  if(!allPayouts.length){
+    list.innerHTML='<div class="empty"><i class="ti ti-cash"></i>No payouts recorded yet.</div>';
+  } else {
+    list.innerHTML=allPayouts.map(p=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border)">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${p.accountName}</div>
+          <div style="font-size:11px;color:var(--text3)">${p.date}${p.pct?' · '+p.pct+'% split':''}</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--gold)">$${p.amount.toLocaleString()}</div>
+      </div>`).join('');
+  }
+  document.getElementById('payout-history-modal').classList.add('open');
+}
 
 // ── Playbooks ─────────────────────────────────────────────────
 function addCriteriaRow(text){
@@ -3272,6 +3962,30 @@ function populatePlaybookDropdown(prefix){
   sel.innerHTML='<option value="">No playbook</option>'+
     db.playbooks.map(pb=>`<option value="${pb.id}">${pb.name}</option>`).join('');
   if(current&&db.playbooks.some(pb=>String(pb.id)===String(current)))sel.value=current;
+}
+
+function populateAccountDropdown(prefix){
+  const sel=document.getElementById(prefix+'-account');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">No account</option>'+
+    (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('');
+  if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
+}
+
+function populateDashAccountFilter(){
+  const sel=document.getElementById('dash-account-filter');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">All Accounts</option>'+
+    (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('');
+  if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
+}
+
+function applyDashAccountFilter(id){
+  dashAccountFilter=id;
+  if(drpActivePreset)applyDRPPreset(drpActivePreset);
+  else renderDashboard(currentDashKey);
 }
 
 // Renders the checklist for whichever playbook is currently selected.
@@ -3521,6 +4235,8 @@ function openEditTrade(key,id){
   document.getElementById('et-notes').value=t.notes||'';
   populatePlaybookDropdown('et');
   document.getElementById('et-playbook').value=t.playbookId||'';
+  populateAccountDropdown('et');
+  document.getElementById('et-account').value=t.accountId||'';
   renderTradeChecklist('et',t.checklistResults);
   document.getElementById('edit-trade-modal').classList.add('open');
 }
@@ -3531,6 +4247,8 @@ function saveEditTrade(){
   const newKey=dateToKey(newDate);
   const pbSel=document.getElementById('et-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
+  const acctSel=document.getElementById('et-account');
+  const accountId=acctSel&&acctSel.value?acctSel.value:null;
   const updated={
     id:editTradeId,
     date:newDate,
@@ -3543,6 +4261,7 @@ function saveEditTrade(){
     images:etImages.slice(),
     notes:document.getElementById('et-notes').value.trim(),
     playbookId,
+    accountId,
     checklistResults:playbookId?readChecklistResults('et'):[]
   };
   // Remove from old key
@@ -3558,6 +4277,7 @@ function saveEditTrade(){
     return;
   }
   closeOverlay('edit-trade-modal');
+  checkAccountAutoFund();
   // If date moved to different month, update currentDetailKey
   if(newKey!==editTradeKey)currentDetailKey=newKey;
   renderDetailTable();
@@ -3614,13 +4334,15 @@ function openDayJournal(dateStr){
 
 // ── Trading Score ────────────────────────────────────────────
 let radarChart=null;
+let radarChartHero=null;
 
-function drawSkeletonRadar(canvas){
+function drawSkeletonRadar(canvas,isHero){
   const dark=document.documentElement.getAttribute('data-theme')!=='light';
-  if(radarChart){radarChart.destroy();radarChart=null;}
+  if(isHero){if(radarChartHero){radarChartHero.destroy();radarChartHero=null;}}
+  else{if(radarChart){radarChart.destroy();radarChart=null;}}
   const ctx=canvas.getContext('2d');
   if(!ctx)return;
-  radarChart=new Chart(ctx,{
+  const inst=new Chart(ctx,{
     type:'radar',
     data:{
       labels:['Win %','Profit','Avg W/L','Max DD','Recovery','Consist.'],
@@ -3645,6 +4367,7 @@ function drawSkeletonRadar(canvas){
       plugins:{legend:{display:false},tooltip:{enabled:false}}
     }
   });
+  if(isHero)radarChartHero=inst;else radarChart=inst;
 }
 
 function renderTradingScore(trades){
@@ -3652,15 +4375,22 @@ function renderTradingScore(trades){
   const marker=document.getElementById('score-marker');
   const breakdown=document.getElementById('score-breakdown');
   const canvas=document.getElementById('radar-chart');
-  if(!scoreVal||!canvas)return;
+
+  const heroValEl=document.getElementById('hero-score-val');
+  const heroThumbEl=document.getElementById('hero-score-thumb');
+  const heroCanvas=document.getElementById('radar-chart-hero');
+  if(!scoreVal&&!heroValEl)return;
 
   if(!trades||!trades.length){
-    scoreVal.textContent='—';
+    if(scoreVal)scoreVal.textContent='—';
     if(marker)marker.style.left='0%';
     const barFill0=document.getElementById('score-bar-fill');
     if(barFill0)barFill0.style.width='0%';
     if(breakdown)breakdown.innerHTML='';
-    drawSkeletonRadar(canvas);
+    if(canvas)drawSkeletonRadar(canvas);
+    if(heroValEl)heroValEl.textContent='—';
+    if(heroThumbEl)heroThumbEl.style.left='0%';
+    if(heroCanvas)drawSkeletonRadar(heroCanvas,true);
     return;
   }
 
@@ -3710,7 +4440,7 @@ function renderTradingScore(trades){
   const total=(wrScore+pfScore+awlScore+consScore+ddScoreN+rfScoreN)/6;
   const rounded=Math.round(total*100)/100;
 
-  scoreVal.textContent=Math.round(total);
+  if(scoreVal)scoreVal.textContent=Math.round(total);
   const barFill=document.getElementById('score-bar-fill');
   if(barFill)barFill.style.width=Math.min(100,Math.max(0,total))+'%';
   if(marker)marker.style.left=Math.min(98,Math.max(2,total))+'%';
@@ -3735,50 +4465,91 @@ function renderTradingScore(trades){
       </div>`).join('');
   }
 
-  // Radar chart
+  // Radar chart (small "Trading Score" card, if present)
   const dark=document.documentElement.getAttribute('data-theme')!=='light';
-  const data=[wrScore,pfScore,awlScore,ddScoreN,rfScoreN,consScore];
-  const rawVals=[Math.round(wr*100)+'%',pf.toFixed(2),awl.toFixed(2),Math.round(dd*100)+'%',rf.toFixed(2),Math.round(consistency*100)+'%'];
-  if(radarChart){radarChart.destroy();radarChart=null;}
-  const ctx=canvas.getContext('2d');
-  if(!ctx)return;
-  radarChart=new Chart(ctx,{
-    type:'radar',
-    data:{
-      labels:['Win %','Profit','Avg W/L','Max DD','Recovery','Consist.'],
-      datasets:[{
-        data,
-        backgroundColor:'rgba(216,90,48,0.35)',
-        borderColor:'#D85A30',
-        borderWidth:2.5,
-        pointBackgroundColor:'#D85A30',
-        pointRadius:3.5,
-        pointHitRadius:14,
-        pointHoverRadius:5,
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{r:{
-        min:0,max:100,
-        ticks:{display:false},
-        grid:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'},
-        pointLabels:{font:{size:9,family:'Inter'},color:dark?'#bbb':'#555'},
-        angleLines:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'}
-      }},
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          enabled:true,
-          callbacks:{
-            title:items=>items[0].label,
-            label:item=>'Value: '+rawVals[item.dataIndex]+'  ·  Score: '+Math.round(item.parsed.r)+'/100'
+  if(canvas){
+    const data=[wrScore,pfScore,awlScore,ddScoreN,rfScoreN,consScore];
+    const rawVals=[Math.round(wr*100)+'%',pf.toFixed(2),awl.toFixed(2),Math.round(dd*100)+'%',rf.toFixed(2),Math.round(consistency*100)+'%'];
+    if(radarChart){radarChart.destroy();radarChart=null;}
+    const ctx=canvas.getContext('2d');
+    if(ctx){
+      radarChart=new Chart(ctx,{
+        type:'radar',
+        data:{
+          labels:['Win %','Profit','Avg W/L','Max DD','Recovery','Consist.'],
+          datasets:[{
+            data,
+            backgroundColor:'rgba(216,90,48,0.35)',
+            borderColor:'#D85A30',
+            borderWidth:2.5,
+            pointBackgroundColor:'#D85A30',
+            pointRadius:3.5,
+            pointHitRadius:14,
+            pointHoverRadius:5,
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{r:{
+            min:0,max:100,
+            ticks:{display:false},
+            grid:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'},
+            pointLabels:{font:{size:9,family:'Inter'},color:dark?'#bbb':'#555'},
+            angleLines:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'}
+          }},
+          plugins:{
+            legend:{display:false},
+            tooltip:{
+              enabled:true,
+              callbacks:{
+                title:items=>items[0].label,
+                label:item=>'Value: '+rawVals[item.dataIndex]+'  ·  Score: '+Math.round(item.parsed.r)+'/100'
+              }
+            }
           }
         }
-      }
+      });
     }
-  });
+  }
+
+  // Combined "Overall Score" card: hexagon radar + score gauge
+  if(heroValEl)heroValEl.textContent=rounded.toFixed(2);
+  if(heroThumbEl)heroThumbEl.style.left=Math.min(99,Math.max(1,total))+'%';
+  if(heroCanvas){
+    if(radarChartHero){radarChartHero.destroy();radarChartHero=null;}
+    const hctx=heroCanvas.getContext('2d');
+    if(hctx){
+      radarChartHero=new Chart(hctx,{
+        type:'radar',
+        data:{
+          labels:['Win %','Profit factor','Avg win/loss','Recovery factor','Max drawdown','Consistency'],
+          datasets:[{
+            data:[wrScore,pfScore,awlScore,rfScoreN,ddScoreN,consScore],
+            backgroundColor:'rgba(124,92,240,0.45)',
+            borderColor:'#7c5cf0',
+            borderWidth:2.5,
+            pointBackgroundColor:'#7c5cf0',
+            pointRadius:3,
+            pointHitRadius:12,
+            pointHoverRadius:5,
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{r:{
+            min:0,max:100,
+            ticks:{display:false},
+            grid:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'},
+            pointLabels:{font:{size:11,family:'Inter',weight:'600'},color:dark?'#bbb':'#555'},
+            angleLines:{color:dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'}
+          }},
+          plugins:{legend:{display:false},tooltip:{enabled:true}}
+        }
+      });
+    }
+  }
 }
 
 // ── P&L by Weekday ───────────────────────────────────────────
@@ -4111,6 +4882,9 @@ function applyDRPPreset(id){
 
   if(id!=='alltime'){
     trades=Object.values(db.trades).flat().filter(t=>t.date>=drpStart&&t.date<=drpEnd).sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  }
+  if(dashAccountFilter){
+    trades=trades.filter(t=>String(t.accountId)===String(dashAccountFilter));
   }
 
   document.getElementById('drp-label').textContent=label;
@@ -4530,21 +5304,31 @@ function enableDragReorder(containerEl,itemSelector,handleSelector,idAttr,storag
 
 // ── Init ──────────────────────────────────────────────────────
 // ── Init ──────────────────────────────────────────────────────
-loadDB();
-applyTheme();
-initSidebar();
-document.getElementById('f-date').value=today();
-currentDashKey=curMonthKey();
-// Init DRP to alltime label
-const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
-initDashSelectors();
-renderDashboard(currentDashKey);
-enableDragReorder(document.querySelector('.snc-cards'),'.sub-block','.sub-drag-handle','data-sub-id','tj_v10_order_statcards');
-// Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
-document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
-document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
-document.getElementById('dm-toggle-topbar').style.display='';
-document.getElementById('drp-wrap').style.display='';
+(async function initApp(){
+  const ok=await checkAuth();
+  if(!ok)return;
+  await loadDB();
+  refreshProfileDisplay();
+  renderMobileBottomNav();
+  renderMoreSheetPinnable();
+  applyTheme();
+  initSidebar();
+  document.getElementById('f-date').value=today();
+  populatePlaybookDropdown('f');
+  populateAccountDropdown('f');
+  populateDashAccountFilter();
+  currentDashKey=curMonthKey();
+  // Init DRP to alltime label
+  const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
+  initDashSelectors();
+  renderDashboard(currentDashKey);
+  enableDragReorder(document.querySelector('.snc-cards'),'.sub-block','.sub-drag-handle','data-sub-id','tj_v10_order_statcards');
+  // Sync the calendar's $/% toggle and show dashboard-only top bar selectors on first load
+  document.getElementById('dm-btn-dollar').classList.toggle('active',displayMode==='dollar');
+  document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
+  document.getElementById('dm-toggle-topbar').style.display='';
+  document.getElementById('drp-wrap').style.display='';
+})();
 
 // Global paste fallback: while the Screenshots manager is open and its zone is focused, route pasted clipboard images into it
 document.addEventListener('paste',function(e){
@@ -4563,7 +5347,6 @@ window.addEventListener('resize',function(){
     closeMobileSidebar();
     initSidebar();
   }
-  syncRightColHeight();
 });
 </script>
 <!-- DRP Panel - at body level to avoid stacking context issues -->
