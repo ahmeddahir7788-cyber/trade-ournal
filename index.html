@@ -467,6 +467,14 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .sb-toggle-top{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:6px;border-radius:var(--r);display:flex;align-items:center}
 /* DISPLAY MODE TOGGLE ($/%) */
 .dm-toggle{display:flex;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:2px;gap:2px}
+
+.theme-toggle-pill{position:relative;width:52px;height:26px;border-radius:100px;background:var(--surface2);border:.5px solid var(--border2);cursor:pointer;padding:0;flex-shrink:0}
+.theme-toggle-pill .tt-icon{position:absolute;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}
+.theme-toggle-pill .tt-icon.tt-sun{left:6px}
+.theme-toggle-pill .tt-icon.tt-moon{right:6px}
+.theme-toggle-knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;transition:left .22s ease;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.theme-toggle-knob i{font-size:11px;color:var(--bg)}
+[data-theme="dark"] .theme-toggle-knob{left:28px}
 .dm-btn{background:none;border:none;padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer}
 .dm-btn.active{background:var(--blue);color:#fff}
 .dm-btn:not(.active):hover{background:var(--border)}
@@ -694,7 +702,8 @@ table.tt tr:last-child td{border-bottom:none}
     <button class="active" onclick="go('dashboard',this)"><span class="nav-tile" style="background:#378ADD"><i class="ti ti-layout-dashboard"></i></span><span class="nav-label">Dashboard</span></button>
     <button onclick="go('log',this)"><span class="nav-tile" style="background:#1D9E75"><i class="ti ti-plus"></i></span><span class="nav-label">Add Trade</span></button>
     <button onclick="go('trades',this)"><span class="nav-tile" style="background:#7F77DD"><i class="ti ti-list"></i></span><span class="nav-label">Trades</span></button>
-    <button onclick="go('accounts',this)"><span class="nav-tile" style="background:#EF9F27"><i class="ti ti-building-bank"></i></span><span class="nav-label">Accounts</span></button>
+    <button onclick="go('accounts',this)"><span class="nav-tile" style="background:#EF9F27"><i class="ti ti-building-bank"></i></span><span class="nav-label">Prop Accounts</span></button>
+    <button onclick="go('realaccounts',this)"><span class="nav-tile" style="background:#22A6B3"><i class="ti ti-wallet"></i></span><span class="nav-label">Real Accounts</span></button>
     <button onclick="go('playbooks',this)"><span class="nav-tile" style="background:#D85A30"><i class="ti ti-notebook"></i></span><span class="nav-label">Playbooks</span></button>
     <button onclick="go('reports',this)"><span class="nav-tile" style="background:#D4537E"><i class="ti ti-chart-pie"></i></span><span class="nav-label">Reports</span></button>
     <button onclick="go('notebook',this)"><span class="nav-tile" style="background:#639922"><i class="ti ti-pencil"></i></span><span class="nav-label">Notebook</span></button>
@@ -767,6 +776,11 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
       <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
     </div>
+    <button class="theme-toggle-pill" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <i class="ti ti-sun tt-icon tt-sun"></i>
+      <i class="ti ti-moon tt-icon tt-moon"></i>
+      <span class="theme-toggle-knob" id="theme-toggle-knob"><i id="theme-toggle-knob-icon" class="ti ti-sun"></i></span>
+    </button>
   </div>
 </div>
 
@@ -1099,9 +1113,35 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div class="pf-filter-row">
       <div class="pf-pills" id="pf-pills"></div>
-      <button class="btn-blue" onclick="openPFModal()"><i class="ti ti-plus"></i> Add account</button>
+      <button class="btn-blue" onclick="openPFModal(null,'prop')"><i class="ti ti-plus"></i> Add account</button>
     </div>
     <div id="pf-cards" class="pf-cards"></div>
+  </div>
+
+  <!-- REAL ACCOUNTS -->
+  <div id="page-realaccounts" class="page">
+    <div class="pf-summary" style="grid-template-columns:repeat(3,1fr)">
+      <div class="pf-metric">
+        <div class="pm-lbl">Total Balance</div>
+        <div class="pm-val" id="ra-invested">$0.00</div>
+        <div class="pm-sub" id="ra-invested-sub">Across 0 accounts</div>
+      </div>
+      <div class="pf-metric">
+        <div class="pm-lbl">Active Accounts</div>
+        <div class="pm-val" id="ra-paidout">0</div>
+        <div class="pm-sub" id="ra-paidout-sub">0 active accounts</div>
+      </div>
+      <div class="pf-metric" id="ra-net-card">
+        <div class="pm-lbl" id="ra-net-lbl">↗ NET RESULT</div>
+        <div class="pm-val" id="ra-net">$0.00</div>
+        <div class="pm-sub" id="ra-net-sub">In profit overall</div>
+      </div>
+    </div>
+    <div class="pf-filter-row">
+      <div class="pf-pills" id="ra-pills"></div>
+      <button class="btn-blue" onclick="openPFModal(null,'real')"><i class="ti ti-plus"></i> Add account</button>
+    </div>
+    <div id="ra-cards" class="pf-cards"></div>
   </div>
 
   <!-- PLAYBOOKS -->
@@ -1839,6 +1879,8 @@ function applyTheme(){
   document.getElementById('theme-icon').className=t==='dark'?'ti ti-sun':'ti ti-moon';
   const lbl=document.getElementById('theme-label');
   if(lbl)lbl.textContent=t==='dark'?'Dark Mode':'Light Mode';
+  const knobIcon=document.getElementById('theme-toggle-knob-icon');
+  if(knobIcon)knobIcon.className=t==='dark'?'ti ti-moon':'ti ti-sun';
 }
 function toggleTheme(){
   const c=document.documentElement.getAttribute('data-theme');
@@ -1847,6 +1889,8 @@ function toggleTheme(){
   document.getElementById('theme-icon').className=n==='dark'?'ti ti-sun':'ti ti-moon';
   const lbl=document.getElementById('theme-label');
   if(lbl)lbl.textContent=n==='dark'?'Dark Mode':'Light Mode';
+  const knobIcon=document.getElementById('theme-toggle-knob-icon');
+  if(knobIcon)knobIcon.className=n==='dark'?'ti ti-moon':'ti ti-sun';
   localStorage.setItem('tj_v10_theme',n);
   refreshCurrentDashboardView();
 }
@@ -1855,7 +1899,8 @@ function toggleTheme(){
 // ── Mobile bottom nav ────────────────────────────────────────
 const MBN_OPTIONS=[
   {id:'trades',label:'Trades',icon:'ti-list',color:'#7F77DD'},
-  {id:'accounts',label:'Accounts',icon:'ti-building-bank',color:'#EF9F27'},
+  {id:'accounts',label:'Prop Accounts',icon:'ti-building-bank',color:'#EF9F27'},
+  {id:'realaccounts',label:'Real Accounts',icon:'ti-wallet',color:'#22A6B3'},
   {id:'playbooks',label:'Playbooks',icon:'ti-notebook',color:'#D85A30'},
   {id:'reports',label:'Reports',icon:'ti-chart-pie',color:'#639922'},
   {id:'notebook',label:'Notebook',icon:'ti-pencil',color:'#22A6B3'}
@@ -2050,7 +2095,7 @@ function renderTopBarTitle(id){
       </button>`;
     refreshProfileDisplay();
   } else {
-    const labels={log:'Add Trade',trades:'Trades',accounts:'Accounts',playbooks:'Playbooks',reports:'Reports',notebook:'Notebook'};
+    const labels={log:'Add Trade',trades:'Trades',accounts:'Prop Accounts',realaccounts:'Real Accounts',playbooks:'Playbooks',reports:'Reports',notebook:'Notebook'};
     tb.textContent=labels[id]||id;
   }
 }
@@ -2081,6 +2126,7 @@ function go(id,btn){
   if(id==='notebook')initNotebook();
   if(id==='trades'){initTradeYearSel();renderMonthCards();populateSymbolFilterDropdown();}
   if(id==='accounts')renderAccounts();
+  if(id==='realaccounts')renderRealAccounts();
   if(id==='playbooks')renderPlaybooks();
   if(id==='log'){populatePlaybookDropdown('f');populateAccountDropdown('f');}
 }
@@ -3546,7 +3592,14 @@ function updateAccountModalFields(){
   document.getElementById('acc-target-field').style.display=isChallenge?'':'none';
 }
 
-function openPFModal(id){
+function setAccountTypeOptions(context){
+  const sel=document.getElementById('acc-type');
+  const propOpts=`<option value="propfirm-challenge">Prop Challenge</option><option value="propfirm-funded">Prop Funded</option>`;
+  const realOpts=`<option value="personal-live">Personal Live</option><option value="personal-demo">Personal Demo</option>`;
+  sel.innerHTML=context==='prop'?propOpts:context==='real'?realOpts:(propOpts+realOpts);
+}
+
+function openPFModal(id,context){
   pfEditId=id||null;
   const titleEl=document.getElementById('pf-modal-title');
   const subEl=document.getElementById('pf-modal-sub');
@@ -3554,6 +3607,8 @@ function openPFModal(id){
   if(subEl)subEl.textContent=pfEditId?'Update this tracking profile.':'Add a new tracking profile for your trades.';
   if(id){
     const a=(db.propfirms||[]).find(p=>String(p.id)===String(id));if(!a)return;
+    const ctx=(a.type==='propfirm-challenge'||a.type==='propfirm-funded')?'prop':'real';
+    setAccountTypeOptions(ctx);
     document.getElementById('acc-name').value=a.name||'';
     document.getElementById('acc-broker').value=a.broker||'';
     document.getElementById('acc-type').value=a.type||'personal-live';
@@ -3567,9 +3622,10 @@ function openPFModal(id){
     document.getElementById('acc-balance').value=a.initialBalance||0;
     document.getElementById('acc-currency').value=a.currency||'USD';
   } else {
+    setAccountTypeOptions(context);
     document.getElementById('acc-name').value='';
     document.getElementById('acc-broker').value='';
-    document.getElementById('acc-type').value='personal-live';
+    document.getElementById('acc-type').value=context==='prop'?'propfirm-challenge':'personal-live';
     document.getElementById('acc-status').value='active';
     document.getElementById('acc-firmname').value='';
     document.getElementById('acc-model').value='2-step';
@@ -3622,7 +3678,7 @@ function savePFAccount(){
   };
   if(pfEditId)db.propfirms=db.propfirms.map(p=>String(p.id)===String(pfEditId)?acc:p);
   else db.propfirms.push(acc);
-  persist();closeOverlay('pf-modal');checkAccountAutoFund();renderAccounts();
+  persist();closeOverlay('pf-modal');checkAccountAutoFund();renderAccounts();renderRealAccounts();
   populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
 }
 
@@ -3630,7 +3686,7 @@ function askPFDelete(id){pfDeleteId=id;document.getElementById('pf-del-modal').c
 function confirmPFDelete(){
   if(!pfDeleteId)return;
   db.propfirms=db.propfirms.filter(p=>String(p.id)!==String(pfDeleteId));
-  pfDeleteId=null;persist();closeOverlay('pf-del-modal');renderAccounts();
+  pfDeleteId=null;persist();closeOverlay('pf-del-modal');renderAccounts();renderRealAccounts();
   populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
 }
 
@@ -3642,9 +3698,57 @@ function accountStageLabel(a){
   return{text:ACCOUNT_STATUS_LABEL[a.status]||a.status,cls:a.status==='active'?'funded':'phase1'};
 }
 
+function accountCardHTML(a){
+  const pnlPct=a.initialBalance?(a.pnl/a.initialBalance*100):0;
+  const isProp=a.type==='propfirm-challenge'||a.type==='propfirm-funded';
+  const subParts=isProp?[a.firmName,a.type==='propfirm-challenge'?('Phase '+(a.currentPhase||1)):null].filter(Boolean):[a.broker].filter(Boolean);
+  subParts.push(ACCOUNT_TYPE_LABEL[a.type]||a.type);
+  const targetProgress=(a.type==='propfirm-challenge'&&a.status!=='failed')
+    ?(a.profitTarget>0
+      ?`<div class="pf-row"><span class="pr-l">Progress to Target</span><span class="pr-v">${a.currency||'USD'} ${a.pnl.toLocaleString(undefined,{maximumFractionDigits:0})} / ${a.profitTarget.toLocaleString()}</span></div>`
+      :`<div style="font-size:11px;color:var(--gold);margin-top:4px">Set a profit target for Phase ${a.currentPhase||1}</div>`)
+    :'';
+  const riskInfo=isProp&&a.status!=='failed'&&(a.maxLoss||a.maxDailyLoss)
+    ?`<div class="pf-row"><span class="pr-l">Max Loss / Daily</span><span class="pr-v">${a.maxLoss?a.maxLoss.toLocaleString():'—'} / ${a.maxDailyLoss?a.maxDailyLoss.toLocaleString():'—'}</span></div>`
+    :'';
+  const payoutsTotal=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const payoutsRow=payoutsTotal>0
+    ?`<div class="pf-row"><span class="pr-l">Paid Out</span><span class="pr-v" style="color:var(--gold)">$${payoutsTotal.toLocaleString()}</span></div>`
+    :'';
+  const availableForPayout=a.pnl-payoutsTotal;
+  const stage=accountStageLabel(a);
+  const payoutBtn=(a.type==='propfirm-funded'&&a.status!=='failed'&&availableForPayout>0)
+    ?`<button class="pf-btn" onclick="openPayoutModal(${a.id})" style="color:var(--gold);border-color:var(--gold)"><i class="ti ti-cash"></i> Payout</button>`
+    :(a.type==='propfirm-funded'&&a.status!=='failed'
+      ?`<span style="font-size:11px;color:var(--text3);align-self:center">No profit to pay out yet</span>`
+      :'');
+  return`<div class="pf-card">
+    <div class="pf-card-top">
+      <div>
+        <div class="pf-firm-name">${a.name}</div>
+        <div class="pf-firm-sub">${subParts.join(' · ')}</div>
+      </div>
+      <span class="pf-status-badge ${stage.cls}">${stage.text}</span>
+    </div>
+    <hr class="pf-divider"/>
+    <div class="pf-row"><span class="pr-l">Initial Balance</span><span class="pr-v">${a.currency||'USD'} ${(a.initialBalance||0).toLocaleString()}</span></div>
+    <div class="pf-row"><span class="pr-l">Current Balance</span><span class="pr-v">${a.currency||'USD'} ${a.balance.toLocaleString(undefined,{maximumFractionDigits:2})}</span></div>
+    <div class="pf-row"><span class="pr-l">P&amp;L</span><span class="pr-v" style="color:${a.pnl>=0?'var(--green)':'var(--red)'}">${a.pnl>=0?'+':'-'}$${Math.abs(Math.round(a.pnl)).toLocaleString()} (${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
+    ${targetProgress}
+    ${riskInfo}
+    ${payoutsRow}
+    ${a.status==='failed'?'<div style="font-size:11px;color:var(--text3);margin-top:4px">Excluded from total balance</div>':''}
+    <div class="pf-card-actions">
+      <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
+      ${payoutBtn}
+      <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
+    </div>
+  </div>`;
+}
+
 function renderAccounts(){
   checkAccountAutoFund();
-  const all=db.propfirms||[];
+  const all=(db.propfirms||[]).filter(a=>a.type==='propfirm-challenge'||a.type==='propfirm-funded');
   const withBal=all.map(a=>({...a,...accountBalance(a)}));
   const totalBalance=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.balance,0);
   const totalPnl=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.pnl,0);
@@ -3670,52 +3774,9 @@ function renderAccounts(){
 
   const cards=document.getElementById('pf-cards');
   if(!all.length){
-    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No trading accounts yet. Add one above!</div>';
+    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No prop-firm accounts yet. Add one above!</div>';
   } else {
-    cards.innerHTML=withBal.map(a=>{
-      const pnlPct=a.initialBalance?(a.pnl/a.initialBalance*100):0;
-      const isProp=a.type==='propfirm-challenge'||a.type==='propfirm-funded';
-      const subParts=isProp?[a.firmName,a.type==='propfirm-challenge'?('Phase '+(a.currentPhase||1)):null].filter(Boolean):[a.broker].filter(Boolean);
-      subParts.push(ACCOUNT_TYPE_LABEL[a.type]||a.type);
-      const targetProgress=(a.type==='propfirm-challenge'&&a.status!=='failed')
-        ?(a.profitTarget>0
-          ?`<div class="pf-row"><span class="pr-l">Progress to Target</span><span class="pr-v">${a.currency||'USD'} ${a.pnl.toLocaleString(undefined,{maximumFractionDigits:0})} / ${a.profitTarget.toLocaleString()}</span></div>`
-          :`<div style="font-size:11px;color:var(--gold);margin-top:4px">Set a profit target for Phase ${a.currentPhase||1}</div>`)
-        :'';
-      const riskInfo=isProp&&a.status!=='failed'&&(a.maxLoss||a.maxDailyLoss)
-        ?`<div class="pf-row"><span class="pr-l">Max Loss / Daily</span><span class="pr-v">${a.maxLoss?a.maxLoss.toLocaleString():'—'} / ${a.maxDailyLoss?a.maxDailyLoss.toLocaleString():'—'}</span></div>`
-        :'';
-      const payoutsTotal=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
-      const payoutsRow=payoutsTotal>0
-        ?`<div class="pf-row"><span class="pr-l">Paid Out</span><span class="pr-v" style="color:var(--gold)">$${payoutsTotal.toLocaleString()}</span></div>`
-        :'';
-      const stage=accountStageLabel(a);
-      const payoutBtn=(a.type==='propfirm-funded'&&a.status!=='failed')
-        ?`<button class="pf-btn" onclick="openPayoutModal(${a.id})" style="color:var(--gold);border-color:var(--gold)"><i class="ti ti-cash"></i> Payout</button>`
-        :'';
-      return`<div class="pf-card">
-        <div class="pf-card-top">
-          <div>
-            <div class="pf-firm-name">${a.name}</div>
-            <div class="pf-firm-sub">${subParts.join(' · ')}</div>
-          </div>
-          <span class="pf-status-badge ${stage.cls}">${stage.text}</span>
-        </div>
-        <hr class="pf-divider"/>
-        <div class="pf-row"><span class="pr-l">Initial Balance</span><span class="pr-v">${a.currency||'USD'} ${(a.initialBalance||0).toLocaleString()}</span></div>
-        <div class="pf-row"><span class="pr-l">Current Balance</span><span class="pr-v">${a.currency||'USD'} ${a.balance.toLocaleString(undefined,{maximumFractionDigits:2})}</span></div>
-        <div class="pf-row"><span class="pr-l">P&amp;L</span><span class="pr-v" style="color:${a.pnl>=0?'var(--green)':'var(--red)'}">${a.pnl>=0?'+':'-'}$${Math.abs(Math.round(a.pnl)).toLocaleString()} (${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%)</span></div>
-        ${targetProgress}
-        ${riskInfo}
-        ${payoutsRow}
-        ${a.status==='failed'?'<div style="font-size:11px;color:var(--text3);margin-top:4px">Excluded from total balance</div>':''}
-        <div class="pf-card-actions">
-          <button class="pf-btn" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i> Edit</button>
-          ${payoutBtn}
-          <button class="pf-btn del" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i> Delete</button>
-        </div>
-      </div>`;
-    }).join('');
+    cards.innerHTML=withBal.map(accountCardHTML).join('');
   }
 
   // Payouts summary box
@@ -3728,15 +3789,56 @@ function renderAccounts(){
   if(payoutsSubEl)payoutsSubEl.textContent=allPayouts.length+' payout'+(allPayouts.length===1?'':'s')+' · tap to view';
 }
 
+function renderRealAccounts(){
+  const all=(db.propfirms||[]).filter(a=>a.type==='personal-live'||a.type==='personal-demo');
+  const withBal=all.map(a=>({...a,...accountBalance(a)}));
+  const totalBalance=withBal.reduce((s,a)=>s+a.balance,0);
+  const totalPnl=withBal.reduce((s,a)=>s+a.pnl,0);
+  const activeCount=all.filter(a=>a.status==='active').length;
+
+  document.getElementById('ra-invested').textContent='$'+totalBalance.toLocaleString(undefined,{maximumFractionDigits:0});
+  document.getElementById('ra-invested-sub').textContent='Across '+all.length+' account'+(all.length===1?'':'s');
+  const netEl=document.getElementById('ra-net');
+  netEl.textContent=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString(undefined,{maximumFractionDigits:0});
+  netEl.style.color=totalPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('ra-net-lbl').textContent=totalPnl>=0?'↗ NET RESULT':'↘ NET RESULT';
+  document.getElementById('ra-net-sub').textContent=totalPnl>=0?'In profit overall':'Down overall so far';
+  document.getElementById('ra-net-card').className='pf-metric '+(totalPnl>=0?'net-pos':'net-neg');
+  document.getElementById('ra-paidout').textContent=activeCount;
+  document.getElementById('ra-paidout-sub').textContent=activeCount+' active account'+(activeCount===1?'':'s');
+
+  const statusCounts={};
+  all.forEach(a=>{statusCounts[a.status]=(statusCounts[a.status]||0)+1;});
+  document.getElementById('ra-pills').innerHTML=Object.entries(statusCounts)
+    .map(([s,c])=>`<span class="pf-pill ${s==='active'?'p-active':s==='failed'?'p-failed':'p-phase'}">${c} ${ACCOUNT_STATUS_LABEL[s]||s}</span>`).join('');
+
+  const cards=document.getElementById('ra-cards');
+  if(!all.length){
+    cards.innerHTML='<div class="empty"><i class="ti ti-wallet"></i>No real accounts yet. Add one above!</div>';
+  } else {
+    cards.innerHTML=withBal.map(accountCardHTML).join('');
+  }
+}
+
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
 
 let payoutAccountId=null;
 function openPayoutModal(accountId){
-  payoutAccountId=accountId;
   const a=(db.propfirms||[]).find(p=>String(p.id)===String(accountId));
   if(!a)return;
-  document.getElementById('payout-account-name').textContent='From: '+a.name+' (current P&L: '+(a.pnl>=0?'+':'-')+'$'+Math.abs(Math.round(a.pnl||0)).toLocaleString()+')';
+  const {pnl}=accountBalance(a);
+  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const available=pnl-alreadyPaid;
+  if(available<=0){
+    alert(pnl<=0
+      ? 'This account isn\'t in profit right now, so there\'s nothing to pay out.'
+      : 'You\'ve already taken out all the available profit ($'+alreadyPaid.toLocaleString()+') on this account.');
+    return;
+  }
+  payoutAccountId=accountId;
+  document.getElementById('payout-account-name').textContent='From: '+a.name+' · available to pay out: $'+available.toLocaleString(undefined,{maximumFractionDigits:2});
   document.getElementById('payout-amount').value='';
+  document.getElementById('payout-amount').max=available;
   document.getElementById('payout-pct').value='';
   document.getElementById('payout-date').value=today();
   document.getElementById('payout-pct-hint').textContent='';
@@ -3747,20 +3849,33 @@ function updatePayoutPctHint(){
   const a=(db.propfirms||[]).find(p=>String(p.id)===String(payoutAccountId));
   const amt=parseFloat(document.getElementById('payout-amount').value)||0;
   const hint=document.getElementById('payout-pct-hint');
-  if(a&&a.pnl>0&&amt>0)hint.textContent='= '+(amt/a.pnl*100).toFixed(1)+'% of this account\'s current profit';
-  else hint.textContent='';
+  if(!a||amt<=0){hint.textContent='';return;}
+  const {pnl}=accountBalance(a);
+  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const available=pnl-alreadyPaid;
+  let msg=pnl>0?'= '+(amt/pnl*100).toFixed(1)+'% of this account\'s total profit':'';
+  if(amt>available){
+    hint.innerHTML='<span style="color:var(--red)">Only $'+available.toLocaleString(undefined,{maximumFractionDigits:2})+' available — you can\'t pay out more than the profit you\'ve made.</span>';
+  } else {
+    hint.textContent=msg;
+  }
 }
 
 function savePayout(){
   const amount=parseFloat(document.getElementById('payout-amount').value)||0;
   if(amount<=0){alert('Enter a payout amount.');return;}
-  const pct=parseFloat(document.getElementById('payout-pct').value)||null;
-  const date=document.getElementById('payout-date').value||today();
   const a=(db.propfirms||[]).find(p=>String(p.id)===String(payoutAccountId));
   if(!a)return;
+  const {pnl}=accountBalance(a);
+  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const available=pnl-alreadyPaid;
+  if(pnl<=0){alert('This account isn\'t in profit right now, so there\'s nothing to pay out.');return;}
+  if(amount>available){alert('You can only pay out up to your current profit. Available: $'+available.toLocaleString(undefined,{maximumFractionDigits:2})+'.');return;}
+  const pct=parseFloat(document.getElementById('payout-pct').value)||null;
+  const date=document.getElementById('payout-date').value||today();
   a.payouts=a.payouts||[];
   a.payouts.push({id:Date.now(),amount,pct,date});
-  persist();closeOverlay('payout-modal');renderAccounts();
+  persist();closeOverlay('payout-modal');renderAccounts();renderRealAccounts();
 }
 
 function openPayoutHistory(){
