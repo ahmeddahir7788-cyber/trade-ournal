@@ -197,7 +197,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .hero-select-wrap i{position:absolute;right:12px;pointer-events:none;font-size:12px;color:var(--text3)}
 .hero-select,select.hero-select{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:9px 32px 9px 16px;font-size:13px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none;cursor:pointer;white-space:nowrap}
 .hero-select:focus{outline:none}
-.btn-addtrade{background:linear-gradient(90deg,#4f6bff,#7c5cf0);color:#fff;border:none;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-addtrade{background:var(--text);color:var(--bg);border:none;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .btn-addtrade:hover{opacity:.9}
 .btn-addtrade i{font-size:15px}
 
@@ -384,7 +384,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .stat-val{font-size:13px;font-weight:700;width:24px;text-align:right;flex-shrink:0}
 
 /* CALENDAR */
-.cal-outer{display:grid;grid-template-columns:minmax(0,9fr) minmax(0,1fr);gap:10px;align-items:start}
+.cal-outer{display:block}
 /* Calendar header row with inline monthly stats and month navigation */
 .cal-header-row{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
 .cal-title-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -396,13 +396,17 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .cms-chip{font-size:13px;font-weight:600;padding:5px 14px;border-radius:100px;background:rgba(29,158,117,0.12);color:var(--green);white-space:nowrap}
 .cms-chip.cms-neg{background:rgba(216,90,48,0.12);color:var(--red)}
 .cms-chip-purple{background:rgba(167,139,250,0.15);color:var(--purple)}
-@media(max-width:700px){.cal-outer{grid-template-columns:1fr}}
 .cal-wrap{margin-top:0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+/* 7 day columns + 1 weekly-summary column, all in ONE grid so rows for the
+   calendar and the week cards are always pixel-aligned (native stretch), instead
+   of two separate grids kept in sync with guessed fixed heights. */
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(120px,170px);gap:4px 10px}
+@media(max-width:700px){.cal-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.week-card,.cal-week-name-header{display:none}}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:7px 4px;font-weight:600;background:transparent;border:none;letter-spacing:.02em}
-.cal-day{border-radius:8px;padding:4px 6px;height:68px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;height:68px;visibility:hidden;border:none}
+.cal-week-name-header{font-size:11px;color:var(--text3);text-align:left;padding:7px 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.cal-day{border-radius:8px;padding:4px 6px;min-height:68px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;min-height:68px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
@@ -417,10 +421,8 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .cal-day.profit .cal-day-pnl,.cal-day.loss .cal-day-pnl,.cal-day.breakeven .cal-day-pnl{color:var(--text)}
 .cal-day-trade-count{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
 .cal-day-trades{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
-/* Weekly summary */
-.weekly-summary{display:flex;flex-direction:column;gap:0}
-.weekly-summary-title{font-size:12px;font-weight:600;color:var(--text3);padding-bottom:8px;margin-bottom:2px;border-bottom:.5px solid var(--border);letter-spacing:.04em;text-transform:uppercase}
-.week-card{padding:8px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:68px;gap:2px}
+/* Weekly summary (now a grid column, not a separate flex column) */
+.week-card{padding:8px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:68px;gap:2px}
 .week-card-top{margin-bottom:2px}
 .week-name{font-size:12px;font-weight:700;color:var(--text)}
 .week-days-label{font-size:11px;color:var(--text3);margin-top:2px}
@@ -468,13 +470,9 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 /* DISPLAY MODE TOGGLE ($/%) */
 .dm-toggle{display:flex;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:2px;gap:2px}
 
-.theme-toggle-pill{position:relative;width:52px;height:26px;border-radius:100px;background:var(--surface2);border:.5px solid var(--border2);cursor:pointer;padding:0;flex-shrink:0}
-.theme-toggle-pill .tt-icon{position:absolute;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none}
-.theme-toggle-pill .tt-icon.tt-sun{left:6px}
-.theme-toggle-pill .tt-icon.tt-moon{right:6px}
-.theme-toggle-knob{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;transition:left .22s ease;box-shadow:0 1px 4px rgba(0,0,0,.35)}
-.theme-toggle-knob i{font-size:11px;color:var(--bg)}
-[data-theme="dark"] .theme-toggle-knob{left:28px}
+.theme-toggle-btn{width:34px;height:34px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.theme-toggle-btn i{font-size:16px;color:var(--text)}
+.theme-toggle-btn:hover{background:var(--border)}
 .dm-btn{background:none;border:none;padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer}
 .dm-btn.active{background:var(--blue);color:#fff}
 .dm-btn:not(.active):hover{background:var(--border)}
@@ -713,7 +711,6 @@ table.tt tr:last-child td{border-bottom:none}
       <span class="profile-avatar-display" style="width:22px;height:22px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;overflow:hidden"><span>?</span></span>
       <span class="sb-bottom-label profile-name-display">Profile</span>
     </button>
-    <button onclick="toggleTheme()"><i id="theme-icon" class="ti ti-sun"></i><span class="sb-bottom-label" id="theme-label">Dark Mode</span></button>
     <button onclick="signOut()"><i class="ti ti-logout"></i><span class="sb-bottom-label">Sign Out</span></button>
   </div>
 </aside>
@@ -735,7 +732,6 @@ table.tt tr:last-child td{border-bottom:none}
   <div id="more-sheet-pinnable"></div>
   <div style="height:1px;background:var(--border);margin:8px 12px"></div>
   <button onclick="closeMoreSheet();openProfileModal()"><i class="ti ti-user-circle"></i>Profile</button>
-  <button onclick="closeMoreSheet();toggleTheme()"><i id="theme-icon-mobile" class="ti ti-sun"></i>Dark Mode</button>
   <button onclick="closeMoreSheet();signOut()"><i class="ti ti-logout"></i>Sign Out</button>
 </div>
 
@@ -776,10 +772,8 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
       <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
     </div>
-    <button class="theme-toggle-pill" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <i class="ti ti-sun tt-icon tt-sun"></i>
-      <i class="ti ti-moon tt-icon tt-moon"></i>
-      <span class="theme-toggle-knob" id="theme-toggle-knob"><i id="theme-toggle-knob-icon" class="ti ti-sun"></i></span>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <i id="theme-toggle-icon" class="ti ti-moon-stars"></i>
     </button>
   </div>
 </div>
@@ -867,7 +861,7 @@ table.tt tr:last-child td{border-bottom:none}
             <button class="cal-nav-btn" onclick="captureCalendar()" title="Screenshot calendar"><i class="ti ti-camera"></i></button>
           </div>
         </div>
-        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div><div class="weekly-summary" id="weekly-summary"></div></div>
+        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div></div>
       </div>
     </div>
 
@@ -896,14 +890,19 @@ table.tt tr:last-child td{border-bottom:none}
           <button class="dash-tab active" id="tab-recent-trades" onclick="switchDashTradesTab('recent')">Recent trades</button>
           <button class="dash-tab" id="tab-open-positions" onclick="switchDashTradesTab('open')">Open Positions</button>
         </div>
-        <div class="dash-trades-scroll" id="dash-trades-panel-recent">
-          <table class="dash-trades-table">
-            <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
-            <tbody id="recent-trades-table"></tbody>
-          </table>
-        </div>
-        <div class="dash-trades-scroll" id="dash-trades-panel-open" style="display:none">
-          <div style="padding:1rem 0;color:var(--text3);font-size:13px">No open positions right now.</div>
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+          <div class="dash-trades-scroll" id="dash-trades-panel-recent">
+            <table class="dash-trades-table">
+              <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
+              <tbody id="recent-trades-table"></tbody>
+            </table>
+          </div>
+          <div class="dash-trades-scroll" id="dash-trades-panel-open" style="display:none">
+            <div style="padding:1rem 0;color:var(--text3);font-size:13px">No open positions right now.</div>
+          </div>
+          <div style="margin-top:auto;padding-top:10px">
+            <button onclick="go('trades',this)" style="width:100%;background:none;border:none;padding:8px 0 2px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px">View all trades <i class="ti ti-arrow-right" style="font-size:12px"></i></button>
+          </div>
         </div>
       </div>
     </div>
@@ -1037,9 +1036,9 @@ table.tt tr:last-child td{border-bottom:none}
             <option value="">No playbook</option>
           </select>
         </div>
-        <div class="field"><label>Account (optional)</label>
+        <div class="field"><label>Account</label>
           <select id="f-account">
-            <option value="">No account</option>
+            <option value="">Choose an account…</option>
           </select>
         </div>
       </div>
@@ -1876,21 +1875,15 @@ async function loadDB(){
 function applyTheme(){
   const t=localStorage.getItem('tj_v10_theme')||'dark';
   document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('theme-icon').className=t==='dark'?'ti ti-sun':'ti ti-moon';
-  const lbl=document.getElementById('theme-label');
-  if(lbl)lbl.textContent=t==='dark'?'Dark Mode':'Light Mode';
-  const knobIcon=document.getElementById('theme-toggle-knob-icon');
-  if(knobIcon)knobIcon.className=t==='dark'?'ti ti-moon':'ti ti-sun';
+  const icon=document.getElementById('theme-toggle-icon');
+  if(icon)icon.className=t==='dark'?'ti ti-moon-stars':'ti ti-sun';
 }
 function toggleTheme(){
   const c=document.documentElement.getAttribute('data-theme');
   const n=c==='dark'?'light':'dark';
   document.documentElement.setAttribute('data-theme',n);
-  document.getElementById('theme-icon').className=n==='dark'?'ti ti-sun':'ti ti-moon';
-  const lbl=document.getElementById('theme-label');
-  if(lbl)lbl.textContent=n==='dark'?'Dark Mode':'Light Mode';
-  const knobIcon=document.getElementById('theme-toggle-knob-icon');
-  if(knobIcon)knobIcon.className=n==='dark'?'ti ti-moon':'ti ti-sun';
+  const icon=document.getElementById('theme-toggle-icon');
+  if(icon)icon.className=n==='dark'?'ti ti-moon-stars':'ti ti-sun';
   localStorage.setItem('tj_v10_theme',n);
   refreshCurrentDashboardView();
 }
@@ -2462,7 +2455,6 @@ function statsOf(trades){
 // ── Calendar ──────────────────────────────────────────────────
 function renderCalendar(key,trades){
   const wrap=document.getElementById('cal-wrap');
-  const weekWrap=document.getElementById('weekly-summary');
   if(!wrap)return;
   const[y,m]=key.split('-').map(Number);
   const todayStr=today();
@@ -2501,12 +2493,10 @@ function renderCalendar(key,trades){
   const daysInMonth=new Date(y,m,0).getDate();
   const firstDay=new Date(y,m-1,1).getDay(); // 0=Sun
   const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const numRows=Math.ceil((firstDay+daysInMonth)/7);
 
-  // Build calendar grid
-  let html='<div class="cal-grid">';
-  dayNames.forEach(d=>html+=`<div class="cal-day-name">${d}</div>`);
-  // Use grid-column-start to position day 1 correctly — no empty cells needed
-  for(let d=1;d<=daysInMonth;d++){
+  function dayCellHTML(d){
+    if(d<1||d>daysInMonth)return'<div class="cal-day empty"></div>';
     const ds=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isToday=ds===todayStr;
     const info=byDate[ds];
@@ -2515,8 +2505,6 @@ function renderCalendar(key,trades){
     if(info){cls+=dayMetric>0?' profit':dayMetric<0?' loss':' breakeven';}
     else cls+=' no-trade';
     if(isToday)cls+=' today';
-    const baseStyle=d===1&&firstDay>0?`grid-column-start:${firstDay+1};`:'';
-    const style=`style="${baseStyle}cursor:pointer"`;
     if(info){
       const dayTrades=trades.filter(t=>t.date===ds);
       const pnlStr=fmtMoneyCompact(info.pnl,dayTrades);
@@ -2524,45 +2512,18 @@ function renderCalendar(key,trades){
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?(dayWins/dayDecisive*100).toFixed(1):0;
       const tradeWord=dayTrades.length===1?'trade':'trades';
-      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')">
+      return`<div class="${cls} cal-day-clickable" style="cursor:pointer" onclick="openDayJournal('${ds}')">
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
         <div class="cal-day-trades">${dayWr}%</div>
       </div>`;
-    } else {
-      html+=`<div class="${cls} cal-day-clickable" ${style} onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
     }
+    return`<div class="${cls} cal-day-clickable" style="cursor:pointer" onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
   }
-  html+='</div>';
-  wrap.innerHTML=html;
 
-  if(!weekWrap)return;
-
-  // Calculate number of rows in the grid
-  const totalCells=firstDay+daysInMonth;
-  const numRows=Math.ceil(totalCells/7);
-  const headerH=34;
-
-  // Build weekly summary aligned to each row
-  const weekNames=['One','Two','Three','Four','Five','Six'];
-  const fmt=d=>MONTHS_FULL[d.getMonth()].slice(0,3)+' '+d.getDate();
-
-  // First Sunday on or before month start
-  const firstSunday=new Date(y,m-1,1-firstDay);
-
-  let wHtml=`<div style="height:${headerH}px"></div>`;
-
-  let wIdx=0;
-  for(let w=0;w<numRows;w++){
-    const wStart=new Date(firstSunday);wStart.setDate(wStart.getDate()+w*7);
-    const wEnd=new Date(wStart);wEnd.setDate(wEnd.getDate()+6);
-
-    // Clamp to month
-    const dispStart=wStart.getMonth()===m-1&&wStart.getFullYear()===y?wStart:new Date(y,m-1,1);
-    const dispEnd=wEnd.getMonth()===m-1&&wEnd.getFullYear()===y?wEnd:new Date(y,m-1,daysInMonth);
-
-    // Sum trades in this week within the month
+  function weekCardHTML(w){
+    const wStart=new Date(y,m-1,1-firstDay+w*7);
     let wPnl=0,wRR=0,wDays=0,wTrades=[];
     for(let d=0;d<7;d++){
       const dd=new Date(wStart);dd.setDate(dd.getDate()+d);
@@ -2576,22 +2537,31 @@ function renderCalendar(key,trades){
         }
       }
     }
-
     const wMetric=displayMode==='percent'?wRR:wPnl;
     const wPnlStr=fmtMoneyCompact(wPnl,wTrades);
     const wTradeCount=wTrades.length;
-    const wWins=wTrades.filter(t=>t.outcome==='Win'||t.outcome==='Partial').length;
-    const wDecisive=wTrades.filter(t=>t.outcome!=='Break Even').length;
-    const wWr=wDecisive>0?Math.round(wWins/wDecisive*100):0;
-    const isLastRow=w===numRows-1;
-    wHtml+=`<div class="week-card" style="height:68px;margin-bottom:${isLastRow?0:4}px">
+    return`<div class="week-card">
       <div class="week-card-top"><span class="week-name">Week ${w+1}</span></div>
       <div style="font-size:14px;font-weight:800;color:${wTradeCount>0?(wMetric>=0?'var(--green)':'var(--red)'):'var(--text3)'}">${wTradeCount>0?wPnlStr:(displayMode==='dollar'?'$0.00':'0R')}</div>
       <div class="week-days-label">${wDays} ${wDays===1?'day':'days'}</div>
     </div>`;
-    wIdx++;
   }
-  weekWrap.innerHTML=wHtml;
+
+  // Build ONE grid: header row (7 day names + label), then for each week row,
+  // exactly 7 day cells followed by that week's summary card — so both columns
+  // live in the same grid and are aligned natively by the browser, row by row.
+  let html='<div class="cal-grid">';
+  dayNames.forEach(d=>html+=`<div class="cal-day-name">${d}</div>`);
+  html+='<div class="cal-week-name-header">Weekly</div>';
+  for(let w=0;w<numRows;w++){
+    for(let d=0;d<7;d++){
+      const dayNum=w*7+d-firstDay+1;
+      html+=dayCellHTML(dayNum);
+    }
+    html+=weekCardHTML(w);
+  }
+  html+='</div>';
+  wrap.innerHTML=html;
 }
 
 // ── Mini Calendar (simple, plain style) ────────────────────────
@@ -2836,11 +2806,18 @@ function drawCharts(trades){
     if(eqChart){eqChart.destroy();eqChart=null;}
     const chartH=c1.canvas.clientHeight||240;
     const lastVal=vals[vals.length-1]||0;
-    const lineColor='#7c5cf0';
+    const isProfit=lastVal>=0;
+    const lineColor=isProfit?'#1D9E75':'#D85A30';
     const grad=c1.createLinearGradient(0,0,0,chartH);
-    grad.addColorStop(0,'rgba(124,92,240,0.55)');
-    grad.addColorStop(0.5,'rgba(124,92,240,0.22)');
-    grad.addColorStop(1,'rgba(124,92,240,0.02)');
+    if(isProfit){
+      grad.addColorStop(0,'rgba(29,158,117,0.55)');
+      grad.addColorStop(0.5,'rgba(29,158,117,0.22)');
+      grad.addColorStop(1,'rgba(29,158,117,0.02)');
+    } else {
+      grad.addColorStop(0,'rgba(216,90,48,0.55)');
+      grad.addColorStop(0.5,'rgba(216,90,48,0.22)');
+      grad.addColorStop(1,'rgba(216,90,48,0.02)');
+    }
 
     // Crosshair plugin
     const crosshairPlugin={
@@ -3330,8 +3307,9 @@ function saveTrade(){
   const sessEl=document.getElementById('f-sess');
   const dirEl=document.getElementById('f-dir');
   const outEl=document.getElementById('f-out');
+  const acctSel=document.getElementById('f-account');
   const errEl=document.getElementById('err-msg');
-  [pnlEl,rrEl,symEl,sessEl,dirEl,outEl].forEach(el=>el.classList.remove('err'));
+  [pnlEl,rrEl,symEl,sessEl,dirEl,outEl,acctSel].forEach(el=>el.classList.remove('err'));
   const fSymBtn=document.getElementById('f-sym-btn');if(fSymBtn)fSymBtn.classList.remove('err');
   errEl.style.display='none';
   const errs=[];
@@ -3341,6 +3319,7 @@ function saveTrade(){
   if(!outEl.value){outEl.classList.add('err');errs.push('Outcome');}
   if(pnlEl.value.trim()===''){pnlEl.classList.add('err');errs.push('P&L');}
   if(rrEl.value.trim()===''){rrEl.classList.add('err');errs.push('RR');}
+  if(!acctSel.value){acctSel.classList.add('err');errs.push('Account');}
   if(errs.length){errEl.textContent='Please fill: '+errs.join(', ');errEl.style.display='inline';return;}
   const date=document.getElementById('f-date').value||today();
   const key=dateToKey(date);
@@ -3352,8 +3331,7 @@ function saveTrade(){
   const finalRR=rrRaw==null?null:(outcome==='Loss'?-rrRaw:rrRaw);
   const pbSel=document.getElementById('f-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
-  const acctSel=document.getElementById('f-account');
-  const accountId=acctSel&&acctSel.value?acctSel.value:null;
+  const accountId=acctSel.value;
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
@@ -3524,6 +3502,13 @@ function accountBalance(a){
 }
 
 const MODEL_PHASES={'1-step':1,'2-step':2,'3-step':3};
+
+// Payouts taken since the account's balance last reset (new phase, funded, or a prior
+// payout) — this is what "available to pay out now" is measured against, since the
+// balance itself resets to the initial balance each time.
+function payoutsSinceReset(a){
+  return(a.payouts||[]).filter(p=>p.id>(a.phaseStartTradeId||0)).reduce((s,p)=>s+(p.amount||0),0);
+}
 
 function accountsTradesToday(accountId){
   const t=today();
@@ -3715,7 +3700,7 @@ function accountCardHTML(a){
   const payoutsRow=payoutsTotal>0
     ?`<div class="pf-row"><span class="pr-l">Paid Out</span><span class="pr-v" style="color:var(--gold)">$${payoutsTotal.toLocaleString()}</span></div>`
     :'';
-  const availableForPayout=a.pnl-payoutsTotal;
+  const availableForPayout=a.pnl-payoutsSinceReset(a);
   const stage=accountStageLabel(a);
   const payoutBtn=(a.type==='propfirm-funded'&&a.status!=='failed'&&availableForPayout>0)
     ?`<button class="pf-btn" onclick="openPayoutModal(${a.id})" style="color:var(--gold);border-color:var(--gold)"><i class="ti ti-cash"></i> Payout</button>`
@@ -3827,7 +3812,7 @@ function openPayoutModal(accountId){
   const a=(db.propfirms||[]).find(p=>String(p.id)===String(accountId));
   if(!a)return;
   const {pnl}=accountBalance(a);
-  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const alreadyPaid=payoutsSinceReset(a);
   const available=pnl-alreadyPaid;
   if(available<=0){
     alert(pnl<=0
@@ -3851,7 +3836,7 @@ function updatePayoutPctHint(){
   const hint=document.getElementById('payout-pct-hint');
   if(!a||amt<=0){hint.textContent='';return;}
   const {pnl}=accountBalance(a);
-  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const alreadyPaid=payoutsSinceReset(a);
   const available=pnl-alreadyPaid;
   let msg=pnl>0?'= '+(amt/pnl*100).toFixed(1)+'% of this account\'s total profit':'';
   if(amt>available){
@@ -3867,7 +3852,7 @@ function savePayout(){
   const a=(db.propfirms||[]).find(p=>String(p.id)===String(payoutAccountId));
   if(!a)return;
   const {pnl}=accountBalance(a);
-  const alreadyPaid=(a.payouts||[]).reduce((s,p)=>s+(p.amount||0),0);
+  const alreadyPaid=payoutsSinceReset(a);
   const available=pnl-alreadyPaid;
   if(pnl<=0){alert('This account isn\'t in profit right now, so there\'s nothing to pay out.');return;}
   if(amount>available){alert('You can only pay out up to your current profit. Available: $'+available.toLocaleString(undefined,{maximumFractionDigits:2})+'.');return;}
@@ -3875,6 +3860,9 @@ function savePayout(){
   const date=document.getElementById('payout-date').value||today();
   a.payouts=a.payouts||[];
   a.payouts.push({id:Date.now(),amount,pct,date});
+  // A payout is a withdrawal, not real trading — the balance starts over at the
+  // initial balance again after this, same as moving to a new phase.
+  a.phaseStartTradeId=Date.now();
   persist();closeOverlay('payout-modal');renderAccounts();renderRealAccounts();
 }
 
@@ -4083,7 +4071,8 @@ function populateAccountDropdown(prefix){
   const sel=document.getElementById(prefix+'-account');
   if(!sel)return;
   const current=sel.value;
-  sel.innerHTML='<option value="">No account</option>'+
+  const placeholder=prefix==='f'?'Choose an account…':'No account';
+  sel.innerHTML=`<option value="">${placeholder}</option>`+
     (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('');
   if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
 }
@@ -4851,15 +4840,20 @@ function renderWeekdayChart(trades){
       meta.data.forEach((bar,i)=>{
         const v=data[i];
         const txt=(v>=0?'$':'-$')+(Math.abs(v)>=1000?(Math.abs(v)/1000).toFixed(1)+'k':Math.abs(Math.round(v)).toLocaleString());
+        // Always anchor the label above the TOP of the bar's bounding box — for a
+        // winning bar that's its tip; for a losing bar that's the baseline — so
+        // every label sits "up" in the same consistent way, never crowded near
+        // the bottom axis for small losses.
+        const topY=Math.min(bar.y,bar.base);
         ctx.fillStyle=v>=0?posColor:negColor;
-        ctx.fillText(txt,bar.x,bar.y-10);
+        ctx.fillText(txt,bar.x,topY-10);
         // small underline flourish beneath the label
         const w=ctx.measureText(txt).width;
         ctx.strokeStyle=v>=0?posColor:negColor;
         ctx.lineWidth=2;
         ctx.beginPath();
-        ctx.moveTo(bar.x-w/2,bar.y+2);
-        ctx.lineTo(bar.x+w/2,bar.y+2);
+        ctx.moveTo(bar.x-w/2,topY+2);
+        ctx.lineTo(bar.x+w/2,topY+2);
         ctx.stroke();
       });
       ctx.restore();
