@@ -2048,9 +2048,8 @@ async function saveProfile(){
 }
 
 function refreshCurrentDashboardView(){
-  if(currentDashKey){
-    renderDashboard(currentDashKey);
-  }
+  if(drpActivePreset){applyDRPPreset(drpActivePreset);return;}
+  if(currentDashKey)renderDashboard(currentDashKey);
 }
 
 function initSidebar(){
@@ -3364,7 +3363,7 @@ function saveTrade(){
   renderTradeChecklist('f');
   updateLogHint();
   checkAccountAutoFund();
-  if(currentDashKey===key)refreshCurrentDashboardView();
+  refreshCurrentDashboardView();
   const msg=document.getElementById('save-msg');
   msg.style.display='inline';setTimeout(()=>msg.style.display='none',2000);
 }
@@ -3473,7 +3472,7 @@ function confirmDelTrade(){
   db.trades[pendingDelKey]=db.trades[pendingDelKey].filter(t=>t.id!==pendingDelTradeId);
   if(!db.trades[pendingDelKey].length)delete db.trades[pendingDelKey];
   pendingDelTradeId=null;pendingDelKey=null;persist();closeOverlay('del-trade-modal');renderDetailTable();
-  if(currentDashKey===currentDetailKey)refreshCurrentDashboardView();
+  refreshCurrentDashboardView();
 }
 
 function exportCSV(){
@@ -4385,7 +4384,7 @@ function saveEditTrade(){
   // If date moved to different month, update currentDetailKey
   if(newKey!==editTradeKey)currentDetailKey=newKey;
   renderDetailTable();
-  if(currentDashKey===editTradeKey||currentDashKey===newKey)refreshCurrentDashboardView();
+  refreshCurrentDashboardView();
   // If the Day Journal popup is open behind this, refresh it so the edited trade shows up to date
   if(currentDayKey&&document.getElementById('day-modal').classList.contains('open')){
     openDayJournal(currentDayKey);
