@@ -51,13 +51,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;flex:1}
 nav button{background:none;border:none;padding:11px 0;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:13px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:400;letter-spacing:0.01em}
 .sidebar:hover nav button{justify-content:flex-start;padding:11px 14px}
-nav button:hover{color:var(--text);background:none}
-nav button.active{color:var(--text);font-weight:700;background:none}
+nav button:hover{color:var(--text);background:var(--surface2)}
+nav button.active{color:var(--text);font-weight:700;background:var(--surface2)}
 nav button.active i{color:var(--blue)}
 nav button i{font-size:19px;flex-shrink:0;color:var(--text3);transition:color .15s}
 nav button:hover i{color:var(--text)}
-.nav-tile{width:24px;height:24px;min-width:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s}
-.nav-tile i{font-size:13px!important;color:#fff!important}
+.nav-tile{width:36px;height:36px;min-width:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.nav-tile i{font-size:18px!important;color:#fff!important;font-weight:700!important;-webkit-text-stroke:.4px #fff}
 nav button.active .nav-tile{transform:scale(1.08)}
 nav button:hover .nav-tile{transform:scale(1.05)}
 .nav-label{transition:opacity .2s;overflow:hidden}
@@ -238,7 +238,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .dash-trades-table{width:100%;border-collapse:collapse}
 .dash-trades-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:4px;border-bottom:.5px solid var(--border)}
 .dash-trades-table th:last-child{text-align:right}
-.dash-trades-scroll{overflow-y:auto;max-height:280px}
+.dash-trades-scroll{overflow-y:auto}
 
 @media(max-width:1100px){
   .dash-top-grid{grid-template-columns:1fr}
@@ -400,32 +400,40 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 /* 7 day columns + 1 weekly-summary column, all in ONE grid so rows for the
    calendar and the week cards are always pixel-aligned (native stretch), instead
    of two separate grids kept in sync with guessed fixed heights. */
-.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(120px,170px);gap:4px 10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(78px,96px);gap:5px 8px}
 @media(max-width:700px){.cal-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.week-card,.cal-week-name-header{display:none}}
 .cal-day.empty{visibility:hidden}
-.cal-day-name{font-size:11px;color:var(--text3);text-align:center;padding:7px 4px;font-weight:600;background:transparent;border:none;letter-spacing:.02em}
+.cal-day-name{font-size:13px;color:var(--text2);text-align:center;padding:7px 4px;font-weight:700;background:transparent;border:none;letter-spacing:.02em}
 .cal-week-name-header{font-size:11px;color:var(--text3);text-align:left;padding:7px 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
-.cal-day{border-radius:8px;padding:4px 6px;min-height:68px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;min-height:68px;visibility:hidden;border:none}
+.cal-day{border-radius:10px;padding:6px 7px;min-height:96px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;min-height:96px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
 .cal-day-clickable:hover{opacity:.85;transition:opacity .1s}
-.cal-day.profit{background:rgba(29,158,117,0.12);border-color:rgba(29,158,117,0.25)}
-.cal-day.loss{background:rgba(216,90,48,0.1);border-color:rgba(216,90,48,0.25)}
-.cal-day.breakeven{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25)}
+.cal-day.profit{background:rgba(29,158,117,0.24);border-color:rgba(29,158,117,0.4)}
+.cal-day.loss{background:rgba(216,90,48,0.22);border-color:rgba(216,90,48,0.4)}
+.cal-day.breakeven{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.35)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
-.cal-day-top{position:absolute;top:4px;right:7px}
-.cal-day-num{font-size:10px;font-weight:500;color:var(--text3)}
-.cal-day-pnl{font-size:12px;font-weight:700;line-height:1.2;color:var(--text)}
-.cal-day.profit .cal-day-pnl,.cal-day.loss .cal-day-pnl,.cal-day.breakeven .cal-day-pnl{color:var(--text)}
-.cal-day-trade-count{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
-.cal-day-trades{font-size:9px;font-weight:500;color:var(--text);margin-top:1px}
+.cal-day-top{position:absolute;top:6px;right:7px;display:flex;align-items:center}
+.cal-day-num{font-size:10px;font-weight:600;color:var(--text3);line-height:1}
+.cal-day.profit .cal-day-num,.cal-day.loss .cal-day-num,.cal-day.breakeven .cal-day-num{color:var(--text);opacity:.6}
+.cal-day-count-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:800;min-width:14px;height:14px;border-radius:100px;display:flex;align-items:center;justify-content:center;padding:0 3px;margin-left:3px}
+.cal-day-pnl{font-size:16px;font-weight:800;line-height:1.15;color:var(--text);margin-top:16px}
+.cal-day.profit .cal-day-pnl{color:var(--green)}
+.cal-day.loss .cal-day-pnl{color:var(--red)}
+.cal-day-trade-count{font-size:11px;font-weight:600;color:var(--text2);margin-top:2px}
+.cal-day-trades{font-size:11px;font-weight:600;color:var(--text2)}
+.cal-day-dot{width:5px;height:5px;border-radius:50%;position:absolute;bottom:7px;left:50%;transform:translateX(-50%)}
+.cal-day.profit .cal-day-dot{background:var(--green)}
+.cal-day.loss .cal-day-dot{background:var(--red)}
+.cal-day.breakeven .cal-day-dot{background:var(--purple)}
 /* Weekly summary (now a grid column, not a separate flex column) */
-.week-card{padding:8px 10px;border-radius:8px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:68px;gap:2px}
-.week-card-top{margin-bottom:2px}
-.week-name{font-size:12px;font-weight:700;color:var(--text)}
-.week-days-label{font-size:11px;color:var(--text3);margin-top:2px}
+.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:96px;gap:2px}
+.week-card-top{margin-bottom:1px}
+.week-name{font-size:11px;font-weight:800;color:var(--text)}
+.week-days-label{font-size:9px;font-weight:700;color:var(--purple);background:rgba(167,139,250,0.18);padding:2px 7px;border-radius:100px;margin-top:3px;white-space:nowrap}
+
 
 .week-stats{display:none}
 
@@ -485,6 +493,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--text2);font-weight:500}
 .field input,.field select,.field textarea{font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;transition:border-color .15s}
+.field select.select-placeholder{color:var(--text3)}
 .field textarea{resize:vertical;min-height:64px;line-height:1.5}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
 .field input.err{border-color:var(--red)!important}
@@ -788,8 +797,8 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Welcome hero -->
     <div class="dash-hero">
-      <div>
-        <div class="dash-hero-title">Welcome Back, <span class="profile-name-display">Trader</span></div>
+      <div style="max-width:560px">
+        <div class="dash-hero-title" id="dash-hero-quote" style="font-size:20px;font-style:italic;line-height:1.35">—</div>
       </div>
       <div class="dash-hero-controls">
         <div class="hero-select-wrap">
@@ -814,32 +823,32 @@ table.tt tr:last-child td{border-bottom:none}
         <!-- Stat cards: Net PnL, Trade Win%, Profit Factor, Day Win%, Avg Win/Loss, Account Balance -->
         <div class="snc-cards dash-stat-grid" data-block-id="stats">
           <div class="dash-stat-card sub-block" data-sub-id="netpnl">
-            <div class="dash-stat-icon"><i class="ti ti-chart-bar"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(29,158,117,0.16)"><i class="ti ti-chart-bar" style="color:#1D9E75"></i></div>
             <div class="dash-stat-lbl">Net P&amp;L <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-netpnl">$0</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="winrate">
-            <div class="dash-stat-icon"><i class="ti ti-gauge"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(55,138,221,0.16)"><i class="ti ti-gauge" style="color:#378ADD"></i></div>
             <div class="dash-stat-lbl">Trade win% <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-winrate">0%</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="pf">
-            <div class="dash-stat-icon"><i class="ti ti-chart-donut-3"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(167,139,250,0.18)"><i class="ti ti-chart-donut-3" style="color:#a78bfa"></i></div>
             <div class="dash-stat-lbl">Profit factor <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-pf">—</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="daywr">
-            <div class="dash-stat-icon"><i class="ti ti-target-arrow"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(239,159,39,0.18)"><i class="ti ti-target-arrow" style="color:#EF9F27"></i></div>
             <div class="dash-stat-lbl">Day win <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-daywr">0%</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="avgwl">
-            <div class="dash-stat-icon"><i class="ti ti-scale"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-scale" style="color:#D85A30"></i></div>
             <div class="dash-stat-lbl">Avg Win/Loss <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-avgwl-ratio">—</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="balance">
-            <div class="dash-stat-icon"><i class="ti ti-building-bank"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(34,166,179,0.18)"><i class="ti ti-building-bank" style="color:#22A6B3"></i></div>
             <div class="dash-stat-lbl">Account balance <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-balance">$0</div>
           </div>
@@ -886,22 +895,16 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <div class="dash-chart-card">
-        <div class="dash-tabs">
-          <button class="dash-tab active" id="tab-recent-trades" onclick="switchDashTradesTab('recent')">Recent trades</button>
-          <button class="dash-tab" id="tab-open-positions" onclick="switchDashTradesTab('open')">Open Positions</button>
-        </div>
+        <div class="dash-chart-title" style="margin-bottom:12px">Recent trades</div>
         <div style="flex:1;display:flex;flex-direction:column;min-height:0">
-          <div class="dash-trades-scroll" id="dash-trades-panel-recent">
+          <div class="dash-trades-scroll" id="dash-trades-panel-recent" style="flex:1">
             <table class="dash-trades-table">
               <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
               <tbody id="recent-trades-table"></tbody>
             </table>
           </div>
-          <div class="dash-trades-scroll" id="dash-trades-panel-open" style="display:none">
-            <div style="padding:1rem 0;color:var(--text3);font-size:13px">No open positions right now.</div>
-          </div>
-          <div style="margin-top:auto;padding-top:10px">
-            <button onclick="go('trades',this)" style="width:100%;background:none;border:none;padding:8px 0 2px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px">View all trades <i class="ti ti-arrow-right" style="font-size:12px"></i></button>
+          <div style="padding-top:10px">
+            <button onclick="viewCurrentMonthTrades()" style="width:100%;background:none;border:none;padding:8px 0 2px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px">View all trades <i class="ti ti-arrow-right" style="font-size:12px"></i></button>
           </div>
         </div>
       </div>
@@ -2093,6 +2096,11 @@ function renderTopBarTitle(id){
 }
 
 // ── Navigation ────────────────────────────────────────────────
+function viewCurrentMonthTrades(){
+  go('trades');
+  openMonthDetail(curMonthKey());
+}
+
 function go(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
@@ -2120,7 +2128,7 @@ function go(id,btn){
   if(id==='accounts')renderAccounts();
   if(id==='realaccounts')renderRealAccounts();
   if(id==='playbooks')renderPlaybooks();
-  if(id==='log'){populatePlaybookDropdown('f');populateAccountDropdown('f');}
+  if(id==='log'){populatePlaybookDropdown('f');populateAccountDropdown('f');refreshSelectPlaceholderStyles(document.getElementById('page-log'));}
 }
 
 
@@ -2409,6 +2417,29 @@ function renderDashboardWithTrades(trades,label){
 }
 
 // ── New hero section: date + welcome, and Recent trades / Open Positions tab switch ──
+const TRADING_QUOTES=[
+  "The market can stay irrational longer than you can stay solvent.",
+  "Plan your trade, trade your plan.",
+  "Cut your losses short and let your winners run.",
+  "Risk comes from not knowing what you're doing.",
+  "The trend is your friend until it ends.",
+  "Amateurs think about how much money they can make. Professionals think about how much money they could lose.",
+  "It's not whether you're right or wrong, but how much money you make when right and how much you lose when wrong.",
+  "The goal of a successful trader is to make the best trades. Money is secondary.",
+  "In trading, the impossible happens about twice a year.",
+  "Discipline is the bridge between goals and accomplishment.",
+  "Every trade is just one of a thousand — don't attach your ego to it.",
+  "Losses are the cost of doing business in the market.",
+  "The market doesn't care how you feel about it.",
+  "Consistency beats intensity. Show up every day.",
+  "Your edge means nothing without risk management.",
+  "Patience is a trading position too.",
+  "Good trades feel boring. Bad trades feel exciting.",
+  "The four most dangerous words in trading: 'this time it's different.'",
+  "Protect your capital first — profits will follow.",
+  "A trading plan without discipline is just a wish."
+];
+
 function renderDashHero(){
   const dEl=document.getElementById('dash-hero-date');
   if(dEl){
@@ -2417,13 +2448,14 @@ function renderDashHero(){
     const d=new Date();
     dEl.textContent=days[d.getDay()]+', '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
   }
-}
-
-function switchDashTradesTab(tab){
-  document.getElementById('tab-recent-trades').classList.toggle('active',tab==='recent');
-  document.getElementById('tab-open-positions').classList.toggle('active',tab==='open');
-  document.getElementById('dash-trades-panel-recent').style.display=tab==='recent'?'':'none';
-  document.getElementById('dash-trades-panel-open').style.display=tab==='open'?'':'none';
+  const qEl=document.getElementById('dash-hero-quote');
+  if(qEl){
+    // Same quote all day, changes daily — based on day-of-year so it's stable on refresh.
+    const now=new Date();
+    const start=new Date(now.getFullYear(),0,0);
+    const dayOfYear=Math.floor((now-start)/86400000);
+    qEl.textContent='"'+TRADING_QUOTES[dayOfYear%TRADING_QUOTES.length]+'"';
+  }
 }
 
 
@@ -2511,11 +2543,13 @@ function renderCalendar(key,trades){
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?(dayWins/dayDecisive*100).toFixed(1):0;
       const tradeWord=dayTrades.length===1?'trade':'trades';
+      const countBadge=dayTrades.length>1?`<span class="cal-day-count-badge">${dayTrades.length}</span>`:'';
       return`<div class="${cls} cal-day-clickable" style="cursor:pointer" onclick="openDayJournal('${ds}')">
-        <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
+        <div class="cal-day-top"><span class="cal-day-num">${d}</span>${countBadge}</div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
         <div class="cal-day-trades">${dayWr}%</div>
+        <span class="cal-day-dot"></span>
       </div>`;
     }
     return`<div class="${cls} cal-day-clickable" style="cursor:pointer" onclick="openDayJournal('${ds}')"><div class="cal-day-top"><span class="cal-day-num">${d}</span></div></div>`;
@@ -2848,7 +2882,7 @@ function drawCharts(trades){
       if(!el&&wrap){
         el=document.createElement('div');
         el.className='eq-topbar';
-        el.style.cssText='position:absolute;top:12px;left:16px;display:flex;align-items:center;gap:16px;pointer-events:none;z-index:2;font-family:Inter,sans-serif';
+        el.style.cssText='position:absolute;top:14px;right:18px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;pointer-events:none;z-index:2;font-family:Inter,sans-serif;text-align:right';
         wrap.style.position='relative';
         wrap.appendChild(el);
       }
@@ -2861,10 +2895,10 @@ function drawCharts(trades){
       let dateStr='';
       if(lbl&&lbl!=='start'){
         try{const p=lbl.split('-');const d=new Date(lbl);const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];dateStr=days[d.getDay()]+', '+parseInt(p[2])+' '+mn[parseInt(p[1])-1]+', '+p[0];}catch(e){dateStr=lbl;}
-      }
+      } else dateStr='Start';
       const pnlColor=v>=0?'#1D9E75':'#D85A30';
-      const pnlStr=(v>=0?'+':' ')+' $'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
-      el.innerHTML=`<span style="font-size:13px;font-weight:600;color:${dark?'#ccc':'#444'}">${dateStr}</span><span style="font-size:13px;font-weight:700;color:${pnlColor}">Net P&L ${pnlStr}</span>`;
+      const pnlStr=(v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
+      el.innerHTML=`<span style="font-size:11px;font-weight:600;color:${dark?'#999':'#777'}">${dateStr}</span><span style="font-size:19px;font-weight:800;color:${pnlColor}">${pnlStr}</span><span style="font-size:10px;font-weight:600;color:${dark?'#777':'#999'}">Net P&amp;L</span>`;
     }
 
     eqChart=new Chart(c1,{
@@ -3360,6 +3394,7 @@ function saveTrade(){
   document.getElementById('f-notes').value='';
   if(pbSel)pbSel.value='';
   if(acctSel)acctSel.value='';
+  refreshSelectPlaceholderStyles(document.getElementById('page-log'));
   renderTradeChecklist('f');
   updateLogHint();
   checkAccountAutoFund();
@@ -4057,6 +4092,19 @@ function openPlaybookDetail(id){
 }
 
 // ── Playbook dropdown + checklist inside Add/Edit Trade ─────────
+// Keep any unselected <select> in .field forms styled like a muted placeholder
+// (matching the Pair picker's "Select pair" look) instead of full-strength text.
+function refreshSelectPlaceholderStyles(container){
+  (container||document).querySelectorAll('.field select').forEach(sel=>{
+    sel.classList.toggle('select-placeholder',sel.value==='');
+  });
+}
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.matches&&e.target.matches('.field select')){
+    e.target.classList.toggle('select-placeholder',e.target.value==='');
+  }
+});
+
 function populatePlaybookDropdown(prefix){
   const sel=document.getElementById(prefix+'-playbook');
   if(!sel)return;
@@ -4341,6 +4389,7 @@ function openEditTrade(key,id){
   populateAccountDropdown('et');
   document.getElementById('et-account').value=t.accountId||'';
   renderTradeChecklist('et',t.checklistResults);
+  refreshSelectPlaceholderStyles(document.getElementById('edit-trade-modal'));
   document.getElementById('edit-trade-modal').classList.add('open');
 }
 
@@ -4890,6 +4939,7 @@ function renderWeekdayChart(trades){
   });
 }
 
+let drpLeftMonth=new Date();
 let drpRightMonth=new Date();
 let drpStart=null,drpEnd=null,drpSelecting=false;
 let drpActivePreset='alltime';
@@ -5425,6 +5475,7 @@ function enableDragReorder(containerEl,itemSelector,handleSelector,idAttr,storag
   populatePlaybookDropdown('f');
   populateAccountDropdown('f');
   populateDashAccountFilter();
+  refreshSelectPlaceholderStyles();
   currentDashKey=curMonthKey();
   // Init DRP to alltime label
   const drpLbl=document.getElementById('drp-label');if(drpLbl)drpLbl.textContent='All Time';
