@@ -213,7 +213,7 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 
 .dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
 .snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
-.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.9rem 1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:10px;justify-content:center;min-height:92px}
+.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.9rem 1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:10px;justify-content:flex-start;min-height:92px}
 .dash-stat-icon{width:30px;height:30px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .dash-stat-icon i{font-size:15px;color:var(--text2)}
 .dash-stat-lbl{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
@@ -405,8 +405,8 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:13px;color:var(--text2);text-align:center;padding:7px 4px;font-weight:700;background:transparent;border:none;letter-spacing:.02em}
 .cal-week-name-header{font-size:11px;color:var(--text3);text-align:left;padding:7px 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
-.cal-day{border-radius:10px;padding:6px 7px;min-height:96px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;min-height:96px;visibility:hidden;border:none}
+.cal-day{border-radius:10px;padding:6px 7px;min-height:74px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;min-height:74px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
@@ -416,20 +416,19 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .cal-day.breakeven{background:rgba(167,139,250,0.18);border-color:rgba(167,139,250,0.35)}
 .cal-day.today{outline:2px solid var(--blue);outline-offset:1px}
 .cal-day-top{position:absolute;top:6px;right:7px;display:flex;align-items:center}
-.cal-day-num{font-size:10px;font-weight:600;color:var(--text3);line-height:1}
-.cal-day.profit .cal-day-num,.cal-day.loss .cal-day-num,.cal-day.breakeven .cal-day-num{color:var(--text);opacity:.6}
-.cal-day-count-badge{background:var(--purple);color:#fff;font-size:9px;font-weight:800;min-width:14px;height:14px;border-radius:100px;display:flex;align-items:center;justify-content:center;padding:0 3px;margin-left:3px}
-.cal-day-pnl{font-size:16px;font-weight:800;line-height:1.15;color:var(--text);margin-top:16px}
+.cal-day-num{font-size:9px;font-weight:500;color:var(--text3);line-height:1}
+.cal-day.profit .cal-day-num,.cal-day.loss .cal-day-num,.cal-day.breakeven .cal-day-num{color:var(--text);opacity:.5}
+.cal-day-pnl{font-size:14px;font-weight:800;line-height:1.1;color:var(--text);margin-top:11px}
 .cal-day.profit .cal-day-pnl{color:var(--green)}
 .cal-day.loss .cal-day-pnl{color:var(--red)}
-.cal-day-trade-count{font-size:11px;font-weight:600;color:var(--text2);margin-top:2px}
-.cal-day-trades{font-size:11px;font-weight:600;color:var(--text2)}
+.cal-day-trade-count{font-size:10px;font-weight:600;color:var(--text2);margin-top:1px}
+.cal-day-trades{font-size:10px;font-weight:600;color:var(--text2)}
 .cal-day-dot{width:5px;height:5px;border-radius:50%;position:absolute;bottom:7px;left:50%;transform:translateX(-50%)}
 .cal-day.profit .cal-day-dot{background:var(--green)}
 .cal-day.loss .cal-day-dot{background:var(--red)}
 .cal-day.breakeven .cal-day-dot{background:var(--purple)}
 /* Weekly summary (now a grid column, not a separate flex column) */
-.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:96px;gap:2px}
+.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:74px;gap:2px}
 .week-card-top{margin-bottom:1px}
 .week-name{font-size:11px;font-weight:800;color:var(--text)}
 .week-days-label{font-size:9px;font-weight:700;color:var(--purple);background:rgba(167,139,250,0.18);padding:2px 7px;border-radius:100px;margin-top:3px;white-space:nowrap}
@@ -935,6 +934,7 @@ table.tt tr:last-child td{border-bottom:none}
 
   <!-- LOG TRADE -->
   <div id="page-log" class="page">
+    <button class="btn-back" onclick="go('dashboard',this)"><i class="ti ti-arrow-left"></i> Back to Dashboard</button>
     <div class="card">
       <div class="fg">
         <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
@@ -2543,9 +2543,8 @@ function renderCalendar(key,trades){
       const dayDecisive=dayTrades.filter(t=>t.outcome!=='Break Even').length;
       const dayWr=dayDecisive>0?(dayWins/dayDecisive*100).toFixed(1):0;
       const tradeWord=dayTrades.length===1?'trade':'trades';
-      const countBadge=dayTrades.length>1?`<span class="cal-day-count-badge">${dayTrades.length}</span>`:'';
       return`<div class="${cls} cal-day-clickable" style="cursor:pointer" onclick="openDayJournal('${ds}')">
-        <div class="cal-day-top"><span class="cal-day-num">${d}</span>${countBadge}</div>
+        <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
         <div class="cal-day-trades">${dayWr}%</div>
@@ -4129,11 +4128,17 @@ function populateDashAccountFilter(){
   if(!sel)return;
   const current=sel.value;
   sel.innerHTML='<option value="">All Accounts</option>'+
-    (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('');
+    (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('')+
+    '<option value="__create__">+ Create Account</option>';
   if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
 }
 
 function applyDashAccountFilter(id){
+  if(id==='__create__'){
+    document.getElementById('dash-account-filter').value=dashAccountFilter||'';
+    openPFModal(null,null);
+    return;
+  }
   dashAccountFilter=id;
   if(drpActivePreset)applyDRPPreset(drpActivePreset);
   else renderDashboard(currentDashKey);
