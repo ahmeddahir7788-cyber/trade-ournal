@@ -196,6 +196,16 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .hero-select-wrap{position:relative;display:flex;align-items:center}
 .hero-select-wrap i{position:absolute;right:12px;pointer-events:none;font-size:12px;color:var(--text3)}
 .hero-select,select.hero-select{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:9px 32px 9px 16px;font-size:13px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none;cursor:pointer;white-space:nowrap}
+
+.tb-filter{display:flex;align-items:center;gap:7px;background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.tb-filter:hover{background:var(--border)}
+.tb-filter i{font-size:14px;color:var(--text3)}
+.tb-filter-badge{background:var(--border2);color:var(--text2);font-size:11px;font-weight:700;padding:2px 9px;border-radius:100px;margin-left:1px}
+.tb-filter-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:.5px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.35);min-width:210px;z-index:200;padding:6px;max-height:340px;overflow-y:auto}
+.tb-filter-item{padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tb-filter-item:hover{background:var(--surface2)}
+.tb-filter-item.active{color:var(--blue)}
+.tb-filter-divider{height:1px;background:var(--border);margin:5px 4px}
 .hero-select:focus{outline:none}
 .btn-addtrade{background:var(--text);color:var(--bg);border:none;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .btn-addtrade:hover{opacity:.9}
@@ -213,12 +223,12 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 
 .dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
 .snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
-.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.9rem 1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:10px;justify-content:flex-start;min-height:92px}
-.dash-stat-icon{width:30px;height:30px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
-.dash-stat-icon i{font-size:15px;color:var(--text2)}
-.dash-stat-lbl{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.7rem .85rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:6px;justify-content:flex-start;min-height:68px}
+.dash-stat-icon{width:26px;height:26px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
+.dash-stat-icon i{font-size:13px;color:var(--text2)}
+.dash-stat-lbl{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
 .dash-stat-lbl i{font-size:11px;color:var(--text3)}
-.dash-stat-val{font-size:19px;font-weight:700;color:var(--text)}
+.dash-stat-val{font-size:17px;font-weight:700;color:var(--text)}
 
 .dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
 .dash-chart-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
@@ -776,6 +786,17 @@ table.tt tr:last-child td{border-bottom:none}
     <span class="top-bar-section" id="top-bar-section">Dashboard</span>
   </div>
   <div class="top-bar-right" id="top-bar-right">
+    <div id="drp-wrap" style="display:none;position:relative">
+      <button id="drp-btn" onclick="toggleDRP()" class="tb-filter">
+        <i class="ti ti-calendar"></i> <span id="drp-label">All Time</span>
+      </button>
+    </div>
+    <div id="acct-filter-wrap" style="display:none;position:relative">
+      <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="tb-filter">
+        <i class="ti ti-filter"></i> Accounts <span class="tb-filter-badge" id="acct-filter-badge">All</span>
+      </button>
+      <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
+    </div>
     <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
       <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
       <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
@@ -796,22 +817,10 @@ table.tt tr:last-child td{border-bottom:none}
 
     <!-- Welcome hero -->
     <div class="dash-hero">
-      <div style="max-width:560px">
-        <div class="dash-hero-title" id="dash-hero-quote" style="font-size:20px;font-style:italic;line-height:1.35">—</div>
+      <div>
+        <div class="dash-hero-title">Welcome Back, <span class="profile-name-display">Trader</span></div>
       </div>
       <div class="dash-hero-controls">
-        <div class="hero-select-wrap">
-          <select id="dash-account-filter" class="hero-select" onchange="applyDashAccountFilter(this.value)">
-            <option value="">All Accounts</option>
-          </select>
-          <i class="ti ti-chevron-down"></i>
-        </div>
-        <div id="drp-wrap" style="display:none;position:relative">
-          <button id="drp-btn" onclick="toggleDRP()" class="hero-select" style="display:flex;align-items:center;gap:7px;cursor:pointer">
-            <span id="drp-label">All Time</span>
-            <i class="ti ti-chevron-down"></i>
-          </button>
-        </div>
         <button class="btn-addtrade" onclick="go('log',this)"><i class="ti ti-plus"></i> Add Trade</button>
       </div>
     </div>
@@ -846,8 +855,18 @@ table.tt tr:last-child td{border-bottom:none}
             <div class="dash-stat-lbl">Avg Win/Loss <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-avgwl-ratio">—</div>
           </div>
+          <div class="dash-stat-card sub-block" data-sub-id="totaltrades">
+            <div class="dash-stat-icon" style="background:rgba(127,119,221,0.18)"><i class="ti ti-list-numbers" style="color:#7F77DD"></i></div>
+            <div class="dash-stat-lbl">Total Trades <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-totaltrades">0</div>
+          </div>
+          <div class="dash-stat-card sub-block" data-sub-id="maxdd">
+            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-trending-down" style="color:#D85A30"></i></div>
+            <div class="dash-stat-lbl">Max Drawdown <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-val" id="snc-maxdd">$0</div>
+          </div>
           <div class="dash-stat-card sub-block" data-sub-id="balance">
-            <div class="dash-stat-icon" style="background:rgba(34,166,179,0.18)"><i class="ti ti-building-bank" style="color:#22A6B3"></i></div>
+            <div class="dash-stat-icon" style="background:rgba(34,166,179,0.16)"><i class="ti ti-building-bank" style="color:#22A6B3"></i></div>
             <div class="dash-stat-lbl">Account balance <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-balance">$0</div>
           </div>
@@ -2113,14 +2132,18 @@ function go(id,btn){
   const drpWrap=document.getElementById('drp-wrap');
   const drpPanel=document.getElementById('drp-panel');
   const drpBd=document.getElementById('drp-backdrop');
+  const acctWrap=document.getElementById('acct-filter-wrap');
   if(id==='dashboard'){
     if(dmWrap)dmWrap.style.display='';
     if(drpWrap)drpWrap.style.display='';
+    if(acctWrap)acctWrap.style.display='';
   } else {
     if(dmWrap)dmWrap.style.display='none';
     if(drpWrap)drpWrap.style.display='none';
     if(drpPanel)drpPanel.style.display='none';
     if(drpBd)drpBd.style.display='none';
+    if(acctWrap)acctWrap.style.display='none';
+    closeAcctFilterPanel();
   }
   if(id==='reports')initReportsPage();
   if(id==='notebook')initNotebook();
@@ -2198,6 +2221,25 @@ function renderNewStatCards(trades){
   // Avg Win / Loss
   const ratioEl=document.getElementById('snc-avgwl-ratio');
   if(ratioEl)ratioEl.textContent=(m.avgLoss>0||m.avgWin>0)?(isFinite(m.avgWinLossRatio)?m.avgWinLossRatio.toFixed(2):'∞'):'—';
+
+  // Total Trades
+  const ttEl=document.getElementById('snc-totaltrades');
+  if(ttEl)ttEl.textContent=trades.length.toLocaleString();
+
+  // Max Drawdown — largest peak-to-trough dip in cumulative P&L, over the same
+  // (filtered) trades shown in the rest of the dashboard.
+  const maxddEl=document.getElementById('snc-maxdd');
+  if(maxddEl){
+    const sortedDD=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+    let cumDD=0,peakDD=0,worstDD=0;
+    sortedDD.forEach(t=>{
+      cumDD+=(t.pnl||0);
+      if(cumDD>peakDD)peakDD=cumDD;
+      const dd=cumDD-peakDD;
+      if(dd<worstDD)worstDD=dd;
+    });
+    maxddEl.textContent=worstDD>=0?'$0':'-$'+Math.abs(Math.round(worstDD)).toLocaleString();
+  }
 
   // Account Balance — sum of every non-failed tracked account's initial balance + its trades' P&L
   const balEl=document.getElementById('snc-balance');
@@ -2416,30 +2458,7 @@ function renderDashboardWithTrades(trades,label){
   renderWeekdayChart(Object.values(db.trades).flat());
 }
 
-// ── New hero section: date + welcome, and Recent trades / Open Positions tab switch ──
-const TRADING_QUOTES=[
-  "The market can stay irrational longer than you can stay solvent.",
-  "Plan your trade, trade your plan.",
-  "Cut your losses short and let your winners run.",
-  "Risk comes from not knowing what you're doing.",
-  "The trend is your friend until it ends.",
-  "Amateurs think about how much money they can make. Professionals think about how much money they could lose.",
-  "It's not whether you're right or wrong, but how much money you make when right and how much you lose when wrong.",
-  "The goal of a successful trader is to make the best trades. Money is secondary.",
-  "In trading, the impossible happens about twice a year.",
-  "Discipline is the bridge between goals and accomplishment.",
-  "Every trade is just one of a thousand — don't attach your ego to it.",
-  "Losses are the cost of doing business in the market.",
-  "The market doesn't care how you feel about it.",
-  "Consistency beats intensity. Show up every day.",
-  "Your edge means nothing without risk management.",
-  "Patience is a trading position too.",
-  "Good trades feel boring. Bad trades feel exciting.",
-  "The four most dangerous words in trading: 'this time it's different.'",
-  "Protect your capital first — profits will follow.",
-  "A trading plan without discipline is just a wish."
-];
-
+// ── New hero section: date + welcome ──
 function renderDashHero(){
   const dEl=document.getElementById('dash-hero-date');
   if(dEl){
@@ -2447,14 +2466,6 @@ function renderDashHero(){
     const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const d=new Date();
     dEl.textContent=days[d.getDay()]+', '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
-  }
-  const qEl=document.getElementById('dash-hero-quote');
-  if(qEl){
-    // Same quote all day, changes daily — based on day-of-year so it's stable on refresh.
-    const now=new Date();
-    const start=new Date(now.getFullYear(),0,0);
-    const dayOfYear=Math.floor((now-start)/86400000);
-    qEl.textContent='"'+TRADING_QUOTES[dayOfYear%TRADING_QUOTES.length]+'"';
   }
 }
 
@@ -4123,26 +4134,54 @@ function populateAccountDropdown(prefix){
   if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
 }
 
+// Refreshes the "Accounts" filter badge to reflect the current selection —
+// call whenever the account list or the active filter changes.
 function populateDashAccountFilter(){
-  const sel=document.getElementById('dash-account-filter');
-  if(!sel)return;
-  const current=sel.value;
-  sel.innerHTML='<option value="">All Accounts</option>'+
-    (db.propfirms||[]).map(a=>`<option value="${a.id}">${a.name||a.broker||'Account'}</option>`).join('')+
-    '<option value="__create__">+ Create Account</option>';
-  if(current&&(db.propfirms||[]).some(a=>String(a.id)===String(current)))sel.value=current;
+  const badge=document.getElementById('acct-filter-badge');
+  if(!badge)return;
+  if(!dashAccountFilter){badge.textContent='All';return;}
+  const a=(db.propfirms||[]).find(p=>String(p.id)===String(dashAccountFilter));
+  if(a)badge.textContent=a.name||a.broker||'Account';
+  else{dashAccountFilter='';badge.textContent='All';}
 }
 
-function applyDashAccountFilter(id){
-  if(id==='__create__'){
-    document.getElementById('dash-account-filter').value=dashAccountFilter||'';
-    openPFModal(null,null);
-    return;
-  }
+function toggleAcctFilterPanel(){
+  const panel=document.getElementById('acct-filter-panel');
+  if(!panel)return;
+  const willOpen=panel.style.display==='none'||!panel.style.display;
+  panel.style.display=willOpen?'block':'none';
+  if(willOpen)renderAcctFilterPanel();
+}
+
+function renderAcctFilterPanel(){
+  const panel=document.getElementById('acct-filter-panel');
+  if(!panel)return;
+  let html=`<div class="tb-filter-item${!dashAccountFilter?' active':''}" onclick="selectAcctFilter('')"><i class="ti ti-list"></i> All Accounts</div>`;
+  (db.propfirms||[]).forEach(a=>{
+    const active=String(dashAccountFilter)===String(a.id);
+    html+=`<div class="tb-filter-item${active?' active':''}" onclick="selectAcctFilter('${a.id}')"><i class="ti ti-${(a.type||'').startsWith('prop')?'building-bank':'wallet'}"></i> ${a.name||a.broker||'Account'}</div>`;
+  });
+  html+=`<div class="tb-filter-divider"></div><div class="tb-filter-item" onclick="closeAcctFilterPanel();openPFModal(null,null)"><i class="ti ti-plus"></i> Create Account</div>`;
+  panel.innerHTML=html;
+}
+
+function closeAcctFilterPanel(){
+  const panel=document.getElementById('acct-filter-panel');
+  if(panel)panel.style.display='none';
+}
+
+function selectAcctFilter(id){
   dashAccountFilter=id;
+  populateDashAccountFilter();
+  closeAcctFilterPanel();
   if(drpActivePreset)applyDRPPreset(drpActivePreset);
   else renderDashboard(currentDashKey);
 }
+
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('acct-filter-wrap');
+  if(wrap&&!wrap.contains(e.target))closeAcctFilterPanel();
+});
 
 // Renders the checklist for whichever playbook is currently selected.
 // existingResults: array of booleans (from the trade being edited) to restore checked state.
@@ -5492,6 +5531,7 @@ function enableDragReorder(containerEl,itemSelector,handleSelector,idAttr,storag
   document.getElementById('dm-btn-pct').classList.toggle('active',displayMode==='percent');
   document.getElementById('dm-toggle-topbar').style.display='';
   document.getElementById('drp-wrap').style.display='';
+  const acctWrapInit=document.getElementById('acct-filter-wrap');if(acctWrapInit)acctWrapInit.style.display='';
 })();
 
 // Global paste fallback: while the Screenshots manager is open and its zone is focused, route pasted clipboard images into it
