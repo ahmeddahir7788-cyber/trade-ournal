@@ -35,18 +35,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar .sb-top{justify-content:center;padding:0 8px}
 .sidebar:hover .sb-top{justify-content:flex-start;padding:0 16px}
 .sidebar.collapsed .sb-top{justify-content:center;padding:0 8px}
-nav{display:flex;flex-direction:column;gap:10px;padding:20px 12px;flex:1}
+nav{display:flex;flex-direction:column;gap:10px;padding:20px 12px;flex:1;justify-content:center;align-items:center}
+.sidebar:hover nav{align-items:stretch}
 nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
 .sidebar:hover nav button{justify-content:flex-start;border:.5px solid var(--border2);border-radius:12px;padding:6px 14px 6px 6px;background:var(--card)}
-.sidebar:hover nav button.active{background:var(--text);border-color:var(--text);color:var(--bg)}
+.sidebar:hover nav button.active{background:var(--surface2);border-color:var(--blue);color:var(--text)}
 .sidebar:hover nav button:hover:not(.active){background:var(--surface2);border-color:var(--text3)}
 nav button:hover{color:var(--text)}
 nav button.active{color:var(--text)}
-nav button.active i{color:var(--bg)}
 nav button i{font-size:20px;flex-shrink:0;color:var(--text2);transition:color .15s}
 nav button:hover i{color:var(--text)}
 .nav-tile{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;background:var(--surface2)!important;border:.5px solid var(--border2);box-shadow:none;font-size:18px;line-height:1}
-nav button.active .nav-tile{background:var(--text)!important;border-color:var(--text)}
+nav button.active .nav-tile{background:var(--surface2)!important;border-color:var(--blue)}
+nav button.active i{color:var(--blue)}
 nav button:hover .nav-tile{border-color:var(--text3)}
 .nav-label{transition:opacity .2s;overflow:hidden}
 .sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
