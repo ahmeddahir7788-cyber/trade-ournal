@@ -22,9 +22,9 @@ html{overflow-x:clip;width:100%}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s;overflow-x:clip;max-width:100vw;width:100%;overscroll-behavior-x:none;touch-action:pan-y}
 
 /* SIDEBAR */
-.sidebar{width:70px;min-width:70px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
+.sidebar{width:78px;min-width:78px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
 .sidebar:hover{width:188px;min-width:188px}
-.sidebar.collapsed{width:70px;min-width:70px}
+.sidebar.collapsed{width:78px;min-width:78px}
 .sb-top{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:56px;border-bottom:.5px solid var(--border);flex-shrink:0}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;white-space:nowrap;color:var(--text)}
 .logo i{color:var(--blue);font-size:20px;flex-shrink:0}
@@ -35,7 +35,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar .sb-top{justify-content:center;padding:0 8px}
 .sidebar:hover .sb-top{justify-content:flex-start;padding:0 16px}
 .sidebar.collapsed .sb-top{justify-content:center;padding:0 8px}
-nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;flex:1}
+nav{display:flex;flex-direction:column;gap:10px;padding:20px 12px;flex:1}
 nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
 .sidebar:hover nav button{justify-content:flex-start;border:.5px solid var(--border2);border-radius:12px;padding:6px 14px 6px 6px;background:var(--card)}
 .sidebar:hover nav button.active{background:var(--text);border-color:var(--text);color:var(--bg)}
@@ -43,9 +43,9 @@ nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14
 nav button:hover{color:var(--text)}
 nav button.active{color:var(--text)}
 nav button.active i{color:var(--bg)}
-nav button i{font-size:18px;flex-shrink:0;color:var(--text2);transition:color .15s}
+nav button i{font-size:20px;flex-shrink:0;color:var(--text2);transition:color .15s}
 nav button:hover i{color:var(--text)}
-.nav-tile{width:38px;height:38px;min-width:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;background:var(--surface2)!important;border:.5px solid var(--border2);box-shadow:none;font-size:18px;line-height:1}
+.nav-tile{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;background:var(--surface2)!important;border:.5px solid var(--border2);box-shadow:none;font-size:18px;line-height:1}
 nav button.active .nav-tile{background:var(--text)!important;border-color:var(--text)}
 nav button:hover .nav-tile{border-color:var(--text3)}
 .nav-label{transition:opacity .2s;overflow:hidden}
@@ -62,8 +62,8 @@ nav button:hover .nav-tile{border-color:var(--text3)}
 .sidebar.collapsed .sb-bottom-label{opacity:0;width:0}
 
 /* MAIN */
-.app-body{margin-left:70px;flex:1;min-width:0;min-height:100vh;transition:margin-left .25s}
-.app-body.collapsed{margin-left:70px}
+.app-body{margin-left:78px;flex:1;min-width:0;min-height:100vh;transition:margin-left .25s}
+.app-body.collapsed{margin-left:78px}
 .content{max-width:100%;margin:0 auto;padding:1rem 1.5rem 1.5rem;transition:max-width .25s;overflow-x:clip}
 .app-body.collapsed .content{max-width:100%}
 .page{display:none}.page.active{display:block}
