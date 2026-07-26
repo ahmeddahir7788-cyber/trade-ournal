@@ -193,6 +193,16 @@ nav button:hover .nav-tile{transform:scale(1.05)}
 .tb-filter-item:hover{background:var(--surface2)}
 .tb-filter-item.active{color:var(--blue)}
 .tb-filter-divider{height:1px;background:var(--border);margin:5px 4px}
+
+.theme-swatch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.theme-swatch-grid{grid-template-columns:repeat(2,1fr)}}
+.theme-swatch-card{border:1.5px solid var(--border2);border-radius:12px;padding:10px;cursor:pointer;transition:border-color .15s}
+.theme-swatch-card:hover{border-color:var(--text3)}
+.theme-swatch-card.active{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.theme-swatch-bars{display:flex;height:44px;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.theme-swatch-bars span{flex:1}
+.theme-swatch-name{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px}
+.theme-swatch-name i{color:var(--blue);font-size:13px}
 .hero-select:focus{outline:none}
 .btn-addtrade{background:var(--text);color:var(--bg);border:none;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .btn-addtrade:hover{opacity:.9}
@@ -747,7 +757,7 @@ table.tt tr:last-child td{border-bottom:none}
 
 <!-- Profile / Settings modal -->
 <div class="overlay" id="profile-modal-overlay">
-  <div class="modal" style="max-width:380px">
+  <div class="modal" style="max-width:520px;max-height:85vh;overflow-y:auto">
     <h3 style="margin-bottom:16px">Your Profile</h3>
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
       <div id="profile-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--text2);overflow:hidden;margin-bottom:10px;border:2px solid var(--border)">
@@ -762,7 +772,17 @@ table.tt tr:last-child td{border-bottom:none}
       <label>Display name</label>
       <input type="text" id="profile-name-input" placeholder="Your name"/>
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px" id="profile-email-display"></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:22px" id="profile-email-display"></div>
+
+    <div style="border-top:.5px solid var(--border);padding-top:18px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <i class="ti ti-palette" style="font-size:18px;color:var(--text2)"></i>
+        <h3 style="margin:0">Theme</h3>
+      </div>
+      <p style="font-size:13px;color:var(--text3);margin:0 0 14px">Pick a palette that matches your trading vibe</p>
+      <div class="theme-swatch-grid" id="theme-swatch-grid"></div>
+    </div>
+
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn-ghost" onclick="closeProfileModal()">Cancel</button>
       <button class="btn-primary" onclick="saveProfile()" id="profile-save-btn">Save</button>
@@ -812,6 +832,10 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="dash-hero-title">Welcome Back, <span class="profile-name-display">Trader</span></div>
       </div>
       <div class="dash-hero-controls">
+        <button onclick="toggleManageCardsPanel()" id="manage-cards-btn" style="position:relative;background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;padding:9px 12px">
+          <i class="ti ti-adjustments-horizontal" style="font-size:14px"></i> Manage cards
+          <div class="tb-filter-panel" id="manage-cards-panel" style="display:none;top:calc(100% + 8px);right:0;text-align:left"></div>
+        </button>
         <button class="btn-addtrade" onclick="go('log',this)"><i class="ti ti-plus"></i> Add Trade</button>
       </div>
     </div>
@@ -819,13 +843,6 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Stat cards (left)  /  Calendar (right) -->
     <div class="dash-top-grid dashboard-block" data-block-id="hero-top">
       <div class="dash-left-col">
-        <!-- Stat cards: Net PnL, Trade Win%, Profit Factor, Day Win%, Avg Win/Loss, Account Balance -->
-        <div style="display:flex;justify-content:flex-end;margin-bottom:-4px">
-          <button onclick="toggleManageCardsPanel()" id="manage-cards-btn" style="position:relative;background:none;border:none;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:4px;padding:4px 6px">
-            <i class="ti ti-adjustments-horizontal" style="font-size:13px"></i> Manage cards
-            <div class="tb-filter-panel" id="manage-cards-panel" style="display:none;top:calc(100% + 4px);right:0;text-align:left"></div>
-          </button>
-        </div>
         <div class="snc-cards dash-stat-grid" data-block-id="stats">
           <div class="dash-stat-card sub-block" data-sub-id="netpnl">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
@@ -1894,6 +1911,7 @@ async function loadDB(){
       if(row.images&&row.images.length)db.dayImages[row.date]=row.images;
     });
     db.userSettings=(settingsRes.data&&settingsRes.data[0]&&settingsRes.data[0].settings)||{};
+    if(db.userSettings.palette)localStorage.setItem('tj_v10_palette',db.userSettings.palette);
   }catch(e){
     console.error('loadDB error',e);
   }
@@ -1906,21 +1924,56 @@ async function loadDB(){
   });
 }
 
-// ── Theme ─────────────────────────────────────────────────────
+// ── Theme / Palettes ──────────────────────────────────────────
+const THEME_PALETTES={
+  midnight:{base:'dark',label:'Midnight',swatch:['#0a0a12','#1a1a2e','#2d2a5e','#5b4fe8'],
+    vars:{'--bg':'#0a0a12','--surface':'#12121c','--surface2':'#1a1a2e','--card':'#12121c','--border':'rgba(255,255,255,0.08)','--border2':'rgba(255,255,255,0.15)','--text':'#f0f0f0','--text2':'#aaaaaa','--text3':'#666666','--shadow':'rgba(0,0,0,0.6)','--blue':'#5b4fe8','--purple':'#8b7cf6'}},
+  daylight:{base:'light',label:'Daylight',swatch:['#ffffff','#e3e7ee','#a9b6c9','#378ADD'],
+    vars:{'--bg':'#f0f2f5','--surface':'#ffffff','--surface2':'#f5f7fa','--card':'#ffffff','--border':'rgba(0,0,0,0.08)','--border2':'rgba(0,0,0,0.15)','--text':'#111111','--text2':'#555555','--text3':'#999999','--shadow':'rgba(0,0,0,0.08)','--blue':'#378ADD','--purple':'#a78bfa'}},
+  noirgold:{base:'dark',label:'Noir & Gold',swatch:['#000000','#161616','#c9a227','#e8c766'],
+    vars:{'--bg':'#000000','--surface':'#0d0d0d','--surface2':'#161616','--card':'#0d0d0d','--border':'rgba(255,255,255,0.08)','--border2':'rgba(255,255,255,0.15)','--text':'#f0f0f0','--text2':'#aaaaaa','--text3':'#666666','--shadow':'rgba(0,0,0,0.6)','--blue':'#c9a227','--gold':'#e8c766','--purple':'#c9a227'}},
+  emerald:{base:'dark',label:'Emerald Prestige',swatch:['#0c3d2c','#1D9E75','#c9a227','#f2ecd8'],
+    vars:{'--bg':'#07120d','--surface':'#0c1a13','--surface2':'#13251b','--card':'#0c1a13','--border':'rgba(255,255,255,0.08)','--border2':'rgba(255,255,255,0.15)','--text':'#f0f0f0','--text2':'#aaaaaa','--text3':'#6a8577','--shadow':'rgba(0,0,0,0.6)','--blue':'#1D9E75','--purple':'#1D9E75','--gold':'#c9a227'}},
+  ocean:{base:'dark',label:'Ocean Deep',swatch:['#0b1f28','#155263','#227c8f','#5fd0c4'],
+    vars:{'--bg':'#06141a','--surface':'#0b1f28','--surface2':'#11303c','--card':'#0b1f28','--border':'rgba(255,255,255,0.08)','--border2':'rgba(255,255,255,0.15)','--text':'#f0f0f0','--text2':'#aaaaaa','--text3':'#6f96a1','--shadow':'rgba(0,0,0,0.6)','--blue':'#22A6B3','--purple':'#5fd0c4'}},
+  linda:{base:'light',label:'Linda',swatch:['#ffffff','#eef3fb','#fdf1c4','#c9a227'],
+    vars:{'--bg':'#fdf6e3','--surface':'#fffdf7','--surface2':'#fbf1d6','--card':'#fffdf7','--border':'rgba(0,0,0,0.08)','--border2':'rgba(0,0,0,0.15)','--text':'#2a2a1a','--text2':'#6b6b55','--text3':'#a3a389','--shadow':'rgba(0,0,0,0.08)','--blue':'#c9a227','--purple':'#c9a227','--gold':'#c9a227'}}
+};
+
 function applyTheme(){
-  const t=localStorage.getItem('tj_v10_theme')||'dark';
-  document.documentElement.setAttribute('data-theme',t);
+  const saved=localStorage.getItem('tj_v10_palette')||'midnight';
+  applyPalette(saved,false);
+}
+function applyPalette(name,persist){
+  const p=THEME_PALETTES[name]||THEME_PALETTES.midnight;
+  document.documentElement.setAttribute('data-theme',p.base);
+  const root=document.documentElement.style;
+  Object.entries(p.vars).forEach(([k,v])=>root.setProperty(k,v));
   const icon=document.getElementById('theme-toggle-icon');
-  if(icon)icon.className=t==='dark'?'ti ti-moon-stars':'ti ti-sun';
+  if(icon)icon.className=p.base==='dark'?'ti ti-moon-stars':'ti ti-sun';
+  if(persist!==false){
+    localStorage.setItem('tj_v10_palette',name);
+    if(!db.userSettings)db.userSettings={};
+    db.userSettings.palette=name;
+    persistUserSettings();
+  }
+  renderThemeSwatches();
 }
 function toggleTheme(){
-  const c=document.documentElement.getAttribute('data-theme');
-  const n=c==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',n);
-  const icon=document.getElementById('theme-toggle-icon');
-  if(icon)icon.className=n==='dark'?'ti ti-moon-stars':'ti ti-sun';
-  localStorage.setItem('tj_v10_theme',n);
+  const current=localStorage.getItem('tj_v10_palette')||'midnight';
+  const base=(THEME_PALETTES[current]||THEME_PALETTES.midnight).base;
+  applyPalette(base==='dark'?'daylight':'midnight');
   refreshCurrentDashboardView();
+}
+function renderThemeSwatches(){
+  const wrap=document.getElementById('theme-swatch-grid');
+  if(!wrap)return;
+  const current=localStorage.getItem('tj_v10_palette')||'midnight';
+  wrap.innerHTML=Object.entries(THEME_PALETTES).map(([id,p])=>`
+    <div class="theme-swatch-card${current===id?' active':''}" onclick="applyPalette('${id}')">
+      <div class="theme-swatch-bars">${p.swatch.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+      <div class="theme-swatch-name">${p.label}${current===id?' <i class="ti ti-check"></i>':''}</div>
+    </div>`).join('');
 }
 
 // ── Mobile bottom nav ────────────────────────────────────────
@@ -2036,6 +2089,7 @@ function openProfileModal(){
     previewEl.innerHTML=`<span id="profile-avatar-initial">${(name||'?').trim().charAt(0).toUpperCase()}</span>`;
   }
   document.getElementById('profile-modal-overlay').classList.add('open');
+  renderThemeSwatches();
 }
 function closeProfileModal(){
   document.getElementById('profile-modal-overlay').classList.remove('open');
