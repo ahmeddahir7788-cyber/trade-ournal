@@ -36,16 +36,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar:hover .sb-top{justify-content:flex-start;padding:0 16px}
 .sidebar.collapsed .sb-top{justify-content:center;padding:0 8px}
 nav{display:flex;flex-direction:column;gap:2px;padding:16px 12px;flex:1}
-nav button{background:none;border:none;padding:11px 0;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:13px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:400;letter-spacing:0.01em}
-.sidebar:hover nav button{justify-content:flex-start;padding:11px 14px}
-nav button:hover{color:var(--text);background:var(--surface2)}
-nav button.active{color:var(--text);font-weight:700;background:var(--surface2)}
-nav button.active i{color:var(--blue)}
-nav button i{font-size:19px;flex-shrink:0;color:var(--text3);transition:color .15s}
+nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
+.sidebar:hover nav button{justify-content:flex-start;border:.5px solid var(--border2);border-radius:12px;padding:6px 14px 6px 6px;background:var(--card)}
+.sidebar:hover nav button.active{background:var(--text);border-color:var(--text);color:var(--bg)}
+.sidebar:hover nav button:hover:not(.active){background:var(--surface2);border-color:var(--text3)}
+nav button:hover{color:var(--text)}
+nav button.active{color:var(--text)}
+nav button.active i{color:var(--bg)}
+nav button i{font-size:18px;flex-shrink:0;color:var(--text2);transition:color .15s}
 nav button:hover i{color:var(--text)}
-.nav-tile{width:32px;height:32px;min-width:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;background:none!important;box-shadow:none;font-size:24px;line-height:1}
-nav button.active .nav-tile{transform:scale(1.1)}
-nav button:hover .nav-tile{transform:scale(1.06)}
+.nav-tile{width:38px;height:38px;min-width:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;background:var(--surface2)!important;border:.5px solid var(--border2);box-shadow:none;font-size:18px;line-height:1}
+nav button.active .nav-tile{background:var(--text)!important;border-color:var(--text)}
+nav button:hover .nav-tile{border-color:var(--text3)}
 .nav-label{transition:opacity .2s;overflow:hidden}
 .sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
 .sidebar:hover .nav-label{opacity:1;width:auto}
@@ -733,19 +735,19 @@ table.tt tr:last-child td{border-bottom:none}
 </div>
   </div>
   <nav>
-    <button class="active" onclick="go('dashboard',this)"><span class="nav-tile">📊</span><span class="nav-label">Dashboard</span></button>
-    <button onclick="go('log',this)"><span class="nav-tile">➕</span><span class="nav-label">Add Trade</span></button>
-    <button onclick="go('trades',this)"><span class="nav-tile">📋</span><span class="nav-label">Trades</span></button>
-    <button onclick="go('accounts',this)"><span class="nav-tile">🏦</span><span class="nav-label">Prop Accounts</span></button>
-    <button onclick="go('realaccounts',this)"><span class="nav-tile">💼</span><span class="nav-label">Real Accounts</span></button>
-    <button onclick="go('playbooks',this)"><span class="nav-tile">⭐</span><span class="nav-label">Playbooks</span></button>
-    <button onclick="go('reports',this)"><span class="nav-tile">📈</span><span class="nav-label">Reports</span></button>
+    <button class="active" onclick="go('dashboard',this)"><span class="nav-tile"><i class="ti ti-layout-dashboard"></i></span><span class="nav-label">Dashboard</span></button>
+    <button onclick="go('log',this)"><span class="nav-tile"><i class="ti ti-plus"></i></span><span class="nav-label">Add Trade</span></button>
+    <button onclick="go('trades',this)"><span class="nav-tile"><i class="ti ti-list"></i></span><span class="nav-label">Trades</span></button>
+    <button onclick="go('accounts',this)"><span class="nav-tile"><i class="ti ti-building-bank"></i></span><span class="nav-label">Prop Accounts</span></button>
+    <button onclick="go('realaccounts',this)"><span class="nav-tile"><i class="ti ti-wallet"></i></span><span class="nav-label">Real Accounts</span></button>
+    <button onclick="go('playbooks',this)"><span class="nav-tile"><i class="ti ti-notebook"></i></span><span class="nav-label">Playbooks</span></button>
+    <button onclick="go('reports',this)"><span class="nav-tile"><i class="ti ti-chart-pie"></i></span><span class="nav-label">Reports</span></button>
     <div class="nav-group open" id="nav-group-notes">
-      <button class="nav-group-toggle" onclick="toggleNotesGroup()"><span style="display:flex;align-items:center;gap:13px"><span class="nav-tile">📝</span><span class="nav-label">Notes</span></span><i class="ti ti-chevron-down nav-group-chevron"></i></button>
+      <button class="nav-group-toggle" onclick="toggleNotesGroup()"><span style="display:flex;align-items:center;gap:12px"><span class="nav-tile"><i class="ti ti-notes"></i></span><span class="nav-label">Notes</span></span><i class="ti ti-chevron-down nav-group-chevron"></i></button>
       <div class="nav-subgroup">
-        <button class="nav-sub-btn" onclick="go('notebook',this)"><span style="font-size:16px">📔</span> Journal</button>
-        <button class="nav-sub-btn" onclick="go('reviews',this)"><span style="font-size:16px">🔍</span> Reviews</button>
-        <button class="nav-sub-btn" onclick="go('outlook',this)"><span style="font-size:16px">🔭</span> Outlook</button>
+        <button class="nav-sub-btn" onclick="go('notebook',this)"><i class="ti ti-book-2"></i> Journal</button>
+        <button class="nav-sub-btn" onclick="go('reviews',this)"><i class="ti ti-search"></i> Reviews</button>
+        <button class="nav-sub-btn" onclick="go('outlook',this)"><i class="ti ti-telescope"></i> Outlook</button>
       </div>
     </div>
   </nav>
