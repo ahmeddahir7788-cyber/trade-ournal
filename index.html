@@ -38,17 +38,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 nav{display:flex;flex-direction:column;gap:10px;padding:20px 12px;flex:1;justify-content:center;align-items:center}
 .sidebar:hover nav{align-items:stretch}
 nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
-.sidebar:hover nav button{justify-content:flex-start;border:.5px solid var(--border2);border-radius:12px;padding:6px 14px 6px 6px;background:var(--card)}
-.sidebar:hover nav button.active{background:var(--surface2);border-color:var(--nc,var(--blue));color:var(--text)}
-.sidebar:hover nav button:hover:not(.active){background:var(--surface2);border-color:var(--text3)}
+.sidebar:hover nav button{justify-content:flex-start;border-radius:12px;padding:8px 14px 8px 6px;background:none}
+.sidebar:hover nav button.active{background:var(--surface2);color:var(--text)}
+.sidebar:hover nav button:hover:not(.active){background:var(--surface2)}
 nav button:hover{color:var(--text)}
 nav button.active{color:var(--text)}
 nav button i{font-size:20px;flex-shrink:0;color:var(--nc,var(--text2));transition:color .15s;opacity:.85}
 nav button:hover i{opacity:1}
-.nav-tile{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s;background:var(--surface2)!important;border:.5px solid var(--border2);box-shadow:none;font-size:18px;line-height:1}
-nav button.active .nav-tile{background:var(--surface2)!important;border-color:var(--nc,var(--blue))}
+.nav-tile{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;background:none!important;border:none;box-shadow:none;font-size:18px;line-height:1}
+nav button.active .nav-tile{transform:scale(1.05)}
 nav button.active i{color:var(--nc,var(--blue));opacity:1}
-nav button:hover .nav-tile{border-color:var(--nc,var(--text3))}
+nav button:hover .nav-tile{transform:scale(1.03)}
 .nav-label{transition:opacity .2s;overflow:hidden}
 .sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
 .sidebar:hover .nav-label{opacity:1;width:auto}
