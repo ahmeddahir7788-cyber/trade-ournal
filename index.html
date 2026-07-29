@@ -22,51 +22,30 @@ html{overflow-x:clip;width:100%}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s;overflow-x:clip;max-width:100vw;width:100%;overscroll-behavior-x:none;touch-action:pan-y}
 
 /* SIDEBAR */
-.sidebar{width:78px;min-width:78px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;transition:width .25s,min-width .25s;overflow:hidden}
-.sidebar:hover{width:188px;min-width:188px}
-.sidebar.collapsed{width:78px;min-width:78px}
-.sb-top{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:56px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.sidebar{width:230px;min-width:230px;background:var(--surface);border-right:.5px solid var(--border);height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow:hidden}
+.sb-top{display:flex;align-items:center;justify-content:flex-start;padding:0 18px;height:64px;border-bottom:.5px solid var(--border);flex-shrink:0}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;white-space:nowrap;color:var(--text)}
 .logo i{color:var(--blue);font-size:20px;flex-shrink:0}
-.logo-text{transition:opacity .2s}
-.sidebar .logo-text{opacity:0;width:0;overflow:hidden;transition:opacity .2s,width .2s}
-.sidebar:hover .logo-text{opacity:1;width:auto}
-.sidebar.collapsed .logo-text{opacity:0;width:0;overflow:hidden}
-.sidebar .sb-top{justify-content:center;padding:0 8px}
-.sidebar:hover .sb-top{justify-content:flex-start;padding:0 16px}
-.sidebar.collapsed .sb-top{justify-content:center;padding:0 8px}
-nav{display:flex;flex-direction:column;gap:10px;padding:20px 12px;flex:1;justify-content:center;align-items:center}
-.sidebar:hover nav{align-items:stretch}
-nav button{background:none;border:none;padding:0;border-radius:12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
-.sidebar:hover nav button{justify-content:flex-start;border-radius:100px;padding:8px 16px 8px 8px;background:none;transition:background .15s,color .15s}
-.sidebar:hover nav button.active{background:rgba(55,138,221,0.12);color:var(--blue);font-weight:800}
-.sidebar:hover nav button:hover:not(.active){background:var(--border)}
+.logo-text{white-space:nowrap}
+nav{display:flex;flex-direction:column;gap:4px;padding:16px 12px;flex:1;overflow-y:auto}
+nav button{background:none;border:none;padding:9px 12px;border-radius:100px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:flex-start;gap:12px;transition:background .15s,color .15s;white-space:nowrap;width:100%;text-align:left;font-weight:600;letter-spacing:0.01em}
 nav button:hover{color:var(--text)}
-nav button.active{color:var(--blue)}
-nav button i{font-size:20px;flex-shrink:0;color:var(--text2);transition:color .15s;opacity:.85}
+nav button:hover:not(.active){background:var(--border)}
+nav button.active{color:var(--blue);background:rgba(55,138,221,0.12);font-weight:800}
+nav button i{font-size:18px;flex-shrink:0;color:var(--text2);transition:color .15s;opacity:.85}
 nav button:hover i{opacity:1}
-.nav-tile{width:44px;height:44px;min-width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;background:none!important;border:none;box-shadow:none;font-size:18px;line-height:1}
-nav button.active .nav-tile{transform:scale(1.05)}
+.nav-tile{width:30px;height:30px;min-width:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:none!important;border:none;box-shadow:none;font-size:16px;line-height:1}
 nav button.active i{color:var(--blue);opacity:1}
-nav button:hover .nav-tile{transform:scale(1.03)}
-.nav-label{transition:opacity .2s;overflow:hidden}
-.sidebar .nav-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
-.sidebar:hover .nav-label{opacity:1;width:auto}
-.sidebar.collapsed .nav-label{opacity:0;width:0}
+.nav-label{white-space:nowrap}
 .sb-bottom{padding:12px 12px;border-top:.5px solid var(--border);display:flex;flex-direction:column;gap:2px}
 .sb-bottom button{background:none;border:none;padding:10px 14px;border-radius:var(--r);font-size:14px;font-family:'Inter',sans-serif;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:13px;width:100%;white-space:nowrap;font-weight:400}
-.sb-bottom button:hover{color:var(--text);background:none}
+.sb-bottom button:hover{color:var(--text);background:var(--surface2)}
 .sb-bottom button i{font-size:19px;flex-shrink:0;color:var(--text3)}
-.sb-bottom-label{transition:opacity .2s;overflow:hidden}
-.sidebar .sb-bottom-label{opacity:0;width:0;transition:opacity .2s,width .2s;white-space:nowrap}
-.sidebar:hover .sb-bottom-label{opacity:1;width:auto}
-.sidebar.collapsed .sb-bottom-label{opacity:0;width:0}
+.sb-bottom-label{white-space:nowrap}
 
 /* MAIN */
-.app-body{margin-left:78px;flex:1;min-width:0;min-height:100vh;transition:margin-left .25s}
-.app-body.collapsed{margin-left:78px}
-.content{max-width:100%;margin:0 auto;padding:1rem 1.5rem 1.5rem;transition:max-width .25s;overflow-x:clip}
-.app-body.collapsed .content{max-width:100%}
+.app-body{margin-left:230px;flex:1;min-width:0;min-height:100vh}
+.content{max-width:100%;margin:0 auto;padding:1rem 1.5rem 1.5rem;overflow-x:clip}
 .page{display:none}.page.active{display:block}
 .ph{margin-bottom:1.5rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
@@ -197,22 +176,15 @@ nav button:hover .nav-tile{transform:scale(1.03)}
 .tb-filter-divider{height:1px;background:var(--border);margin:5px 4px}
 
 .nav-group-toggle{justify-content:space-between!important}
-.nav-group-chevron{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0;opacity:0;width:0}
-.sidebar:hover .nav-group-chevron{opacity:1;width:auto}
+.nav-group-chevron{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0}
 .nav-group.open .nav-group-chevron{transform:rotate(180deg)}
-.nav-subgroup{display:none;flex-direction:column;gap:2px;padding-left:12px;margin:2px 0 4px}
-.sidebar:hover .nav-group.open .nav-subgroup{display:flex}
-.sidebar.collapsed .nav-subgroup,.sidebar:not(:hover) .nav-subgroup{display:none}
+.nav-subgroup{display:none;flex-direction:column;gap:2px;padding-left:14px;margin-top:2px}
+.nav-group.open .nav-subgroup{display:flex}
 .nav-sub-btn{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 10px;border-radius:var(--r);background:none;border:none;color:var(--text3);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;width:100%;text-align:left;font-weight:500}
 .nav-sub-btn i{font-size:15px;width:16px;flex-shrink:0}
 .nav-sub-btn:hover{color:var(--text);background:var(--surface2)}
 .nav-sub-btn.active{color:var(--blue);font-weight:700;background:rgba(55,138,221,0.12)}
 .nav-sub-btn.active i{color:var(--blue)}
-@media(max-width:768px){
-  .nav-group-chevron{opacity:1;width:auto}
-  .nav-subgroup{display:none}
-  .nav-group.open .nav-subgroup{display:flex}
-}
 
 .theme-swatch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:480px){.theme-swatch-grid{grid-template-columns:repeat(2,1fr)}}
@@ -745,7 +717,7 @@ table.tt tr:last-child td{border-bottom:none}
     <button onclick="go('reports',this)"><span class="nav-tile"><i class="ti ti-chart-pie"></i></span><span class="nav-label">Reports</span></button>
     <div class="nav-group open" id="nav-group-notes">
       <button class="nav-group-toggle" onclick="toggleNotesGroup()"><span style="display:flex;align-items:center;gap:12px"><span class="nav-tile"><i class="ti ti-notes"></i></span><span class="nav-label">Notes</span></span><i class="ti ti-chevron-down nav-group-chevron"></i></button>
-      <div class="nav-subgroup">
+      <div class="nav-subgroup" id="notes-subgroup">
         <button class="nav-sub-btn" onclick="go('notebook',this)"><i class="ti ti-book-2"></i> Journal</button>
         <button class="nav-sub-btn" onclick="go('reviews',this)"><i class="ti ti-search"></i> Reviews</button>
         <button class="nav-sub-btn" onclick="go('outlook',this)"><i class="ti ti-telescope"></i> Outlook</button>
