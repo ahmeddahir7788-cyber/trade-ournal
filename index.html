@@ -237,7 +237,7 @@ nav button.active i{color:var(--blue);opacity:1}
 .dash-trades-table{width:100%;border-collapse:collapse}
 .dash-trades-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:4px;border-bottom:.5px solid var(--border)}
 .dash-trades-table th:last-child{text-align:right}
-.dash-trades-scroll{overflow-y:auto}
+.dash-trades-scroll{overflow-y:auto;max-height:300px}
 
 @media(max-width:1100px){
   .dash-top-grid{grid-template-columns:1fr}
@@ -917,12 +917,12 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="dash-row2 dashboard-block" data-block-id="hero-row2">
       <div class="dash-chart-card">
         <div class="dash-chart-title">Net Daily P&amp;L <i class="ti ti-info-circle"></i></div>
-        <div class="chart-wrap" style="flex:1;min-height:240px"><canvas id="daily-pnl-chart"></canvas></div>
+        <div class="chart-wrap" style="flex:1;min-height:180px"><canvas id="daily-pnl-chart"></canvas></div>
       </div>
 
       <div class="dash-chart-card score-combo-card">
         <div class="dash-chart-title">Overall Score <i class="ti ti-info-circle"></i></div>
-        <div style="position:relative;flex:1;min-height:220px"><canvas id="radar-chart-hero"></canvas></div>
+        <div style="position:relative;flex:1;min-height:170px"><canvas id="radar-chart-hero"></canvas></div>
         <div class="score-combo-bottom">
           <div class="score-hero-lbl">Overall Score</div>
           <div class="score-hero-val" id="hero-score-val">—</div>
@@ -3087,7 +3087,7 @@ function renderRecentTradesTable(){
   const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
   if(!all.length){wrap.innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px">No trades yet.</div>';return;}
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  wrap.innerHTML=all.slice(0,25).map(t=>{
+  wrap.innerHTML=all.slice(0,10).map(t=>{
     const[y,m,d]=t.date.split('-');
     const dateStr=mn[parseInt(m)-1]+' '+parseInt(d);
     const pnl=t.pnl||0;
