@@ -791,32 +791,6 @@ table.tt tr:last-child td{border-bottom:none}
 
 
 <div class="app-body" id="app-body">
-<div class="top-bar" id="top-bar">
-  <div class="top-bar-left">
-    <span class="top-bar-section" id="top-bar-section">Dashboard</span>
-  </div>
-  <div class="top-bar-right" id="top-bar-right">
-    <div id="drp-wrap" style="display:none;position:relative">
-      <button id="drp-btn" onclick="toggleDRP()" class="tb-filter">
-        <i class="ti ti-calendar"></i> <span id="drp-label">All Time</span>
-      </button>
-    </div>
-    <div id="acct-filter-wrap" style="display:none;position:relative">
-      <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="tb-filter">
-        <i class="ti ti-filter"></i> Accounts <span class="tb-filter-badge" id="acct-filter-badge">All</span>
-      </button>
-      <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
-    </div>
-    <div class="dm-toggle" id="dm-toggle-topbar" style="display:none">
-      <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
-      <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
-    </div>
-    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
-      <i id="theme-toggle-icon" class="ti ti-moon-stars"></i>
-    </button>
-  </div>
-</div>
-
 <div class="content">
 
   <!-- DASHBOARD -->
@@ -831,6 +805,24 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="dash-hero-title">Welcome Back, <span class="profile-name-display">Trader</span></div>
       </div>
       <div class="dash-hero-controls">
+        <div id="drp-wrap" style="position:relative">
+          <button id="drp-btn" onclick="toggleDRP()" class="tb-filter">
+            <i class="ti ti-calendar"></i> <span id="drp-label">All Time</span>
+          </button>
+        </div>
+        <div id="acct-filter-wrap" style="position:relative">
+          <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="tb-filter">
+            <i class="ti ti-filter"></i> Accounts <span class="tb-filter-badge" id="acct-filter-badge">All</span>
+          </button>
+          <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
+        </div>
+        <div class="dm-toggle" id="dm-toggle-topbar">
+          <button class="dm-btn active" id="dm-btn-dollar" onclick="setDisplayMode('dollar')">$</button>
+          <button class="dm-btn" id="dm-btn-pct" onclick="setDisplayMode('percent')">%</button>
+        </div>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
+          <i id="theme-toggle-icon" class="ti ti-moon-stars"></i>
+        </button>
         <button onclick="toggleManageCardsPanel()" id="manage-cards-btn" style="position:relative;background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;padding:9px 12px">
           <i class="ti ti-adjustments-horizontal" style="font-size:14px"></i> Manage cards
           <div class="tb-filter-panel" id="manage-cards-panel" style="display:none;top:calc(100% + 8px);right:0;text-align:left"></div>
