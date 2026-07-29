@@ -210,8 +210,8 @@ nav button.active i{color:var(--blue);opacity:1}
 .score-hero-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--text);box-shadow:0 1px 4px rgba(0,0,0,.25);transform:translate(-50%,-50%);transition:left .5s;left:0%}
 .score-hero-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:8px}
 
-.dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
-.snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
+.dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);grid-auto-rows:1fr;gap:.85rem;flex:1}
+.snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
 .dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.7rem .85rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:6px;justify-content:flex-start;min-height:68px}
 .dash-stat-icon{width:26px;height:26px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .dash-stat-icon i{font-size:13px;color:var(--text2)}
@@ -238,6 +238,21 @@ nav button.active i{color:var(--blue);opacity:1}
 .dash-trades-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:4px;border-bottom:.5px solid var(--border)}
 .dash-trades-table th:last-child{text-align:right}
 .dash-trades-scroll{overflow-y:auto;max-height:300px}
+
+.rev-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1rem}
+.rev-stat-card{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
+.rev-stat-lbl{font-size:12px;color:var(--text2);margin-bottom:6px}
+.rev-stat-val{font-size:22px;font-weight:700;color:var(--text)}
+.rev-field{margin-bottom:1.1rem}
+.rev-field label{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px}
+.rev-field textarea{width:100%;min-height:90px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;color:var(--text);outline:none;resize:vertical;box-sizing:border-box}
+.rev-choice-field{margin-bottom:1.1rem}
+.rev-choice-field label{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px}
+.rev-btn-group{display:flex;flex-wrap:wrap;gap:8px}
+.rev-btn-group button{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif}
+.rev-btn-group button:hover{background:var(--border)}
+.rev-btn-group button.active{background:var(--blue);border-color:var(--blue);color:#fff}
+@media(max-width:700px){.rev-stat-grid{grid-template-columns:repeat(2,1fr)}}
 
 @media(max-width:1100px){
   .dash-top-grid{grid-template-columns:1fr}
@@ -408,8 +423,8 @@ nav button.active i{color:var(--blue);opacity:1}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:13px;color:var(--text2);text-align:center;padding:7px 4px;font-weight:700;background:transparent;border:none;letter-spacing:.02em}
 .cal-week-name-header{font-size:11px;color:var(--text3);text-align:left;padding:7px 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
-.cal-day{border-radius:10px;padding:6px 7px;min-height:74px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;min-height:74px;visibility:hidden;border:none}
+.cal-day{border-radius:10px;padding:6px 7px;height:92px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;height:92px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
@@ -431,7 +446,7 @@ nav button.active i{color:var(--blue);opacity:1}
 .cal-day.loss .cal-day-dot{background:var(--red)}
 .cal-day.breakeven .cal-day-dot{background:var(--purple)}
 /* Weekly summary (now a grid column, not a separate flex column) */
-.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:74px;gap:2px}
+.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:92px;gap:2px}
 .week-card-top{margin-bottom:1px}
 .week-name{font-size:11px;font-weight:800;color:var(--text)}
 .week-days-label{font-size:9px;font-weight:700;color:var(--purple);background:rgba(167,139,250,0.18);padding:2px 7px;border-radius:100px;margin-top:3px;white-space:nowrap}
@@ -1289,11 +1304,114 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="ph">
       <div class="ph-left"><h1>Reviews</h1><p>Weekly / monthly reviews — what worked, what didn't, what to fix</p></div>
     </div>
+    <div class="dm-toggle" style="width:fit-content;margin-bottom:1.25rem">
+      <button class="dm-btn active" id="rev-tab-weekly" onclick="setReviewMode('weekly')">Weekly</button>
+      <button class="dm-btn" id="rev-tab-monthly" onclick="setReviewMode('monthly')">Monthly</button>
+    </div>
     <div class="card" style="margin-bottom:0">
-      <textarea id="reviews-textarea" oninput="onReviewsEdited()" placeholder="Review your recent trading: what went well, what mistakes came up, patterns you noticed, and what you'll change going forward…" style="width:100%;min-height:420px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="reviews-save-status">Saved</div>
+      <h3 id="rev-form-title" style="margin:0 0 1rem">New Weekly Review</h3>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:1rem">
+        <button onclick="navReviewPeriod(-1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-left"></i></button>
+        <div style="text-align:center">
+          <div id="rev-period-lbl" style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:600">Week of</div>
+          <div id="rev-period-range" style="font-size:17px;font-weight:700;color:var(--text)">—</div>
+        </div>
+        <button onclick="navReviewPeriod(1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-right"></i></button>
+      </div>
+
+      <div class="rev-stat-grid">
+        <div class="rev-stat-card"><div class="rev-stat-lbl">Trades</div><div class="rev-stat-val" id="rev-st-trades">0</div></div>
+        <div class="rev-stat-card"><div class="rev-stat-lbl">Wins</div><div class="rev-stat-val" id="rev-st-wins" style="color:var(--green)">0</div></div>
+        <div class="rev-stat-card"><div class="rev-stat-lbl">Losses</div><div class="rev-stat-val" id="rev-st-losses" style="color:var(--red)">0</div></div>
+        <div class="rev-stat-card"><div class="rev-stat-lbl">P&amp;L</div><div class="rev-stat-val" id="rev-st-pnl">$0</div></div>
+      </div>
+
+      <div id="rev-no-trades" style="display:none;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 18px;color:var(--text3);font-size:13px;margin-bottom:1.25rem"></div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Your Reflection</div>
+
+      <div class="rev-field">
+        <label>What worked well this week?</label>
+        <textarea id="rev-q-worked" placeholder="Your answer…"></textarea>
+      </div>
+      <div class="rev-field">
+        <label>What didn't work well this week?</label>
+        <textarea id="rev-q-notworked" placeholder="Your answer…"></textarea>
+      </div>
+
+      <div class="rev-choice-field">
+        <label>Did you journal your losing trades?</label>
+        <div class="rev-btn-group" data-key="journaled">
+          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
+          <button data-val="No" onclick="selectRevChoice(this)">No</button>
+          <button data-val="Partially" onclick="selectRevChoice(this)">Partially</button>
+        </div>
+      </div>
+      <div class="rev-choice-field">
+        <label>Did you enter trades too soon?</label>
+        <div class="rev-btn-group" data-key="enteredSoon">
+          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
+          <button data-val="No" onclick="selectRevChoice(this)">No</button>
+          <button data-val="Sometimes" onclick="selectRevChoice(this)">Sometimes</button>
+        </div>
+      </div>
+      <div class="rev-choice-field">
+        <label>Did you enter trades too late?</label>
+        <div class="rev-btn-group" data-key="enteredLate">
+          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
+          <button data-val="No" onclick="selectRevChoice(this)">No</button>
+          <button data-val="Sometimes" onclick="selectRevChoice(this)">Sometimes</button>
+        </div>
+      </div>
+      <div class="rev-choice-field">
+        <label>Did you take profit too soon or too late?</label>
+        <div class="rev-btn-group" data-key="profitTiming">
+          <button data-val="Too soon" onclick="selectRevChoice(this)">Too soon</button>
+          <button data-val="Too late" onclick="selectRevChoice(this)">Too late</button>
+          <button data-val="On plan" onclick="selectRevChoice(this)">On plan</button>
+          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
+        </div>
+      </div>
+      <div class="rev-choice-field">
+        <label>Did you risk too much or too little?</label>
+        <div class="rev-btn-group" data-key="riskSizing">
+          <button data-val="Too much" onclick="selectRevChoice(this)">Too much</button>
+          <button data-val="Too little" onclick="selectRevChoice(this)">Too little</button>
+          <button data-val="On plan" onclick="selectRevChoice(this)">On plan</button>
+          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
+        </div>
+      </div>
+      <div class="rev-choice-field">
+        <label>Did you follow your model or overcomplicate things?</label>
+        <div class="rev-btn-group" data-key="followedModel">
+          <button data-val="Followed" onclick="selectRevChoice(this)">Followed</button>
+          <button data-val="Overcomplicated" onclick="selectRevChoice(this)">Overcomplicated</button>
+          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
+        </div>
+      </div>
+
+      <div class="rev-field">
+        <label>What actions are you taking to fix these issues?</label>
+        <textarea id="rev-q-actions" placeholder="Your answer…"></textarea>
+      </div>
+      <div class="rev-field">
+        <label>What advice would you give yourself at the beginning of next week?</label>
+        <textarea id="rev-q-advice" placeholder="Your answer…"></textarea>
+      </div>
+      <div class="rev-field" style="margin-bottom:1.25rem">
+        <label>What are you most proud of?</label>
+        <textarea id="rev-q-proud" placeholder="Your answer…"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn-back" style="margin-bottom:0" onclick="cancelReviewEdits()">Cancel</button>
+        <button class="btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" onclick="saveReview()"><i class="ti ti-check"></i> Save Review</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center" id="reviews-save-status"></div>
     </div>
   </div>
+
 
   <!-- OUTLOOK -->
   <div id="page-outlook" class="page">
@@ -5375,23 +5493,138 @@ function openShotFull(key,idx){
 let currentNoteId=null;
 let noteSaveTimer=null;
 
-// ── Reviews / Outlook (simple auto-saving notepads) ────────────
-let reviewsSaveTimer=null,outlookSaveTimer=null;
+// ── Reviews (Weekly / Monthly, backed by real trade data) ──────
+let reviewMode='weekly';
+let reviewRefDate=new Date();
+let outlookSaveTimer=null;
+
+const REV_MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const REV_MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function toISODateLocalRev(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function startOfWeekRev(d){
+  const dt=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  dt.setDate(dt.getDate()-dt.getDay());
+  return dt;
+}
+function currentReviewPeriod(){
+  if(reviewMode==='weekly'){
+    const start=startOfWeekRev(reviewRefDate);
+    const end=new Date(start);end.setDate(end.getDate()+6);
+    return{start,end,key:toISODateLocalRev(start)};
+  }
+  const start=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth(),1);
+  const end=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth()+1,0);
+  return{start,end,key:start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')};
+}
+function getReviewsStore(){
+  if(!db.userSettings)db.userSettings={};
+  if(!db.userSettings.weeklyReviews)db.userSettings.weeklyReviews={};
+  if(!db.userSettings.monthlyReviews)db.userSettings.monthlyReviews={};
+  return reviewMode==='weekly'?db.userSettings.weeklyReviews:db.userSettings.monthlyReviews;
+}
 
 function initReviewsPage(){
-  const ta=document.getElementById('reviews-textarea');
-  if(ta)ta.value=(db.userSettings&&db.userSettings.reviewsText)||'';
+  reviewMode='weekly';
+  reviewRefDate=new Date();
+  const wTab=document.getElementById('rev-tab-weekly'),mTab=document.getElementById('rev-tab-monthly');
+  if(wTab)wTab.classList.add('active');
+  if(mTab)mTab.classList.remove('active');
+  renderReviewForm();
 }
-function onReviewsEdited(){
+function setReviewMode(mode){
+  reviewMode=mode;
+  reviewRefDate=new Date();
+  const wTab=document.getElementById('rev-tab-weekly'),mTab=document.getElementById('rev-tab-monthly');
+  if(wTab)wTab.classList.toggle('active',mode==='weekly');
+  if(mTab)mTab.classList.toggle('active',mode==='monthly');
+  renderReviewForm();
+}
+function navReviewPeriod(delta){
+  if(reviewMode==='weekly'){
+    const d=new Date(reviewRefDate);d.setDate(d.getDate()+delta*7);reviewRefDate=d;
+  } else {
+    reviewRefDate=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth()+delta,1);
+  }
+  renderReviewForm();
+}
+function renderReviewForm(){
+  const{start,end,key}=currentReviewPeriod();
+  const titleEl=document.getElementById('rev-form-title');
+  const lblEl=document.getElementById('rev-period-lbl');
+  const rangeEl=document.getElementById('rev-period-range');
+  if(!titleEl||!lblEl||!rangeEl)return;
+  if(reviewMode==='weekly'){
+    titleEl.textContent='New Weekly Review';
+    lblEl.textContent='Week of';
+    rangeEl.textContent=REV_MONTH_SHORT[start.getMonth()]+' '+start.getDate()+' – '+REV_MONTH_SHORT[end.getMonth()]+' '+end.getDate()+', '+end.getFullYear();
+  } else {
+    titleEl.textContent='New Monthly Review';
+    lblEl.textContent='Month of';
+    rangeEl.textContent=REV_MONTH_NAMES[start.getMonth()]+' '+start.getFullYear();
+  }
+
+  const startStr=toISODateLocalRev(start),endStr=toISODateLocalRev(end);
+  const all=Object.values(db.trades||{}).flat().filter(t=>t.date&&t.date>=startStr&&t.date<=endStr);
+  const m=computeMetrics(all);
+  document.getElementById('rev-st-trades').textContent=all.length.toLocaleString();
+  document.getElementById('rev-st-wins').textContent=m.wins.toLocaleString();
+  document.getElementById('rev-st-losses').textContent=m.losses.toLocaleString();
+  const pnlEl=document.getElementById('rev-st-pnl');
+  pnlEl.textContent=(m.net>=0?'$':'-$')+Math.abs(Math.round(m.net)).toLocaleString();
+  pnlEl.style.color=m.net>0?'var(--green)':m.net<0?'var(--red)':'var(--text)';
+
+  const noTradesEl=document.getElementById('rev-no-trades');
+  if(!all.length){
+    noTradesEl.style.display='';
+    noTradesEl.textContent=reviewMode==='weekly'?"No trades found in this week — pick a different week above.":"No trades found in this month — pick a different month above.";
+  } else {
+    noTradesEl.style.display='none';
+  }
+
+  const store=getReviewsStore();
+  const saved=store[key]||{};
+  document.getElementById('rev-q-worked').value=saved.worked||'';
+  document.getElementById('rev-q-notworked').value=saved.notWorked||'';
+  document.getElementById('rev-q-actions').value=saved.actions||'';
+  document.getElementById('rev-q-advice').value=saved.advice||'';
+  document.getElementById('rev-q-proud').value=saved.proud||'';
+  document.querySelectorAll('#page-reviews .rev-btn-group').forEach(group=>{
+    const val=saved[group.getAttribute('data-key')]||'';
+    group.setAttribute('data-selected',val);
+    group.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.getAttribute('data-val')===val));
+  });
+
+  const statusEl=document.getElementById('reviews-save-status');
+  if(statusEl)statusEl.textContent='';
+}
+function selectRevChoice(btn){
+  const group=btn.parentElement;
+  group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  group.setAttribute('data-selected',btn.getAttribute('data-val'));
+}
+function cancelReviewEdits(){
+  renderReviewForm();
+}
+async function saveReview(){
+  const{key}=currentReviewPeriod();
+  const store=getReviewsStore();
+  const data={
+    worked:document.getElementById('rev-q-worked').value,
+    notWorked:document.getElementById('rev-q-notworked').value,
+    actions:document.getElementById('rev-q-actions').value,
+    advice:document.getElementById('rev-q-advice').value,
+    proud:document.getElementById('rev-q-proud').value
+  };
+  document.querySelectorAll('#page-reviews .rev-btn-group').forEach(group=>{
+    data[group.getAttribute('data-key')]=group.getAttribute('data-selected')||'';
+  });
+  store[key]=data;
   const statusEl=document.getElementById('reviews-save-status');
   if(statusEl)statusEl.textContent='Saving…';
-  clearTimeout(reviewsSaveTimer);
-  reviewsSaveTimer=setTimeout(async()=>{
-    if(!db.userSettings)db.userSettings={};
-    db.userSettings.reviewsText=document.getElementById('reviews-textarea').value;
-    await persistUserSettings();
-    if(statusEl)statusEl.textContent='Saved';
-  },600);
+  await persistUserSettings();
+  if(statusEl)statusEl.textContent='Saved';
 }
 
 function initOutlookPage(){
