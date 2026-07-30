@@ -739,6 +739,7 @@ table.tt tr:last-child td{border-bottom:none}
 .rev-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .outlook-news-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0}
 .outlook-news-count{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:1px 9px;font-size:12px;font-weight:700;color:var(--text2)}
+.outlook-unsaved-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #f59e0b;color:#f59e0b;background:rgba(245,158,11,.08);border-radius:100px;padding:4px 12px;font-size:12px;font-weight:700;margin-left:10px;vertical-align:middle}
 .outlook-news-daycol{border-left:3px solid var(--red);background:var(--surface2);border-radius:8px;padding:12px 14px}
 .outlook-news-daycol-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .outlook-news-daycol-hd b{font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:var(--text)}
@@ -1463,7 +1464,7 @@ table.tt tr:last-child td{border-bottom:none}
   <!-- OUTLOOK -->
   <div id="page-outlook" class="page">
     <div class="ph">
-      <div class="ph-left"><h1><i class="ti ti-eye" style="color:var(--blue);margin-right:6px"></i>Weekly Outlook</h1><p>Your forward-looking notes — plans, goals, levels to watch</p></div>
+      <div class="ph-left"><h1><i class="ti ti-eye" style="color:var(--blue);margin-right:6px"></i>Weekly Outlook <span class="outlook-unsaved-pill" id="outlook-unsaved-pill" style="display:none"><i class="ti ti-alert-circle"></i> Unsaved</span></h1><p>Your forward-looking notes — plans, goals, levels to watch</p></div>
       <div style="display:flex;align-items:center;gap:6px">
         <button onclick="navOutlookWeek(-1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-left"></i></button>
         <span class="rev-date-pill" id="outlook-week-pill">Week of —</span>
@@ -1497,7 +1498,7 @@ table.tt tr:last-child td{border-bottom:none}
     <div id="outlook-index-list"></div>
     <div class="card">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">News Outlook Notes</div>
-      <textarea id="outlook-textarea" placeholder="What news events are you watching this week? How might they affect your trading?" style="width:100%;min-height:140px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+      <textarea id="outlook-textarea" oninput="markOutlookDirty()" placeholder="What news events are you watching this week? How might they affect your trading?" style="width:100%;min-height:140px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:1.25rem">
       <input id="outlook-add-index-input" type="text" placeholder="Add index (e.g. YM)" style="flex:1;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:12px 16px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addOutlookIndex();}"/>
@@ -5831,10 +5832,23 @@ function getOutlookWeekState(){
   return db.userSettings.outlookWeeks[key];
 }
 
+let outlookDirty=false;
+function markOutlookDirty(){
+  outlookDirty=true;
+  const pill=document.getElementById('outlook-unsaved-pill');
+  if(pill)pill.style.display='';
+}
+function clearOutlookDirty(){
+  outlookDirty=false;
+  const pill=document.getElementById('outlook-unsaved-pill');
+  if(pill)pill.style.display='none';
+}
+
 function initOutlookPage(){
   outlookRefDate=new Date();
   outlookOpenTF={};
   outlookNewsCollapsed=false;
+  clearOutlookDirty();
   const body=document.getElementById('outlook-news-body');
   if(body)body.style.display='';
   const chev=document.getElementById('outlook-news-chevron');
@@ -5871,12 +5885,14 @@ function setOutlookBias(sym,tf,bias){
   const weekState=getOutlookWeekState();
   const a=getOutlookAnalysisMut(weekState,sym,tf);
   a.bias=bias;
+  markOutlookDirty();
   renderOutlookIndices();
 }
 function onOutlookReasonInput(el,sym,tf){
   const weekState=getOutlookWeekState();
   const a=getOutlookAnalysisMut(weekState,sym,tf);
   a.reason=el.value;
+  markOutlookDirty();
 }
 const OUTLOOK_BIAS_ICON={bullish:'trending-up',bearish:'trending-down',unsure:'minus'};
 
@@ -5954,6 +5970,7 @@ function addOutlookIndex(){
   if(!us.outlookIndices.includes(val)){
     us.outlookIndices.push(val);
     us.outlookData[val]={collapsed:false};
+    markOutlookDirty();
   }
   input.value='';
   renderOutlookIndices();
@@ -5964,6 +5981,7 @@ function removeOutlookIndex(sym){
   us.outlookIndices=us.outlookIndices.filter(s=>s!==sym);
   delete us.outlookData[sym];
   delete outlookOpenTF[sym];
+  markOutlookDirty();
   renderOutlookIndices();
 }
 
@@ -5979,7 +5997,7 @@ function onOutlookShotUpload(e,sym,tf){
     reader.onload=ev=>{
       weekState.shots[sym][tf].push(ev.target.result);
       remaining--;
-      if(remaining===0)renderOutlookIndices();
+      if(remaining===0){markOutlookDirty();renderOutlookIndices();}
     };
     reader.readAsDataURL(file);
   });
@@ -5991,6 +6009,7 @@ function removeOutlookShot(sym,tf,idx){
   const arr=weekState.shots[sym]&&weekState.shots[sym][tf];
   if(!arr)return;
   arr.splice(idx,1);
+  markOutlookDirty();
   renderOutlookIndices();
 }
 
@@ -6001,27 +6020,84 @@ function toggleOutlookNewsCollapse(){
   if(body)body.style.display=outlookNewsCollapsed?'none':'';
   if(chev)chev.className='ti ti-chevron-'+(outlookNewsCollapsed?'down':'up');
 }
-function sortOutlookNews(){renderOutlookNews();}
-function renderOutlookNews(){
+
+// Live USD high-impact news: this unofficial feed only covers last/this/next
+// week relative to today, and may be blocked by the browser's CORS policy —
+// when that happens (or the viewed week is further out) we fall back to the
+// manual add-your-own form below the list.
+const OUTLOOK_NEWS_CACHE={};
+function outlookWeekOffsetLabel(weekStartDate){
+  const thisWeekStart=startOfWeekRev(new Date());
+  const diffDays=Math.round((weekStartDate-thisWeekStart)/86400000);
+  if(diffDays===0)return'this';
+  if(diffDays===7)return'next';
+  if(diffDays===-7)return'last';
+  return null;
+}
+async function fetchOutlookNewsFeed(which){
+  if(OUTLOOK_NEWS_CACHE[which]&&(Date.now()-OUTLOOK_NEWS_CACHE[which].ts)<10*60*1000){
+    return OUTLOOK_NEWS_CACHE[which].events;
+  }
+  const res=await fetch('https://nfs.faireconomy.media/ff_calendar_'+which+'week.json');
+  if(!res.ok)throw new Error('feed request failed');
+  const data=await res.json();
+  OUTLOOK_NEWS_CACHE[which]={ts:Date.now(),events:data};
+  return data;
+}
+function sortOutlookNews(){
+  delete OUTLOOK_NEWS_CACHE.last;delete OUTLOOK_NEWS_CACHE.this;delete OUTLOOK_NEWS_CACHE.next;
+  renderOutlookNews();
+}
+async function renderOutlookNews(){
   const weekState=getOutlookWeekState();
   const daysWrap=document.getElementById('outlook-news-days');
   const countEl=document.getElementById('outlook-news-count');
   if(!daysWrap||!countEl)return;
-  const events=(weekState.news||[]).slice().sort((a,b)=>(a.date+' '+a.time).localeCompare(b.date+' '+b.time));
+
+  const weekStart=startOfWeekRev(outlookRefDate);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
+  const startStr=toISODateLocalRev(weekStart),endStr=toISODateLocalRev(weekEnd);
+  const which=outlookWeekOffsetLabel(weekStart);
+  const renderToken=(renderOutlookNews._token=(renderOutlookNews._token||0)+1);
+
+  let autoList=[];
+  let errMsg=null;
+  if(which){
+    daysWrap.innerHTML=`<div style="color:var(--text3);font-size:13px;grid-column:1/-1">Loading USD high-impact news…</div>`;
+    try{
+      const feed=await fetchOutlookNewsFeed(which);
+      if(renderToken!==renderOutlookNews._token)return;
+      autoList=feed.filter(e=>e.country==='USD'&&e.impact==='High').map(e=>{
+        const d=new Date(e.date);
+        return{date:toISODateLocalRev(d),time:d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}).toLowerCase(),title:e.title};
+      });
+    }catch(err){
+      if(renderToken!==renderOutlookNews._token)return;
+      errMsg="Couldn't load live news data automatically — it may be blocked by your browser or temporarily unavailable. Add events manually below.";
+    }
+  } else {
+    errMsg="Live USD news only auto-loads for last week, this week, and next week. Add events for this week manually below.";
+  }
+
+  const manualList=(weekState.news||[]).map((ev,i)=>({date:ev.date,time:ev.time,title:ev.title,idx:i}));
+  const all=[...autoList.filter(ev=>ev.date>=startStr&&ev.date<=endStr),...manualList];
+  const events=all.sort((a,b)=>(a.date+' '+a.time).localeCompare(b.date+' '+b.time));
   countEl.textContent=events.length;
+
+  const errHtml=errMsg?`<div style="color:var(--text3);font-size:12px;grid-column:1/-1;margin-bottom:2px">${errMsg}</div>`:'';
   if(!events.length){
-    daysWrap.innerHTML=`<div style="color:var(--text3);font-size:13px;grid-column:1/-1">No news events added yet — add one below.</div>`;
+    daysWrap.innerHTML=errHtml+`<div style="color:var(--text3);font-size:13px;grid-column:1/-1">No high-impact USD news found for this week.</div>`;
     return;
   }
   const grouped={};
   events.forEach(ev=>{(grouped[ev.date]=grouped[ev.date]||[]).push(ev);});
-  daysWrap.innerHTML=Object.keys(grouped).sort().map(dateStr=>{
+  daysWrap.innerHTML=errHtml+Object.keys(grouped).sort().map(dateStr=>{
     const d=new Date(dateStr+'T00:00:00');
     const wname=OUTLOOK_DAY_NAMES[d.getDay()];
     const mShort=REV_MONTH_SHORT[d.getMonth()]+' '+d.getDate();
     const evtsHtml=grouped[dateStr].map(ev=>{
-      const idx=weekState.news.indexOf(ev);
-      return `<div class="outlook-news-evt"><span class="dot"></span><span class="time">${escapeHtmlRev(ev.time||'')}</span><span>${escapeHtmlRev(ev.title)}</span><button onclick="removeOutlookNewsEvent(${idx})" title="Remove"><i class="ti ti-x"></i></button></div>`;
+      const removeBtn=ev.idx!=null?`<button onclick="removeOutlookNewsEvent(${ev.idx})" title="Remove"><i class="ti ti-x"></i></button>`:'';
+      return `<div class="outlook-news-evt"><span class="dot"></span><span class="time">${escapeHtmlRev(ev.time||'')}</span><span>${escapeHtmlRev(ev.title)}</span>${removeBtn}</div>`;
     }).join('');
     return `<div class="outlook-news-daycol">
       <div class="outlook-news-daycol-hd"><b>${wname}</b><span>${mShort}</span></div>
@@ -6038,11 +6114,13 @@ function addOutlookNewsEvent(){
   const weekState=getOutlookWeekState();
   weekState.news.push({date:dateEl.value,time:timeEl.value||'',title:titleEl.value.trim()});
   dateEl.value='';timeEl.value='';titleEl.value='';
+  markOutlookDirty();
   renderOutlookNews();
 }
 function removeOutlookNewsEvent(idx){
   const weekState=getOutlookWeekState();
   weekState.news.splice(idx,1);
+  markOutlookDirty();
   renderOutlookNews();
 }
 
@@ -6053,7 +6131,9 @@ async function saveOutlook(){
   if(statusEl)statusEl.textContent='Saving…';
   await persistUserSettings();
   if(statusEl)statusEl.textContent='Saved';
+  clearOutlookDirty();
 }
+
 
 function initNotebook(){
   if(!db.notes)db.notes=[];
