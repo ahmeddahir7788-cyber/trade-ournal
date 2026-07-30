@@ -721,6 +721,18 @@ table.tt tr:last-child td{border-bottom:none}
 .outlook-tf-btn:hover{background:var(--border)}
 .outlook-tf-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
 .outlook-tf-panel{padding:0 1.25rem 1.1rem}
+.outlook-bias-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.outlook-bias-lbl{font-size:13px;font-weight:600;color:var(--text2)}
+.outlook-bias-btn{display:flex;align-items:center;gap:5px;background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif}
+.outlook-bias-btn:hover{background:var(--border)}
+.outlook-bias-btn.bullish.active{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.outlook-bias-btn.bearish.active{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+.outlook-bias-btn.unsure.active{background:var(--border);border-color:var(--border2);color:var(--text)}
+.outlook-reason-ta{width:100%;min-height:80px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;margin-bottom:12px}
+.outlook-bias-pill{display:inline-flex;align-items:center;gap:4px;border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700;border:.5px solid}
+.outlook-bias-pill.bullish{color:var(--green);border-color:var(--green);background:rgba(34,197,94,.12)}
+.outlook-bias-pill.bearish{color:var(--red);border-color:var(--red);background:rgba(239,68,68,.12)}
+.outlook-bias-pill.unsure{color:var(--text2);border-color:var(--border2);background:var(--surface2)}
 .rev-date-pill{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
 .rev-icon-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px}
 .rev-icon-btn:hover{color:var(--text)}
@@ -5846,6 +5858,28 @@ function renderOutlookAll(){
   renderOutlookIndices();
 }
 
+function readOutlookAnalysis(weekState,sym,tf){
+  return(weekState.analysis&&weekState.analysis[sym]&&weekState.analysis[sym][tf])||{bias:'',reason:''};
+}
+function getOutlookAnalysisMut(weekState,sym,tf){
+  if(!weekState.analysis)weekState.analysis={};
+  if(!weekState.analysis[sym])weekState.analysis[sym]={};
+  if(!weekState.analysis[sym][tf])weekState.analysis[sym][tf]={bias:'',reason:''};
+  return weekState.analysis[sym][tf];
+}
+function setOutlookBias(sym,tf,bias){
+  const weekState=getOutlookWeekState();
+  const a=getOutlookAnalysisMut(weekState,sym,tf);
+  a.bias=bias;
+  renderOutlookIndices();
+}
+function onOutlookReasonInput(el,sym,tf){
+  const weekState=getOutlookWeekState();
+  const a=getOutlookAnalysisMut(weekState,sym,tf);
+  a.reason=el.value;
+}
+const OUTLOOK_BIAS_ICON={bullish:'trending-up',bearish:'trending-down',unsure:'minus'};
+
 function renderOutlookIndices(){
   const us=getOutlookState();
   const weekState=getOutlookWeekState();
@@ -5858,11 +5892,24 @@ function renderOutlookIndices(){
       const active=outlookOpenTF[sym]===tf;
       return `<button class="outlook-tf-btn${active?' active':''}" onclick="toggleOutlookTF('${sym}','${tf}')">${tf}</button>`;
     }).join('');
+    const biasPills=OUTLOOK_TIMEFRAMES.map(tf=>{
+      const a=readOutlookAnalysis(weekState,sym,tf);
+      if(!a.bias)return'';
+      return `<span class="outlook-bias-pill ${a.bias}"><i class="ti ti-${OUTLOOK_BIAS_ICON[a.bias]}"></i> ${tf}</span>`;
+    }).join('');
     let panelHtml='';
     if(outlookOpenTF[sym]){
       const tf=outlookOpenTF[sym];
       const shots=(weekState.shots[sym]&&weekState.shots[sym][tf])||[];
+      const analysis=readOutlookAnalysis(weekState,sym,tf);
       panelHtml=`<div class="outlook-tf-panel">
+        <div class="outlook-bias-row">
+          <span class="outlook-bias-lbl">${tf} Analysis</span>
+          <button class="outlook-bias-btn bullish${analysis.bias==='bullish'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','bullish')"><i class="ti ti-trending-up"></i> Bullish</button>
+          <button class="outlook-bias-btn bearish${analysis.bias==='bearish'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','bearish')"><i class="ti ti-trending-down"></i> Bearish</button>
+          <button class="outlook-bias-btn unsure${analysis.bias==='unsure'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','unsure')"><i class="ti ti-minus"></i> Unsure</button>
+        </div>
+        <textarea class="outlook-reason-ta" placeholder="Reason for bias on ${sym} ${tf}…" oninput="onOutlookReasonInput(this,'${sym}','${tf}')">${escapeHtmlRev(analysis.reason||'')}</textarea>
         ${shots.length?`<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px">${shots.map((src,i)=>`<div class="nb-shot-thumb"><img src="${src}"/><button class="nb-shot-remove" onclick="removeOutlookShot('${sym}','${tf}',${i})"><i class="ti ti-x"></i></button></div>`).join('')}</div>`:''}
         <label class="img-upload-zone" style="margin-bottom:0">
           <i class="ti ti-photo-plus"></i><p>Click to add a ${tf} chart screenshot for this week</p>
@@ -5872,7 +5919,10 @@ function renderOutlookIndices(){
     }
     return `<div class="card outlook-index-card">
       <div class="outlook-index-head" onclick="toggleOutlookCollapse('${sym}')">
-        <span class="outlook-index-name">${sym}</span>
+        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="outlook-index-name">${sym}</span>
+          ${biasPills}
+        </span>
         <div style="display:flex;align-items:center;gap:10px">
           <button class="outlook-remove-idx" onclick="event.stopPropagation();removeOutlookIndex('${sym}')" title="Remove index"><i class="ti ti-trash"></i></button>
           <i class="ti ti-chevron-${collapsed?'down':'up'}"></i>
