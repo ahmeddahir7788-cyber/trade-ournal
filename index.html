@@ -210,8 +210,8 @@ nav button.active i{color:var(--blue);opacity:1}
 .score-hero-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--text);box-shadow:0 1px 4px rgba(0,0,0,.25);transform:translate(-50%,-50%);transition:left .5s;left:0%}
 .score-hero-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:8px}
 
-.dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);grid-auto-rows:1fr;gap:.85rem;flex:1}
-.snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
+.dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
+.snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
 .dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.7rem .85rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:6px;justify-content:flex-start;min-height:68px}
 .dash-stat-icon{width:26px;height:26px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .dash-stat-icon i{font-size:13px;color:var(--text2)}
@@ -237,22 +237,7 @@ nav button.active i{color:var(--blue);opacity:1}
 .dash-trades-table{width:100%;border-collapse:collapse}
 .dash-trades-table th{text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:4px;border-bottom:.5px solid var(--border)}
 .dash-trades-table th:last-child{text-align:right}
-.dash-trades-scroll{overflow-y:auto;max-height:300px}
-
-.rev-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1rem}
-.rev-stat-card{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.rev-stat-lbl{font-size:12px;color:var(--text2);margin-bottom:6px}
-.rev-stat-val{font-size:22px;font-weight:700;color:var(--text)}
-.rev-field{margin-bottom:1.1rem}
-.rev-field label{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px}
-.rev-field textarea{width:100%;min-height:90px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;color:var(--text);outline:none;resize:vertical;box-sizing:border-box}
-.rev-choice-field{margin-bottom:1.1rem}
-.rev-choice-field label{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px}
-.rev-btn-group{display:flex;flex-wrap:wrap;gap:8px}
-.rev-btn-group button{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif}
-.rev-btn-group button:hover{background:var(--border)}
-.rev-btn-group button.active{background:var(--blue);border-color:var(--blue);color:#fff}
-@media(max-width:700px){.rev-stat-grid{grid-template-columns:repeat(2,1fr)}}
+.dash-trades-scroll{overflow-y:auto}
 
 @media(max-width:1100px){
   .dash-top-grid{grid-template-columns:1fr}
@@ -381,7 +366,8 @@ nav button.active i{color:var(--blue);opacity:1}
 .bd-item{background:var(--surface);padding:12px;text-align:center}
 .bd-item .bd-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
 .bd-item .bd-val{font-size:22px;font-weight:600}
-.chart-wrap{position:relative;width:100%;height:210px}
+.chart-wrap{position:relative;width:100%;height:210px;overflow:hidden}
+.chart-wrap canvas{position:absolute;left:0;top:0}
 
 /* STREAK & BREAKDOWN */
 .streak-grid{display:flex;flex-direction:column;gap:10px}
@@ -423,8 +409,8 @@ nav button.active i{color:var(--blue);opacity:1}
 .cal-day.empty{visibility:hidden}
 .cal-day-name{font-size:13px;color:var(--text2);text-align:center;padding:7px 4px;font-weight:700;background:transparent;border:none;letter-spacing:.02em}
 .cal-week-name-header{font-size:11px;color:var(--text3);text-align:left;padding:7px 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
-.cal-day{border-radius:10px;padding:6px 7px;height:92px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
-.cal-day.empty{background:transparent;height:92px;visibility:hidden;border:none}
+.cal-day{border-radius:10px;padding:6px 7px;min-height:74px;position:relative;cursor:default;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;overflow:hidden;border:.5px solid var(--border);background:var(--card)}
+.cal-day.empty{background:transparent;min-height:74px;visibility:hidden;border:none}
 .cal-row-empty{display:contents}
 .cal-day.no-trade{background:var(--card)}
 .cal-day-clickable{cursor:pointer}
@@ -446,7 +432,7 @@ nav button.active i{color:var(--blue);opacity:1}
 .cal-day.loss .cal-day-dot{background:var(--red)}
 .cal-day.breakeven .cal-day-dot{background:var(--purple)}
 /* Weekly summary (now a grid column, not a separate flex column) */
-.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;height:92px;gap:2px}
+.week-card{padding:8px 8px;border-radius:9px;background:var(--card);border:.5px solid var(--border);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:74px;gap:2px}
 .week-card-top{margin-bottom:1px}
 .week-name{font-size:11px;font-weight:800;color:var(--text)}
 .week-days-label{font-size:9px;font-weight:700;color:var(--purple);background:rgba(167,139,250,0.18);padding:2px 7px;border-radius:100px;margin-top:3px;white-space:nowrap}
@@ -710,45 +696,7 @@ table.tt tr:last-child td{border-bottom:none}
 .mactions button{padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;border:none}
 .mc{background:var(--surface2);color:var(--text2)}
 .md{background:var(--red);color:#fff}
-.mp{background:var(--blue);color:#fff}.outlook-index-card{padding:0}
-.outlook-index-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.25rem;cursor:pointer}
-.outlook-index-name{font-size:16px;font-weight:800;color:var(--text)}
-.outlook-remove-idx{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px;opacity:0;transition:opacity .15s}
-.outlook-index-card:hover .outlook-remove-idx{opacity:1}
-.outlook-remove-idx:hover{color:var(--red)}
-.outlook-tf-row{display:flex;gap:8px;padding:0 1.25rem 1.1rem}
-.outlook-tf-btn{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif}
-.outlook-tf-btn:hover{background:var(--border)}
-.outlook-tf-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.outlook-tf-panel{padding:0 1.25rem 1.1rem}
-.outlook-bias-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.outlook-bias-lbl{font-size:13px;font-weight:600;color:var(--text2)}
-.outlook-bias-btn{display:flex;align-items:center;gap:5px;background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif}
-.outlook-bias-btn:hover{background:var(--border)}
-.outlook-bias-btn.bullish.active{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
-.outlook-bias-btn.bearish.active{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
-.outlook-bias-btn.unsure.active{background:var(--border);border-color:var(--border2);color:var(--text)}
-.outlook-reason-ta{width:100%;min-height:80px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;color:var(--text);outline:none;resize:vertical;box-sizing:border-box;margin-bottom:12px}
-.outlook-bias-pill{display:inline-flex;align-items:center;gap:4px;border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700;border:.5px solid}
-.outlook-bias-pill.bullish{color:var(--green);border-color:var(--green);background:rgba(34,197,94,.12)}
-.outlook-bias-pill.bearish{color:var(--red);border-color:var(--red);background:rgba(239,68,68,.12)}
-.outlook-bias-pill.unsure{color:var(--text2);border-color:var(--border2);background:var(--surface2)}
-.rev-date-pill{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
-.rev-icon-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px}
-.rev-icon-btn:hover{color:var(--text)}
-.rev-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.outlook-news-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0}
-.outlook-news-count{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:1px 9px;font-size:12px;font-weight:700;color:var(--text2)}
-.outlook-unsaved-pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #f59e0b;color:#f59e0b;background:rgba(245,158,11,.08);border-radius:100px;padding:4px 12px;font-size:12px;font-weight:700;margin-left:10px;vertical-align:middle}
-.outlook-news-daycol{border-left:3px solid var(--red);background:var(--surface2);border-radius:8px;padding:12px 14px}
-.outlook-news-daycol-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.outlook-news-daycol-hd b{font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:var(--text)}
-.outlook-news-daycol-hd span{font-size:11px;color:var(--text3)}
-.outlook-news-evt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);margin-bottom:6px}
-.outlook-news-evt .dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
-.outlook-news-evt .time{background:var(--border);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--text2);white-space:nowrap}
-.outlook-news-evt button{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;flex-shrink:0}
-.outlook-news-evt button:hover{color:var(--red)}
+.mp{background:var(--blue);color:#fff}
 </style>
 </head>
 <body>
@@ -947,22 +895,10 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <!-- Calendar -->
-      <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
-        <div class="cal-header-row">
-          <div class="cal-title-nav">
-            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
-            <h3 id="cal-title" style="margin:0">Calendar</h3>
-            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
-          </div>
-          <div class="cal-header-stats">
-            <span class="cms-label">Monthly stats:</span>
-            <span class="cms-chip" id="cms-pnl-chip">$0</span>
-            <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
-            <button class="cal-nav-btn" onclick="captureCalendar()" title="Screenshot calendar"><i class="ti ti-camera"></i></button>
-          </div>
-        </div>
-        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div></div>
+      <!-- Daily Net Cumulative P&L (moved here from below) -->
+      <div class="dash-chart-card" style="min-width:0">
+        <div class="dash-chart-title">Daily Net Cumulative P&amp;L <i class="ti ti-info-circle"></i></div>
+        <div class="chart-wrap" style="flex:1;min-height:300px;position:relative;overflow:hidden"><canvas id="equity-chart"></canvas></div>
       </div>
     </div>
 
@@ -970,12 +906,12 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="dash-row2 dashboard-block" data-block-id="hero-row2">
       <div class="dash-chart-card">
         <div class="dash-chart-title">Net Daily P&amp;L <i class="ti ti-info-circle"></i></div>
-        <div class="chart-wrap" style="flex:1;min-height:180px"><canvas id="daily-pnl-chart"></canvas></div>
+        <div class="chart-wrap" style="height:240px;overflow:hidden"><canvas id="daily-pnl-chart"></canvas></div>
       </div>
 
       <div class="dash-chart-card score-combo-card">
         <div class="dash-chart-title">Overall Score <i class="ti ti-info-circle"></i></div>
-        <div style="position:relative;flex:1;min-height:170px"><canvas id="radar-chart-hero"></canvas></div>
+        <div style="position:relative;height:220px;overflow:hidden"><canvas id="radar-chart-hero"></canvas></div>
         <div class="score-combo-bottom">
           <div class="score-hero-lbl">Overall Score</div>
           <div class="score-hero-val" id="hero-score-val">—</div>
@@ -1006,10 +942,22 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Daily Net Cumulative P&L (moved here) + Trading Score mini + Profit Distribution + Fear & Greed -->
     <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:stretch">
 
-      <!-- Daily Net Cumulative P&L -->
-      <div class="dash-chart-card" style="min-width:0">
-        <div class="dash-chart-title">Daily Net Cumulative P&amp;L <i class="ti ti-info-circle"></i></div>
-        <div class="chart-wrap" style="flex:1;min-height:300px;position:relative"><canvas id="equity-chart"></canvas></div>
+      <!-- Calendar (moved here from above) -->
+      <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
+        <div class="cal-header-row">
+          <div class="cal-title-nav">
+            <button class="cal-nav-btn" onclick="navMonth(-1)" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+            <h3 id="cal-title" style="margin:0">Calendar</h3>
+            <button class="cal-nav-btn" onclick="navMonth(1)" title="Next month"><i class="ti ti-chevron-right"></i></button>
+          </div>
+          <div class="cal-header-stats">
+            <span class="cms-label">Monthly stats:</span>
+            <span class="cms-chip" id="cms-pnl-chip">$0</span>
+            <span class="cms-chip cms-chip-purple" id="cms-days-chip">0 days</span>
+            <button class="cal-nav-btn" onclick="captureCalendar()" title="Screenshot calendar"><i class="ti ti-camera"></i></button>
+          </div>
+        </div>
+        <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div></div>
       </div>
 
       <!-- Right column: P&L by Weekday -->
@@ -1019,7 +967,7 @@ table.tt tr:last-child td{border-bottom:none}
             <h3 style="margin:0">P&amp;L by Weekday</h3>
             <span style="font-size:11px;color:var(--text3)">$ · all time</span>
           </div>
-          <div class="chart-wrap" style="flex:1;min-height:260px"><canvas id="weekday-chart"></canvas></div>
+          <div class="chart-wrap" style="height:260px;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
         </div>
       </div>
     </div>
@@ -1341,171 +1289,22 @@ table.tt tr:last-child td{border-bottom:none}
   <div id="page-reviews" class="page">
     <div class="ph">
       <div class="ph-left"><h1>Reviews</h1><p>Weekly / monthly reviews — what worked, what didn't, what to fix</p></div>
-      <button class="btn-blue" onclick="openReviewForm()"><i class="ti ti-plus"></i> New Review</button>
     </div>
-    <div class="dm-toggle" style="width:fit-content;margin-bottom:1.25rem">
-      <button class="dm-btn active" id="rev-tab-weekly" onclick="setReviewMode('weekly')">Weekly</button>
-      <button class="dm-btn" id="rev-tab-monthly" onclick="setReviewMode('monthly')">Monthly</button>
-    </div>
-
-    <!-- LIST VIEW -->
-    <div id="rev-list-view">
-      <div id="rev-list"></div>
-    </div>
-
-    <!-- FORM VIEW -->
-    <div id="rev-form-view" style="display:none">
     <div class="card" style="margin-bottom:0">
-      <h3 id="rev-form-title" style="margin:0 0 1rem">New Weekly Review</h3>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:1rem">
-        <button onclick="navReviewPeriod(-1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-left"></i></button>
-        <div style="text-align:center">
-          <div id="rev-period-lbl" style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:600">Week of</div>
-          <div id="rev-period-range" style="font-size:17px;font-weight:700;color:var(--text)">—</div>
-        </div>
-        <button onclick="navReviewPeriod(1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-right"></i></button>
-      </div>
-
-      <div class="rev-stat-grid">
-        <div class="rev-stat-card"><div class="rev-stat-lbl">Trades</div><div class="rev-stat-val" id="rev-st-trades">0</div></div>
-        <div class="rev-stat-card"><div class="rev-stat-lbl">Wins</div><div class="rev-stat-val" id="rev-st-wins" style="color:var(--green)">0</div></div>
-        <div class="rev-stat-card"><div class="rev-stat-lbl">Losses</div><div class="rev-stat-val" id="rev-st-losses" style="color:var(--red)">0</div></div>
-        <div class="rev-stat-card"><div class="rev-stat-lbl">P&amp;L</div><div class="rev-stat-val" id="rev-st-pnl">$0</div></div>
-      </div>
-
-      <div id="rev-no-trades" style="display:none;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 18px;color:var(--text3);font-size:13px;margin-bottom:1.25rem"></div>
-
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Your Reflection</div>
-
-      <div class="rev-field">
-        <label>What worked well this week?</label>
-        <textarea id="rev-q-worked" placeholder="Your answer…"></textarea>
-      </div>
-      <div class="rev-field">
-        <label>What didn't work well this week?</label>
-        <textarea id="rev-q-notworked" placeholder="Your answer…"></textarea>
-      </div>
-
-      <div class="rev-choice-field">
-        <label>Did you journal your losing trades?</label>
-        <div class="rev-btn-group" data-key="journaled">
-          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
-          <button data-val="No" onclick="selectRevChoice(this)">No</button>
-          <button data-val="Partially" onclick="selectRevChoice(this)">Partially</button>
-        </div>
-      </div>
-      <div class="rev-choice-field">
-        <label>Did you enter trades too soon?</label>
-        <div class="rev-btn-group" data-key="enteredSoon">
-          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
-          <button data-val="No" onclick="selectRevChoice(this)">No</button>
-          <button data-val="Sometimes" onclick="selectRevChoice(this)">Sometimes</button>
-        </div>
-      </div>
-      <div class="rev-choice-field">
-        <label>Did you enter trades too late?</label>
-        <div class="rev-btn-group" data-key="enteredLate">
-          <button data-val="Yes" onclick="selectRevChoice(this)">Yes</button>
-          <button data-val="No" onclick="selectRevChoice(this)">No</button>
-          <button data-val="Sometimes" onclick="selectRevChoice(this)">Sometimes</button>
-        </div>
-      </div>
-      <div class="rev-choice-field">
-        <label>Did you take profit too soon or too late?</label>
-        <div class="rev-btn-group" data-key="profitTiming">
-          <button data-val="Too soon" onclick="selectRevChoice(this)">Too soon</button>
-          <button data-val="Too late" onclick="selectRevChoice(this)">Too late</button>
-          <button data-val="On plan" onclick="selectRevChoice(this)">On plan</button>
-          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
-        </div>
-      </div>
-      <div class="rev-choice-field">
-        <label>Did you risk too much or too little?</label>
-        <div class="rev-btn-group" data-key="riskSizing">
-          <button data-val="Too much" onclick="selectRevChoice(this)">Too much</button>
-          <button data-val="Too little" onclick="selectRevChoice(this)">Too little</button>
-          <button data-val="On plan" onclick="selectRevChoice(this)">On plan</button>
-          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
-        </div>
-      </div>
-      <div class="rev-choice-field">
-        <label>Did you follow your model or overcomplicate things?</label>
-        <div class="rev-btn-group" data-key="followedModel">
-          <button data-val="Followed" onclick="selectRevChoice(this)">Followed</button>
-          <button data-val="Overcomplicated" onclick="selectRevChoice(this)">Overcomplicated</button>
-          <button data-val="Mixed" onclick="selectRevChoice(this)">Mixed</button>
-        </div>
-      </div>
-
-      <div class="rev-field">
-        <label>What actions are you taking to fix these issues?</label>
-        <textarea id="rev-q-actions" placeholder="Your answer…"></textarea>
-      </div>
-      <div class="rev-field">
-        <label>What advice would you give yourself at the beginning of next week?</label>
-        <textarea id="rev-q-advice" placeholder="Your answer…"></textarea>
-      </div>
-      <div class="rev-field" style="margin-bottom:1.25rem">
-        <label>What are you most proud of?</label>
-        <textarea id="rev-q-proud" placeholder="Your answer…"></textarea>
-      </div>
-
-      <div style="display:flex;gap:10px">
-        <button class="btn-back" style="margin-bottom:0" onclick="closeReviewForm()">Cancel</button>
-        <button class="btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" onclick="saveReview()"><i class="ti ti-check"></i> Save Review</button>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center" id="reviews-save-status"></div>
-    </div>
+      <textarea id="reviews-textarea" oninput="onReviewsEdited()" placeholder="Review your recent trading: what went well, what mistakes came up, patterns you noticed, and what you'll change going forward…" style="width:100%;min-height:420px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="reviews-save-status">Saved</div>
     </div>
   </div>
-
 
   <!-- OUTLOOK -->
   <div id="page-outlook" class="page">
     <div class="ph">
-      <div class="ph-left"><h1><i class="ti ti-eye" style="color:var(--blue);margin-right:6px"></i>Weekly Outlook <span class="outlook-unsaved-pill" id="outlook-unsaved-pill" style="display:none"><i class="ti ti-alert-circle"></i> Unsaved</span></h1><p>Your forward-looking notes — plans, goals, levels to watch</p></div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="navOutlookWeek(-1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-left"></i></button>
-        <span class="rev-date-pill" id="outlook-week-pill">Week of —</span>
-        <button onclick="navOutlookWeek(1)" style="background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px"><i class="ti ti-chevron-right"></i></button>
-      </div>
+      <div class="ph-left"><h1>Outlook</h1><p>Your forward-looking notes — plans, goals, levels to watch</p></div>
     </div>
-
-    <div class="card outlook-index-card" style="margin-bottom:1rem">
-      <div class="outlook-index-head" onclick="toggleOutlookNewsCollapse()">
-        <span style="display:flex;align-items:center;gap:9px">
-          <span class="outlook-news-dot"></span>
-          <span class="outlook-index-name" style="font-size:15px">High-Impact USD News</span>
-          <span class="outlook-news-count" id="outlook-news-count">0</span>
-        </span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="rev-icon-btn" onclick="event.stopPropagation();sortOutlookNews()" title="Re-sort by date"><i class="ti ti-refresh"></i></button>
-          <i class="ti ti-chevron-up" id="outlook-news-chevron"></i>
-        </div>
-      </div>
-      <div id="outlook-news-body" style="padding:0 1.25rem 1.1rem">
-        <div id="outlook-news-days" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:14px"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input type="date" id="outlook-news-date" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px"/>
-          <input type="time" id="outlook-news-time" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px"/>
-          <input type="text" id="outlook-news-title" placeholder="Event name (e.g. FOMC Statement)" style="flex:1;min-width:160px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px"/>
-          <button class="btn-blue" onclick="addOutlookNewsEvent()"><i class="ti ti-plus"></i> Add</button>
-        </div>
-      </div>
+    <div class="card" style="margin-bottom:0">
+      <textarea id="outlook-textarea" oninput="onOutlookEdited()" placeholder="What are you watching for next week? Key levels, upcoming news, goals, or things to focus on…" style="width:100%;min-height:420px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="outlook-save-status">Saved</div>
     </div>
-
-    <div id="outlook-index-list"></div>
-    <div class="card">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">News Outlook Notes</div>
-      <textarea id="outlook-textarea" oninput="markOutlookDirty()" placeholder="What news events are you watching this week? How might they affect your trading?" style="width:100%;min-height:140px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;color:var(--text);outline:none;resize:vertical;box-sizing:border-box"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:1.25rem">
-      <input id="outlook-add-index-input" type="text" placeholder="Add index (e.g. YM)" style="flex:1;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);padding:12px 16px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addOutlookIndex();}"/>
-      <button onclick="addOutlookIndex()" style="width:48px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ti ti-plus"></i></button>
-    </div>
-    <button class="btn-primary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="saveOutlook()"><i class="ti ti-device-floppy"></i> Save Outlook</button>
-    <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center" id="outlook-save-status"></div>
   </div>
 
 </div>
@@ -3289,7 +3088,7 @@ function renderRecentTradesTable(){
   const all=Object.values(db.trades).flat().filter(t=>t.date).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
   if(!all.length){wrap.innerHTML='<div style="padding:1rem 0;color:var(--text3);font-size:13px">No trades yet.</div>';return;}
   const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  wrap.innerHTML=all.slice(0,10).map(t=>{
+  wrap.innerHTML=all.slice(0,25).map(t=>{
     const[y,m,d]=t.date.split('-');
     const dateStr=mn[parseInt(m)-1]+' '+parseInt(d);
     const pnl=t.pnl||0;
@@ -5577,563 +5376,40 @@ function openShotFull(key,idx){
 let currentNoteId=null;
 let noteSaveTimer=null;
 
-// ── Reviews (Weekly / Monthly, backed by real trade data) ──────
-let reviewMode='weekly';
-let reviewRefDate=new Date();
-
-const REV_MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const REV_MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function toISODateLocalRev(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function startOfWeekRev(d){
-  const dt=new Date(d.getFullYear(),d.getMonth(),d.getDate());
-  dt.setDate(dt.getDate()-dt.getDay());
-  return dt;
-}
-function periodRangeFromKey(mode,key){
-  if(mode==='weekly'){
-    const start=new Date(key+'T00:00:00');
-    const end=new Date(start);end.setDate(end.getDate()+6);
-    return{start,end};
-  }
-  const parts=key.split('-').map(Number);
-  const start=new Date(parts[0],parts[1]-1,1);
-  const end=new Date(parts[0],parts[1],0);
-  return{start,end};
-}
-function tradesForPeriod(mode,key){
-  const{start,end}=periodRangeFromKey(mode,key);
-  const startStr=toISODateLocalRev(start),endStr=toISODateLocalRev(end);
-  return Object.values(db.trades||{}).flat().filter(t=>t.date&&t.date>=startStr&&t.date<=endStr);
-}
-function escapeHtmlRev(s){
-  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function currentReviewPeriod(){
-  if(reviewMode==='weekly'){
-    const start=startOfWeekRev(reviewRefDate);
-    const end=new Date(start);end.setDate(end.getDate()+6);
-    return{start,end,key:toISODateLocalRev(start)};
-  }
-  const start=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth(),1);
-  const end=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth()+1,0);
-  return{start,end,key:start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')};
-}
-function getReviewsStore(){
-  if(!db.userSettings)db.userSettings={};
-  if(!db.userSettings.weeklyReviews)db.userSettings.weeklyReviews={};
-  if(!db.userSettings.monthlyReviews)db.userSettings.monthlyReviews={};
-  return reviewMode==='weekly'?db.userSettings.weeklyReviews:db.userSettings.monthlyReviews;
-}
+// ── Reviews / Outlook (simple auto-saving notepads) ────────────
+let reviewsSaveTimer=null,outlookSaveTimer=null;
 
 function initReviewsPage(){
-  reviewMode='weekly';
-  reviewRefDate=new Date();
-  const wTab=document.getElementById('rev-tab-weekly'),mTab=document.getElementById('rev-tab-monthly');
-  if(wTab)wTab.classList.add('active');
-  if(mTab)mTab.classList.remove('active');
-  showReviewListView();
+  const ta=document.getElementById('reviews-textarea');
+  if(ta)ta.value=(db.userSettings&&db.userSettings.reviewsText)||'';
 }
-function setReviewMode(mode){
-  reviewMode=mode;
-  reviewRefDate=new Date();
-  const wTab=document.getElementById('rev-tab-weekly'),mTab=document.getElementById('rev-tab-monthly');
-  if(wTab)wTab.classList.toggle('active',mode==='weekly');
-  if(mTab)mTab.classList.toggle('active',mode==='monthly');
-  showReviewListView();
-}
-function showReviewListView(){
-  const listView=document.getElementById('rev-list-view'),formView=document.getElementById('rev-form-view');
-  if(listView)listView.style.display='';
-  if(formView)formView.style.display='none';
-  renderReviewsList();
-}
-function openReviewForm(key){
-  if(key){
-    if(reviewMode==='weekly')reviewRefDate=new Date(key+'T00:00:00');
-    else{const p=key.split('-').map(Number);reviewRefDate=new Date(p[0],p[1]-1,1);}
-  } else {
-    reviewRefDate=new Date();
-  }
-  const listView=document.getElementById('rev-list-view'),formView=document.getElementById('rev-form-view');
-  if(listView)listView.style.display='none';
-  if(formView)formView.style.display='';
-  renderReviewForm();
-}
-function closeReviewForm(){
-  showReviewListView();
-}
-function deleteReview(key){
-  if(!confirm('Delete this review? This can\'t be undone.'))return;
-  const store=getReviewsStore();
-  delete store[key];
-  persistUserSettings();
-  renderReviewsList();
-}
-function renderReviewsList(){
-  const wrap=document.getElementById('rev-list');
-  if(!wrap)return;
-  const store=getReviewsStore();
-  const keys=Object.keys(store).sort().reverse();
-  if(!keys.length){
-    wrap.innerHTML=`<div class="card" style="text-align:center;color:var(--text3);font-size:13px">No saved reviews yet — click "New Review" to add one.</div>`;
-    return;
-  }
-  wrap.innerHTML=keys.map(key=>{
-    const saved=store[key]||{};
-    const trades=tradesForPeriod(reviewMode,key);
-    const m=computeMetrics(trades);
-    const pnlStr=(m.net>=0?'+$':'-$')+Math.abs(Math.round(m.net)).toLocaleString();
-    const pnlColor=m.net>0?'var(--green)':m.net<0?'var(--red)':'var(--text3)';
-    let pillLbl;
-    if(reviewMode==='weekly'){
-      const start=new Date(key+'T00:00:00');
-      pillLbl=REV_MONTH_SHORT[start.getMonth()]+' '+start.getDate()+', '+start.getFullYear();
-    } else {
-      const p=key.split('-').map(Number);
-      pillLbl=REV_MONTH_NAMES[p[1]-1]+' '+p[0];
-    }
-    const lessons=[saved.actions,saved.advice].filter(Boolean);
-    const lessonsHtml=lessons.length?`<div class="rev-clamp" style="margin-top:10px;font-size:13px;color:var(--text2)"><b style="color:var(--text)">Lessons:</b> ${lessons.map(l=>'- '+escapeHtmlRev(l)).join(' ')}</div>`:'';
-    const bodyRaw=saved.worked||saved.notWorked||'';
-    const bodyHtml=bodyRaw?`<div class="rev-clamp" style="margin-top:12px;font-size:14px;color:var(--text);line-height:1.6">${escapeHtmlRev(bodyRaw)}</div>`:`<div style="margin-top:12px;font-size:13px;color:var(--text3)">No reflection written yet.</div>`;
-    return`<div class="card rev-list-item">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="rev-date-pill">${pillLbl}</span>
-          <span style="font-size:13px;color:var(--text3)">${trades.length} trade${trades.length===1?'':'s'}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-weight:700;color:${pnlColor}">${pnlStr}</span>
-          <button class="rev-icon-btn" onclick="openReviewForm('${key}')" title="Edit"><i class="ti ti-pencil"></i></button>
-          <button class="rev-icon-btn" onclick="deleteReview('${key}')" title="Delete"><i class="ti ti-trash"></i></button>
-        </div>
-      </div>
-      <div style="margin-top:8px;font-size:13px;font-weight:700">
-        <span style="color:var(--green)">${m.wins}W</span>
-        <span style="color:var(--red);margin-left:10px">${m.losses}L</span>
-      </div>
-      ${bodyHtml}
-      ${lessonsHtml}
-    </div>`;
-  }).join('');
-}
-function navReviewPeriod(delta){
-  if(reviewMode==='weekly'){
-    const d=new Date(reviewRefDate);d.setDate(d.getDate()+delta*7);reviewRefDate=d;
-  } else {
-    reviewRefDate=new Date(reviewRefDate.getFullYear(),reviewRefDate.getMonth()+delta,1);
-  }
-  renderReviewForm();
-}
-function renderReviewForm(){
-  const{start,end,key}=currentReviewPeriod();
-  const titleEl=document.getElementById('rev-form-title');
-  const lblEl=document.getElementById('rev-period-lbl');
-  const rangeEl=document.getElementById('rev-period-range');
-  if(!titleEl||!lblEl||!rangeEl)return;
-  const store=getReviewsStore();
-  const isExisting=!!store[key];
-  if(reviewMode==='weekly'){
-    titleEl.textContent=isExisting?'Edit Weekly Review':'New Weekly Review';
-    lblEl.textContent='Week of';
-    rangeEl.textContent=REV_MONTH_SHORT[start.getMonth()]+' '+start.getDate()+' – '+REV_MONTH_SHORT[end.getMonth()]+' '+end.getDate()+', '+end.getFullYear();
-  } else {
-    titleEl.textContent=isExisting?'Edit Monthly Review':'New Monthly Review';
-    lblEl.textContent='Month of';
-    rangeEl.textContent=REV_MONTH_NAMES[start.getMonth()]+' '+start.getFullYear();
-  }
-
-  const startStr=toISODateLocalRev(start),endStr=toISODateLocalRev(end);
-  const all=Object.values(db.trades||{}).flat().filter(t=>t.date&&t.date>=startStr&&t.date<=endStr);
-  const m=computeMetrics(all);
-  document.getElementById('rev-st-trades').textContent=all.length.toLocaleString();
-  document.getElementById('rev-st-wins').textContent=m.wins.toLocaleString();
-  document.getElementById('rev-st-losses').textContent=m.losses.toLocaleString();
-  const pnlEl=document.getElementById('rev-st-pnl');
-  pnlEl.textContent=(m.net>=0?'$':'-$')+Math.abs(Math.round(m.net)).toLocaleString();
-  pnlEl.style.color=m.net>0?'var(--green)':m.net<0?'var(--red)':'var(--text)';
-
-  const noTradesEl=document.getElementById('rev-no-trades');
-  if(!all.length){
-    noTradesEl.style.display='';
-    noTradesEl.textContent=reviewMode==='weekly'?"No trades found in this week — pick a different week above.":"No trades found in this month — pick a different month above.";
-  } else {
-    noTradesEl.style.display='none';
-  }
-
-  const saved=store[key]||{};
-  document.getElementById('rev-q-worked').value=saved.worked||'';
-  document.getElementById('rev-q-notworked').value=saved.notWorked||'';
-  document.getElementById('rev-q-actions').value=saved.actions||'';
-  document.getElementById('rev-q-advice').value=saved.advice||'';
-  document.getElementById('rev-q-proud').value=saved.proud||'';
-  document.querySelectorAll('#page-reviews .rev-btn-group').forEach(group=>{
-    const val=saved[group.getAttribute('data-key')]||'';
-    group.setAttribute('data-selected',val);
-    group.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.getAttribute('data-val')===val));
-  });
-
-  const statusEl=document.getElementById('reviews-save-status');
-  if(statusEl)statusEl.textContent='';
-}
-function selectRevChoice(btn){
-  const group=btn.parentElement;
-  group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  group.setAttribute('data-selected',btn.getAttribute('data-val'));
-}
-async function saveReview(){
-  const{key}=currentReviewPeriod();
-  const store=getReviewsStore();
-  const data={
-    worked:document.getElementById('rev-q-worked').value,
-    notWorked:document.getElementById('rev-q-notworked').value,
-    actions:document.getElementById('rev-q-actions').value,
-    advice:document.getElementById('rev-q-advice').value,
-    proud:document.getElementById('rev-q-proud').value
-  };
-  document.querySelectorAll('#page-reviews .rev-btn-group').forEach(group=>{
-    data[group.getAttribute('data-key')]=group.getAttribute('data-selected')||'';
-  });
-  store[key]=data;
+function onReviewsEdited(){
   const statusEl=document.getElementById('reviews-save-status');
   if(statusEl)statusEl.textContent='Saving…';
-  await persistUserSettings();
-  if(statusEl)statusEl.textContent='Saved';
-  showReviewListView();
-}
-
-const OUTLOOK_TIMEFRAMES=['1W','1D','4H'];
-let outlookOpenTF={};
-let outlookRefDate=new Date();
-let outlookNewsCollapsed=false;
-const OUTLOOK_DAY_NAMES=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-function getOutlookState(){
-  if(!db.userSettings)db.userSettings={};
-  if(!db.userSettings.outlookIndices)db.userSettings.outlookIndices=['DXY','ES','NQ'];
-  if(!db.userSettings.outlookData)db.userSettings.outlookData={};
-  db.userSettings.outlookIndices.forEach(sym=>{
-    if(!db.userSettings.outlookData[sym])db.userSettings.outlookData[sym]={collapsed:false};
-  });
-  return db.userSettings;
-}
-function currentOutlookWeekKey(){
-  return toISODateLocalRev(startOfWeekRev(outlookRefDate));
-}
-function getOutlookWeekState(){
-  if(!db.userSettings)db.userSettings={};
-  if(!db.userSettings.outlookWeeks)db.userSettings.outlookWeeks={};
-  const key=currentOutlookWeekKey();
-  if(!db.userSettings.outlookWeeks[key])db.userSettings.outlookWeeks[key]={notes:'',news:[],shots:{}};
-  if(!db.userSettings.outlookWeeks[key].shots)db.userSettings.outlookWeeks[key].shots={};
-  if(!db.userSettings.outlookWeeks[key].news)db.userSettings.outlookWeeks[key].news=[];
-  return db.userSettings.outlookWeeks[key];
-}
-
-let outlookDirty=false;
-function markOutlookDirty(){
-  outlookDirty=true;
-  const pill=document.getElementById('outlook-unsaved-pill');
-  if(pill)pill.style.display='';
-}
-function clearOutlookDirty(){
-  outlookDirty=false;
-  const pill=document.getElementById('outlook-unsaved-pill');
-  if(pill)pill.style.display='none';
+  clearTimeout(reviewsSaveTimer);
+  reviewsSaveTimer=setTimeout(async()=>{
+    if(!db.userSettings)db.userSettings={};
+    db.userSettings.reviewsText=document.getElementById('reviews-textarea').value;
+    await persistUserSettings();
+    if(statusEl)statusEl.textContent='Saved';
+  },600);
 }
 
 function initOutlookPage(){
-  outlookRefDate=new Date();
-  outlookOpenTF={};
-  outlookNewsCollapsed=false;
-  clearOutlookDirty();
-  const body=document.getElementById('outlook-news-body');
-  if(body)body.style.display='';
-  const chev=document.getElementById('outlook-news-chevron');
-  if(chev)chev.className='ti ti-chevron-up';
-  renderOutlookAll();
-}
-function navOutlookWeek(delta){
-  const d=new Date(outlookRefDate);d.setDate(d.getDate()+delta*7);outlookRefDate=d;
-  renderOutlookAll();
-}
-function renderOutlookAll(){
-  const weekState=getOutlookWeekState();
-  const start=startOfWeekRev(outlookRefDate);
-  const pillEl=document.getElementById('outlook-week-pill');
-  if(pillEl)pillEl.textContent='Week of '+REV_MONTH_SHORT[start.getMonth()]+' '+start.getDate();
   const ta=document.getElementById('outlook-textarea');
-  if(ta)ta.value=weekState.notes||'';
-  const statusEl=document.getElementById('outlook-save-status');
-  if(statusEl)statusEl.textContent='';
-  renderOutlookNews();
-  renderOutlookIndices();
+  if(ta)ta.value=(db.userSettings&&db.userSettings.outlookText)||'';
 }
-
-function readOutlookAnalysis(weekState,sym,tf){
-  return(weekState.analysis&&weekState.analysis[sym]&&weekState.analysis[sym][tf])||{bias:'',reason:''};
-}
-function getOutlookAnalysisMut(weekState,sym,tf){
-  if(!weekState.analysis)weekState.analysis={};
-  if(!weekState.analysis[sym])weekState.analysis[sym]={};
-  if(!weekState.analysis[sym][tf])weekState.analysis[sym][tf]={bias:'',reason:''};
-  return weekState.analysis[sym][tf];
-}
-function setOutlookBias(sym,tf,bias){
-  const weekState=getOutlookWeekState();
-  const a=getOutlookAnalysisMut(weekState,sym,tf);
-  a.bias=bias;
-  markOutlookDirty();
-  renderOutlookIndices();
-}
-function onOutlookReasonInput(el,sym,tf){
-  const weekState=getOutlookWeekState();
-  const a=getOutlookAnalysisMut(weekState,sym,tf);
-  a.reason=el.value;
-  markOutlookDirty();
-}
-const OUTLOOK_BIAS_ICON={bullish:'trending-up',bearish:'trending-down',unsure:'minus'};
-
-function renderOutlookIndices(){
-  const us=getOutlookState();
-  const weekState=getOutlookWeekState();
-  const wrap=document.getElementById('outlook-index-list');
-  if(!wrap)return;
-  wrap.innerHTML=us.outlookIndices.map(sym=>{
-    const data=us.outlookData[sym]||{collapsed:false};
-    const collapsed=!!data.collapsed;
-    const tfButtons=OUTLOOK_TIMEFRAMES.map(tf=>{
-      const active=outlookOpenTF[sym]===tf;
-      return `<button class="outlook-tf-btn${active?' active':''}" onclick="toggleOutlookTF('${sym}','${tf}')">${tf}</button>`;
-    }).join('');
-    const biasPills=OUTLOOK_TIMEFRAMES.map(tf=>{
-      const a=readOutlookAnalysis(weekState,sym,tf);
-      if(!a.bias)return'';
-      return `<span class="outlook-bias-pill ${a.bias}"><i class="ti ti-${OUTLOOK_BIAS_ICON[a.bias]}"></i> ${tf}</span>`;
-    }).join('');
-    let panelHtml='';
-    if(outlookOpenTF[sym]){
-      const tf=outlookOpenTF[sym];
-      const shots=(weekState.shots[sym]&&weekState.shots[sym][tf])||[];
-      const analysis=readOutlookAnalysis(weekState,sym,tf);
-      panelHtml=`<div class="outlook-tf-panel">
-        <div class="outlook-bias-row">
-          <span class="outlook-bias-lbl">${tf} Analysis</span>
-          <button class="outlook-bias-btn bullish${analysis.bias==='bullish'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','bullish')"><i class="ti ti-trending-up"></i> Bullish</button>
-          <button class="outlook-bias-btn bearish${analysis.bias==='bearish'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','bearish')"><i class="ti ti-trending-down"></i> Bearish</button>
-          <button class="outlook-bias-btn unsure${analysis.bias==='unsure'?' active':''}" onclick="setOutlookBias('${sym}','${tf}','unsure')"><i class="ti ti-minus"></i> Unsure</button>
-        </div>
-        <textarea class="outlook-reason-ta" placeholder="Reason for bias on ${sym} ${tf}…" oninput="onOutlookReasonInput(this,'${sym}','${tf}')">${escapeHtmlRev(analysis.reason||'')}</textarea>
-        ${shots.length?`<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px">${shots.map((src,i)=>`<div class="nb-shot-thumb"><img src="${src}"/><button class="nb-shot-remove" onclick="removeOutlookShot('${sym}','${tf}',${i})"><i class="ti ti-x"></i></button></div>`).join('')}</div>`:''}
-        <label class="img-upload-zone" style="margin-bottom:0">
-          <i class="ti ti-photo-plus"></i><p>Click to add a ${tf} chart screenshot for this week</p>
-          <input type="file" accept="image/*" multiple style="display:none" onchange="onOutlookShotUpload(event,'${sym}','${tf}')"/>
-        </label>
-      </div>`;
-    }
-    return `<div class="card outlook-index-card">
-      <div class="outlook-index-head" onclick="toggleOutlookCollapse('${sym}')">
-        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="outlook-index-name">${sym}</span>
-          ${biasPills}
-        </span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="outlook-remove-idx" onclick="event.stopPropagation();removeOutlookIndex('${sym}')" title="Remove index"><i class="ti ti-trash"></i></button>
-          <i class="ti ti-chevron-${collapsed?'down':'up'}"></i>
-        </div>
-      </div>
-      ${collapsed?'':`<div class="outlook-tf-row">${tfButtons}</div>${panelHtml}`}
-    </div>`;
-  }).join('');
-}
-
-function toggleOutlookCollapse(sym){
-  const us=getOutlookState();
-  us.outlookData[sym].collapsed=!us.outlookData[sym].collapsed;
-  if(us.outlookData[sym].collapsed)delete outlookOpenTF[sym];
-  renderOutlookIndices();
-}
-
-function toggleOutlookTF(sym,tf){
-  outlookOpenTF[sym]=outlookOpenTF[sym]===tf?null:tf;
-  renderOutlookIndices();
-}
-
-function addOutlookIndex(){
-  const input=document.getElementById('outlook-add-index-input');
-  if(!input)return;
-  const val=input.value.trim().toUpperCase();
-  if(!val)return;
-  const us=getOutlookState();
-  if(!us.outlookIndices.includes(val)){
-    us.outlookIndices.push(val);
-    us.outlookData[val]={collapsed:false};
-    markOutlookDirty();
-  }
-  input.value='';
-  renderOutlookIndices();
-}
-
-function removeOutlookIndex(sym){
-  const us=getOutlookState();
-  us.outlookIndices=us.outlookIndices.filter(s=>s!==sym);
-  delete us.outlookData[sym];
-  delete outlookOpenTF[sym];
-  markOutlookDirty();
-  renderOutlookIndices();
-}
-
-function onOutlookShotUpload(e,sym,tf){
-  const weekState=getOutlookWeekState();
-  if(!weekState.shots[sym])weekState.shots[sym]={};
-  if(!weekState.shots[sym][tf])weekState.shots[sym][tf]=[];
-  const files=[...e.target.files];
-  let remaining=files.length;
-  if(!remaining)return;
-  files.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      weekState.shots[sym][tf].push(ev.target.result);
-      remaining--;
-      if(remaining===0){markOutlookDirty();renderOutlookIndices();}
-    };
-    reader.readAsDataURL(file);
-  });
-  e.target.value='';
-}
-
-function removeOutlookShot(sym,tf,idx){
-  const weekState=getOutlookWeekState();
-  const arr=weekState.shots[sym]&&weekState.shots[sym][tf];
-  if(!arr)return;
-  arr.splice(idx,1);
-  markOutlookDirty();
-  renderOutlookIndices();
-}
-
-function toggleOutlookNewsCollapse(){
-  outlookNewsCollapsed=!outlookNewsCollapsed;
-  const body=document.getElementById('outlook-news-body');
-  const chev=document.getElementById('outlook-news-chevron');
-  if(body)body.style.display=outlookNewsCollapsed?'none':'';
-  if(chev)chev.className='ti ti-chevron-'+(outlookNewsCollapsed?'down':'up');
-}
-
-// Live USD high-impact news: this unofficial feed only covers last/this/next
-// week relative to today, and may be blocked by the browser's CORS policy —
-// when that happens (or the viewed week is further out) we fall back to the
-// manual add-your-own form below the list.
-const OUTLOOK_NEWS_CACHE={};
-function outlookWeekOffsetLabel(weekStartDate){
-  const thisWeekStart=startOfWeekRev(new Date());
-  const diffDays=Math.round((weekStartDate-thisWeekStart)/86400000);
-  if(diffDays===0)return'this';
-  if(diffDays===7)return'next';
-  if(diffDays===-7)return'last';
-  return null;
-}
-async function fetchOutlookNewsFeed(which){
-  if(OUTLOOK_NEWS_CACHE[which]&&(Date.now()-OUTLOOK_NEWS_CACHE[which].ts)<10*60*1000){
-    return OUTLOOK_NEWS_CACHE[which].events;
-  }
-  const res=await fetch('https://nfs.faireconomy.media/ff_calendar_'+which+'week.json');
-  if(!res.ok)throw new Error('feed request failed');
-  const data=await res.json();
-  OUTLOOK_NEWS_CACHE[which]={ts:Date.now(),events:data};
-  return data;
-}
-function sortOutlookNews(){
-  delete OUTLOOK_NEWS_CACHE.last;delete OUTLOOK_NEWS_CACHE.this;delete OUTLOOK_NEWS_CACHE.next;
-  renderOutlookNews();
-}
-async function renderOutlookNews(){
-  const weekState=getOutlookWeekState();
-  const daysWrap=document.getElementById('outlook-news-days');
-  const countEl=document.getElementById('outlook-news-count');
-  if(!daysWrap||!countEl)return;
-
-  const weekStart=startOfWeekRev(outlookRefDate);
-  const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
-  const startStr=toISODateLocalRev(weekStart),endStr=toISODateLocalRev(weekEnd);
-  const which=outlookWeekOffsetLabel(weekStart);
-  const renderToken=(renderOutlookNews._token=(renderOutlookNews._token||0)+1);
-
-  let autoList=[];
-  let errMsg=null;
-  if(which){
-    daysWrap.innerHTML=`<div style="color:var(--text3);font-size:13px;grid-column:1/-1">Loading USD high-impact news…</div>`;
-    try{
-      const feed=await fetchOutlookNewsFeed(which);
-      if(renderToken!==renderOutlookNews._token)return;
-      autoList=feed.filter(e=>e.country==='USD'&&e.impact==='High').map(e=>{
-        const d=new Date(e.date);
-        return{date:toISODateLocalRev(d),time:d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}).toLowerCase(),title:e.title};
-      });
-    }catch(err){
-      if(renderToken!==renderOutlookNews._token)return;
-      errMsg="Couldn't load live news data automatically — it may be blocked by your browser or temporarily unavailable. Add events manually below.";
-    }
-  } else {
-    errMsg="Live USD news only auto-loads for last week, this week, and next week. Add events for this week manually below.";
-  }
-
-  const manualList=(weekState.news||[]).map((ev,i)=>({date:ev.date,time:ev.time,title:ev.title,idx:i}));
-  const all=[...autoList.filter(ev=>ev.date>=startStr&&ev.date<=endStr),...manualList];
-  const events=all.sort((a,b)=>(a.date+' '+a.time).localeCompare(b.date+' '+b.time));
-  countEl.textContent=events.length;
-
-  const errHtml=errMsg?`<div style="color:var(--text3);font-size:12px;grid-column:1/-1;margin-bottom:2px">${errMsg}</div>`:'';
-  if(!events.length){
-    daysWrap.innerHTML=errHtml+`<div style="color:var(--text3);font-size:13px;grid-column:1/-1">No high-impact USD news found for this week.</div>`;
-    return;
-  }
-  const grouped={};
-  events.forEach(ev=>{(grouped[ev.date]=grouped[ev.date]||[]).push(ev);});
-  daysWrap.innerHTML=errHtml+Object.keys(grouped).sort().map(dateStr=>{
-    const d=new Date(dateStr+'T00:00:00');
-    const wname=OUTLOOK_DAY_NAMES[d.getDay()];
-    const mShort=REV_MONTH_SHORT[d.getMonth()]+' '+d.getDate();
-    const evtsHtml=grouped[dateStr].map(ev=>{
-      const removeBtn=ev.idx!=null?`<button onclick="removeOutlookNewsEvent(${ev.idx})" title="Remove"><i class="ti ti-x"></i></button>`:'';
-      return `<div class="outlook-news-evt"><span class="dot"></span><span class="time">${escapeHtmlRev(ev.time||'')}</span><span>${escapeHtmlRev(ev.title)}</span>${removeBtn}</div>`;
-    }).join('');
-    return `<div class="outlook-news-daycol">
-      <div class="outlook-news-daycol-hd"><b>${wname}</b><span>${mShort}</span></div>
-      ${evtsHtml}
-    </div>`;
-  }).join('');
-}
-function addOutlookNewsEvent(){
-  const dateEl=document.getElementById('outlook-news-date');
-  const timeEl=document.getElementById('outlook-news-time');
-  const titleEl=document.getElementById('outlook-news-title');
-  if(!dateEl||!titleEl)return;
-  if(!dateEl.value||!titleEl.value.trim())return;
-  const weekState=getOutlookWeekState();
-  weekState.news.push({date:dateEl.value,time:timeEl.value||'',title:titleEl.value.trim()});
-  dateEl.value='';timeEl.value='';titleEl.value='';
-  markOutlookDirty();
-  renderOutlookNews();
-}
-function removeOutlookNewsEvent(idx){
-  const weekState=getOutlookWeekState();
-  weekState.news.splice(idx,1);
-  markOutlookDirty();
-  renderOutlookNews();
-}
-
-async function saveOutlook(){
-  const weekState=getOutlookWeekState();
-  weekState.notes=document.getElementById('outlook-textarea').value;
+function onOutlookEdited(){
   const statusEl=document.getElementById('outlook-save-status');
   if(statusEl)statusEl.textContent='Saving…';
-  await persistUserSettings();
-  if(statusEl)statusEl.textContent='Saved';
-  clearOutlookDirty();
+  clearTimeout(outlookSaveTimer);
+  outlookSaveTimer=setTimeout(async()=>{
+    if(!db.userSettings)db.userSettings={};
+    db.userSettings.outlookText=document.getElementById('outlook-textarea').value;
+    await persistUserSettings();
+    if(statusEl)statusEl.textContent='Saved';
+  },600);
 }
-
 
 function initNotebook(){
   if(!db.notes)db.notes=[];
