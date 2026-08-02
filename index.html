@@ -924,18 +924,11 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
 
       <div class="dash-chart-card">
-        <div class="dash-chart-title" style="margin-bottom:12px">Recent trades</div>
-        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
-          <div class="dash-trades-scroll" id="dash-trades-panel-recent" style="flex:1">
-            <table class="dash-trades-table">
-              <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
-              <tbody id="recent-trades-table"></tbody>
-            </table>
-          </div>
-          <div style="padding-top:10px">
-            <button onclick="viewCurrentMonthTrades()" style="width:100%;background:none;border:none;padding:8px 0 2px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px">View all trades <i class="ti ti-arrow-right" style="font-size:12px"></i></button>
-          </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
+          <div class="dash-chart-title" style="margin-bottom:0">P&amp;L by Weekday</div>
+          <span style="font-size:11px;color:var(--text3)">$ · all time</span>
         </div>
+        <div class="chart-wrap" style="flex:1;min-height:200px;position:relative;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
       </div>
     </div>
 
@@ -943,7 +936,8 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Daily Net Cumulative P&L (moved here) + Trading Score mini + Profit Distribution + Fear & Greed -->
     <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem">
 
-      <!-- Calendar (moved here from above) -->
+      <!-- Calendar + Recent trades -->
+      <div style="min-width:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1rem;align-items:stretch">
       <div class="card" id="cal-card" style="margin-bottom:0;min-width:0">
         <div class="cal-header-row">
           <div class="cal-title-nav">
@@ -965,14 +959,37 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div></div>
       </div>
 
+      <div class="dash-chart-card" style="min-width:0">
+        <div class="dash-chart-title" style="margin-bottom:12px">Recent trades</div>
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+          <div class="dash-trades-scroll" id="dash-trades-panel-recent" style="flex:1">
+            <table class="dash-trades-table">
+              <thead><tr><th>Close Date</th><th>Symbol</th><th>Net P&amp;L</th></tr></thead>
+              <tbody id="recent-trades-table"></tbody>
+            </table>
+          </div>
+          <div style="padding-top:10px">
+            <button onclick="viewCurrentMonthTrades()" style="width:100%;background:none;border:none;padding:8px 0 2px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px">View all trades <i class="ti ti-arrow-right" style="font-size:12px"></i></button>
+          </div>
+        </div>
+      </div>
+      </div>
+
       <!-- Right column: P&L by Weekday + Short/Long Analysis -->
       <div style="min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem" id="right-col">
-        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
-            <h3 style="margin:0">P&amp;L by Weekday</h3>
-            <span style="font-size:11px;color:var(--text3)">$ · all time</span>
+        <div class="card analysis-card" style="margin-bottom:0">
+          <h3 style="margin:0">Profitability</h3>
+          <div class="analysis-gauge-wrap">
+            <canvas id="profitability-gauge"></canvas>
+            <div class="analysis-gauge-center">
+              <div class="analysis-gauge-lbl">Total Trades</div>
+              <div class="analysis-gauge-val" id="profitability-total">0</div>
+            </div>
           </div>
-          <div class="chart-wrap" style="height:260px;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
+          <div class="analysis-stats-row" style="grid-template-columns:repeat(2,1fr)">
+            <div><div class="analysis-stat-val" style="font-size:16px" id="profitability-win-pct">0%</div><div class="analysis-stat-lbl" id="profitability-wins-lbl">Wins: 0</div></div>
+            <div><div class="analysis-stat-val" style="font-size:16px" id="profitability-loss-pct">0%</div><div class="analysis-stat-lbl" id="profitability-losses-lbl">Losses: 0</div></div>
+          </div>
         </div>
 
         <div class="card analysis-card" style="margin-bottom:0">
@@ -2797,7 +2814,28 @@ function computeDirectionAnalysis(trades,dir){
   return{winsN:wins.length,lossesN:losses.length,winSum,lossSum,pnl,wr};
 }
 
+function computeProfitability(trades){
+  const wins=trades.filter(t=>t.outcome==='Win'||t.outcome==='Partial');
+  const losses=trades.filter(t=>t.outcome==='Loss');
+  const total=trades.length;
+  const winPct=total>0?Math.round(wins.length/total*100):0;
+  const lossPct=total>0?Math.round(losses.length/total*100):0;
+  return{total,winsN:wins.length,lossesN:losses.length,winPct,lossPct};
+}
+
+function renderProfitability(trades){
+  const d=computeProfitability(trades);
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set('profitability-total',d.total);
+  set('profitability-win-pct',d.winPct+'%');
+  set('profitability-wins-lbl','Wins: '+d.winsN);
+  set('profitability-loss-pct',d.lossPct+'%');
+  set('profitability-losses-lbl','Losses: '+d.lossesN);
+  drawAnalysisGauge('profitability-gauge',d.winsN,d.lossesN);
+}
+
 function renderDirectionAnalysis(trades){
+  renderProfitability(trades);
   ['Short','Long'].forEach(dir=>{
     const d=computeDirectionAnalysis(trades,dir);
     const p=dir.toLowerCase();
