@@ -337,6 +337,15 @@ nav button.active i{color:var(--blue);opacity:1}
 .stat-card-bottom{margin-top:8px}
 /* Gauge */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px}
+.analysis-card{display:flex;flex-direction:column}
+.analysis-gauge-wrap{position:relative;display:flex;justify-content:center;margin:10px 0 2px}
+.analysis-gauge-wrap canvas{display:block}
+.analysis-gauge-center{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.analysis-gauge-lbl{font-size:12px;color:var(--text3);font-weight:600}
+.analysis-gauge-val{font-size:20px;font-weight:800;color:var(--text);line-height:1.2}
+.analysis-stats-row{display:grid;grid-template-columns:repeat(3,1fr);border-top:.5px solid var(--border);margin-top:10px;padding-top:10px;text-align:center;gap:4px}
+.analysis-stat-lbl{font-size:11px;color:var(--text3);margin-bottom:3px;white-space:nowrap}
+.analysis-stat-val{font-size:13px;font-weight:700;color:var(--text)}
 .gauge-counts{display:flex;gap:6px;justify-content:center;width:100%}
 .gc{font-size:11px;font-weight:700;padding:2px 7px;border-radius:100px;text-align:center;min-width:20px}
 .gc.green{background:rgba(29,158,117,0.15);color:var(--green)}
@@ -960,14 +969,48 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="cal-outer"><div class="cal-wrap" id="cal-wrap"></div></div>
       </div>
 
-      <!-- Right column: P&L by Weekday -->
-      <div style="min-width:0" id="right-col">
+      <!-- Right column: P&L by Weekday + Short/Long Analysis -->
+      <div style="min-width:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1rem" id="right-col">
         <div class="card" style="margin-bottom:0;display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
             <h3 style="margin:0">P&amp;L by Weekday</h3>
             <span style="font-size:11px;color:var(--text3)">$ · all time</span>
           </div>
           <div class="chart-wrap" style="height:260px;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem;min-width:0">
+          <div class="card analysis-card" style="margin-bottom:0">
+            <h3 style="margin:0">Short Analysis</h3>
+            <div class="analysis-gauge-wrap">
+              <canvas id="short-analysis-gauge"></canvas>
+              <div class="analysis-gauge-center">
+                <div class="analysis-gauge-lbl">Profit</div>
+                <div class="analysis-gauge-val" id="short-analysis-profit">$0</div>
+              </div>
+            </div>
+            <div class="analysis-stats-row">
+              <div><div class="analysis-stat-lbl">Wins (<span id="short-analysis-wins-n">0</span>)</div><div class="analysis-stat-val" id="short-analysis-wins-val">$0</div></div>
+              <div><div class="analysis-stat-lbl">Win Rate</div><div class="analysis-stat-val" id="short-analysis-wr">0%</div></div>
+              <div><div class="analysis-stat-lbl">Losses (<span id="short-analysis-losses-n">0</span>)</div><div class="analysis-stat-val" id="short-analysis-losses-val">$0</div></div>
+            </div>
+          </div>
+
+          <div class="card analysis-card" style="margin-bottom:0">
+            <h3 style="margin:0">Long Analysis</h3>
+            <div class="analysis-gauge-wrap">
+              <canvas id="long-analysis-gauge"></canvas>
+              <div class="analysis-gauge-center">
+                <div class="analysis-gauge-lbl">Profit</div>
+                <div class="analysis-gauge-val" id="long-analysis-profit">$0</div>
+              </div>
+            </div>
+            <div class="analysis-stats-row">
+              <div><div class="analysis-stat-lbl">Wins (<span id="long-analysis-wins-n">0</span>)</div><div class="analysis-stat-val" id="long-analysis-wins-val">$0</div></div>
+              <div><div class="analysis-stat-lbl">Win Rate</div><div class="analysis-stat-val" id="long-analysis-wr">0%</div></div>
+              <div><div class="analysis-stat-lbl">Losses (<span id="long-analysis-losses-n">0</span>)</div><div class="analysis-stat-val" id="long-analysis-losses-val">$0</div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2532,6 +2575,7 @@ function renderDashboard(key){
   renderCalendar(key,trades);
   renderTodayCard();
   renderWeekdayChart(Object.values(db.trades).flat());
+  renderDirectionAnalysis(Object.values(db.trades).flat());
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -2546,6 +2590,7 @@ function renderDashboardWithTrades(trades,label){
   renderCalendar(key,trades);
   renderTodayCard();
   renderWeekdayChart(Object.values(db.trades).flat());
+  renderDirectionAnalysis(Object.values(db.trades).flat());
 }
 
 // ── New hero section: date + welcome ──
@@ -2720,6 +2765,59 @@ function renderMiniCalendar(key){
 }
 
 // ── Session stats ─────────────────────────────────────────────
+function drawAnalysisGauge(canvasId,wins,losses){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  const dpr=Math.max(window.devicePixelRatio||1,2);
+  const W=240,H=130,cx=W/2,cy=120,r=94,thick=18;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const total=wins+losses;
+  const start=-Math.PI;
+  if(total<=0){
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    ctx.beginPath();ctx.arc(cx,cy,r,start,0);
+    ctx.strokeStyle=isDark?'#2a2e37':'#e5e7eb';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+    return;
+  }
+  const winAngle=(wins/total)*Math.PI;
+  ctx.beginPath();ctx.arc(cx,cy,r,start,start+winAngle);
+  ctx.strokeStyle='#1D9E75';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r,start+winAngle,0);
+  ctx.strokeStyle='#D85A30';ctx.lineWidth=thick;ctx.lineCap='round';ctx.stroke();
+}
+
+function computeDirectionAnalysis(trades,dir){
+  const st=trades.filter(t=>t.direction===dir);
+  const wins=st.filter(t=>t.outcome==='Win'||t.outcome==='Partial');
+  const losses=st.filter(t=>t.outcome==='Loss');
+  const winSum=wins.reduce((s,t)=>s+(t.pnl||0),0);
+  const lossSum=Math.abs(losses.reduce((s,t)=>s+(t.pnl||0),0));
+  const pnl=st.reduce((s,t)=>s+(t.pnl||0),0);
+  const decisive=wins.length+losses.length;
+  const wr=decisive>0?Math.round(wins.length/decisive*100):0;
+  return{winsN:wins.length,lossesN:losses.length,winSum,lossSum,pnl,wr};
+}
+
+function renderDirectionAnalysis(trades){
+  ['Short','Long'].forEach(dir=>{
+    const d=computeDirectionAnalysis(trades,dir);
+    const p=dir.toLowerCase();
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+    set(p+'-analysis-profit',(d.pnl>=0?'':'-')+'$'+Math.abs(d.pnl).toFixed(2));
+    set(p+'-analysis-wins-n',d.winsN);
+    set(p+'-analysis-wins-val','$'+d.winSum.toFixed(2));
+    set(p+'-analysis-wr',d.wr+'%');
+    set(p+'-analysis-losses-n',d.lossesN);
+    set(p+'-analysis-losses-val','$'+d.lossSum.toFixed(2));
+    drawAnalysisGauge(p+'-analysis-gauge',d.winsN,d.lossesN);
+  });
+}
+
 function drawGauge(wins,be,losses,canvasId){
   canvasId=canvasId||'wr-gauge';
   const canvas=document.getElementById(canvasId);
