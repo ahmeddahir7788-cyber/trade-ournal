@@ -783,15 +783,6 @@ table.tt tr:last-child td{border-bottom:none}
     </div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:22px" id="profile-email-display"></div>
 
-    <div style="border-top:.5px solid var(--border);padding-top:18px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <i class="ti ti-palette" style="font-size:18px;color:var(--text2)"></i>
-        <h3 style="margin:0">Theme</h3>
-      </div>
-      <p style="font-size:13px;color:var(--text3);margin:0 0 14px">Pick a palette that matches your trading vibe</p>
-      <div class="theme-swatch-grid" id="theme-swatch-grid"></div>
-    </div>
-
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn-ghost" onclick="closeProfileModal()">Cancel</button>
       <button class="btn-primary" onclick="saveProfile()" id="profile-save-btn">Save</button>
@@ -838,58 +829,42 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="dash-left-col">
         <div class="snc-cards dash-stat-grid" data-block-id="stats">
           <div class="dash-stat-card sub-block" data-sub-id="netpnl">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('netpnl')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(29,158,117,0.16)"><i class="ti ti-chart-bar" style="color:#1D9E75"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(29,158,117,0.16)"><i class="ti ti-chart-bar" style="color:#1D9E75"></i></div>
             <div class="dash-stat-lbl">Net P&amp;L <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-netpnl">$0</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="winrate">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('winrate')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(55,138,221,0.16)"><i class="ti ti-gauge" style="color:#378ADD"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(55,138,221,0.16)"><i class="ti ti-gauge" style="color:#378ADD"></i></div>
             <div class="dash-stat-lbl">Trade win% <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-winrate">0%</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="pf">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('pf')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(167,139,250,0.18)"><i class="ti ti-chart-donut-3" style="color:#a78bfa"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(167,139,250,0.18)"><i class="ti ti-chart-donut-3" style="color:#a78bfa"></i></div>
             <div class="dash-stat-lbl">Profit factor <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-pf">—</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="daywr">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('daywr')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(239,159,39,0.18)"><i class="ti ti-target-arrow" style="color:#EF9F27"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(239,159,39,0.18)"><i class="ti ti-target-arrow" style="color:#EF9F27"></i></div>
             <div class="dash-stat-lbl">Day win <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-daywr">0%</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="avgwl">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('avgwl')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-scale" style="color:#D85A30"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-scale" style="color:#D85A30"></i></div>
             <div class="dash-stat-lbl">Avg Win/Loss <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-avgwl-ratio">—</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="totaltrades">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('totaltrades')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(127,119,221,0.18)"><i class="ti ti-list-numbers" style="color:#7F77DD"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(127,119,221,0.18)"><i class="ti ti-list-numbers" style="color:#7F77DD"></i></div>
             <div class="dash-stat-lbl">Total Trades <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-totaltrades">0</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="maxdd">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('maxdd')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-trending-down" style="color:#D85A30"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(216,90,48,0.18)"><i class="ti ti-trending-down" style="color:#D85A30"></i></div>
             <div class="dash-stat-lbl">Max Drawdown <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-maxdd">$0</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="balance">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <button class="sub-hide-btn" title="Hide card" onclick="hideStatCard('balance')"><i class="ti ti-eye-off"></i></button>
-            <div class="dash-stat-icon" style="background:rgba(34,166,179,0.16)"><i class="ti ti-building-bank" style="color:#22A6B3"></i></div>
+            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>            <div class="dash-stat-icon" style="background:rgba(34,166,179,0.16)"><i class="ti ti-building-bank" style="color:#22A6B3"></i></div>
             <div class="dash-stat-lbl">Account balance <i class="ti ti-info-circle"></i></div>
             <div class="dash-stat-val" id="snc-balance">$0</div>
           </div>
@@ -2704,7 +2679,6 @@ function renderCalendar(key,trades){
         <div class="cal-day-top"><span class="cal-day-num">${d}</span></div>
         <div class="cal-day-pnl">${pnlStr}</div>
         <div class="cal-day-trade-count">${dayTrades.length} ${tradeWord}</div>
-        <div class="cal-day-trades">${dayWr}%</div>
         <span class="cal-day-dot"></span>
       </div>`;
     }
