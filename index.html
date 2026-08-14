@@ -817,9 +817,6 @@ table.tt tr:last-child td{border-bottom:none}
           </button>
           <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
         </div>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
-          <i id="theme-toggle-icon" class="ti ti-moon-stars"></i>
-        </button>
         <button class="btn-addtrade" onclick="go('log',this)"><i class="ti ti-plus"></i> Add Trade</button>
       </div>
     </div>
@@ -1991,30 +1988,12 @@ const THEME_PALETTES={
 };
 
 function applyTheme(){
-  const saved=localStorage.getItem('tj_v10_palette')||'midnight';
-  applyPalette(saved,false);
+  document.documentElement.setAttribute('data-theme','dark');
 }
 function applyPalette(name,persist){
-  const p=THEME_PALETTES[name]||THEME_PALETTES.midnight;
-  document.documentElement.setAttribute('data-theme',p.base);
-  const root=document.documentElement.style;
-  Object.entries(p.vars).forEach(([k,v])=>root.setProperty(k,v));
-  const icon=document.getElementById('theme-toggle-icon');
-  if(icon)icon.className=p.base==='dark'?'ti ti-moon-stars':'ti ti-sun';
-  if(persist!==false){
-    localStorage.setItem('tj_v10_palette',name);
-    if(!db.userSettings)db.userSettings={};
-    db.userSettings.palette=name;
-    persistUserSettings();
-  }
-  renderThemeSwatches();
+  document.documentElement.setAttribute('data-theme','dark');
 }
-function toggleTheme(){
-  const current=localStorage.getItem('tj_v10_palette')||'midnight';
-  const base=(THEME_PALETTES[current]||THEME_PALETTES.midnight).base;
-  applyPalette(base==='dark'?'daylight':'midnight');
-  refreshCurrentDashboardView();
-}
+function toggleTheme(){}
 function renderThemeSwatches(){
   const wrap=document.getElementById('theme-swatch-grid');
   if(!wrap)return;
