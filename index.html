@@ -753,9 +753,6 @@ table.tt tr:last-child td{border-bottom:none}
   </div>
 </aside>
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
-<button class="sb-toggle-fixed" id="sb-toggle-fixed" onclick="toggleSidebar()" title="Toggle sidebar">
-  <i class="ti ti-menu-2"></i>
-</button>
 
 <!-- Mobile bottom navigation (phones/small tablets) -->
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
@@ -805,6 +802,15 @@ table.tt tr:last-child td{border-bottom:none}
 
 
 <div class="app-body" id="app-body">
+<div class="top-bar">
+  <div class="top-bar-left">
+    <button class="sb-toggle-top" onclick="toggleSidebar()" title="Toggle sidebar">
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <div class="top-bar-section" id="top-bar-section"></div>
+  </div>
+  <div class="top-bar-right"></div>
+</div>
 <div class="content">
 
   <!-- DASHBOARD -->
@@ -5710,16 +5716,13 @@ function deleteCurrentNote(){
 const STAT_CARD_LABELS={netpnl:'Net P&L',winrate:'Trade win%',pf:'Profit factor',daywr:'Day win',avgwl:'Avg Win/Loss',totaltrades:'Total Trades',maxdd:'Max Drawdown',balance:'Account balance'};
 
 function getHiddenStatCards(){
-  try{return JSON.parse(localStorage.getItem('tj_v10_hidden_statcards'))||[];}catch(e){return[];}
+  return[];
 }
-function setHiddenStatCards(arr){
-  try{localStorage.setItem('tj_v10_hidden_statcards',JSON.stringify(arr));}catch(e){}
-}
+function setHiddenStatCards(arr){}
 function applyStatCardVisibility(){
-  const hidden=getHiddenStatCards();
+  try{localStorage.removeItem('tj_v10_hidden_statcards');}catch(e){}
   document.querySelectorAll('.dash-stat-grid .sub-block').forEach(el=>{
-    const id=el.getAttribute('data-sub-id');
-    el.style.display=hidden.includes(id)?'none':'';
+    el.style.display='';
   });
 }
 function hideStatCard(id){
