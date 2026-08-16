@@ -59,12 +59,70 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .addtrade-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:2rem 1rem}
 .addtrade-modal-backdrop.open{display:flex}
 .addtrade-modal{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);max-width:900px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-.addtrade-modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:1.4rem 1.6rem 1.1rem;border-bottom:.5px solid var(--border)}
-.addtrade-modal-header h2{margin:0 0 4px;font-size:22px;font-weight:800;color:var(--text)}
-.addtrade-modal-header p{margin:0;font-size:13px;color:var(--text3)}
+.addtrade-modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.6rem;border-bottom:.5px solid var(--border);position:sticky;top:0;background:var(--card);z-index:5}
+.addtrade-modal-back{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:6px;border-radius:var(--r);flex-shrink:0}
+.addtrade-modal-back:hover{background:var(--surface2);color:var(--text)}
+.addtrade-modal-title-wrap{text-align:center;flex:1}
+.addtrade-modal-title-wrap h2{margin:0 0 4px;font-size:19px;font-weight:800;color:var(--text)}
+.at-date-row{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--text3);cursor:pointer;text-transform:uppercase;position:relative}
+.at-date-row .at-date-display{color:var(--text2);text-decoration:underline;text-transform:none;font-weight:600}
+.at-date-row input[type=date]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .addtrade-modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;padding:6px;border-radius:var(--r);flex-shrink:0}
 .addtrade-modal-close:hover{background:var(--surface2);color:var(--text)}
-.addtrade-modal .card{border:none;box-shadow:none;margin-bottom:0;padding:1.6rem}
+.addtrade-modal .card{border:none;box-shadow:none;margin-bottom:0;padding:1.6rem;display:flex;flex-direction:column;gap:1.5rem}
+.at-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 2.2rem}
+.at-col{display:flex;flex-direction:column;gap:1.1rem;min-width:0}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.field-row-3{grid-template-columns:1fr 1fr 1fr}
+.addtrade-modal .notes-field{max-width:100%}
+@media(max-width:700px){.field-row,.field-row-3{grid-template-columns:1fr}}
+.req{color:var(--red)}
+.side-toggle{display:flex;gap:8px}
+.side-btn{flex:1;padding:10px 14px;border-radius:var(--r);border:.5px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.side-btn.active.side-buy{background:rgba(29,158,117,0.18);border-color:var(--green);color:var(--green)}
+.side-btn.active.side-sell{background:rgba(216,90,48,0.18);border-color:var(--red);color:var(--red)}
+.pnl-input-wrap{position:relative;display:flex;align-items:center}
+.pnl-input-wrap .pnl-dollar{position:absolute;left:14px;color:var(--text3);font-size:14px;pointer-events:none}
+.pnl-input-wrap input{padding-left:28px!important}
+.rr-slider-row{display:flex;align-items:center;gap:12px}
+.rr-slider-label{font-size:13px;font-weight:700;color:var(--text2);min-width:38px;flex-shrink:0}
+.rr-slider{flex:1;-webkit-appearance:none;appearance:none;height:8px;border-radius:100px;background:linear-gradient(90deg,var(--red),var(--green));outline:none;cursor:pointer}
+.rr-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--border2);cursor:pointer}
+.rr-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--border2);cursor:pointer}
+.rr-slider.rating-slider{background:var(--surface2)}
+.advanced-options{border-top:.5px solid var(--border);padding-top:12px;margin-top:2px}
+.advanced-toggle{background:none;border:none;color:var(--text2);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0}
+.advanced-toggle i{font-size:14px;transition:transform .15s}
+.advanced-toggle.open i{transform:rotate(90deg)}
+.advanced-body{display:flex;flex-direction:column;gap:1.1rem;margin-top:14px}
+.at-dropzone{border:1.5px dashed var(--border2);border-radius:var(--rlg);padding:2.4rem 1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center;min-height:200px}
+.at-dropzone:hover{border-color:var(--text3);background:var(--surface2)}
+.at-dropzone i{font-size:32px;color:var(--text3)}
+.at-dropzone-title{font-size:14px;font-weight:700;color:var(--text)}
+/* Section cards (Result / PD Array / Session / Learning / Mistakes) */
+.at-section{border:.5px solid var(--border);border-radius:var(--rlg);padding:1.2rem 1.3rem;background:var(--surface)}
+.at-section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.at-section-icon{width:30px;height:30px;border-radius:9px;background:rgba(99,102,241,0.15);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.at-section-icon.warn{background:rgba(216,90,48,0.15);color:var(--red)}
+.at-section-head h4{margin:0;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)}
+.at-section-sub{margin-bottom:10px;font-size:12px;font-weight:600;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.at-section-sub .show-prompts{color:#818cf8;cursor:pointer;font-weight:600;text-decoration:none}
+.at-section-sub .show-prompts:hover{text-decoration:underline}
+.at-learning-field{margin-bottom:14px}
+.at-learning-field:last-child{margin-bottom:0}
+.at-learning-field textarea{width:100%;min-height:80px;font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;resize:vertical;line-height:1.5}
+.at-learning-field textarea:focus{border-color:var(--blue)}
+/* Tag pill groups (Result / Direction / PD Array / Session / Timeframe / Mistakes) */
+.tag-group{display:flex;flex-wrap:wrap;gap:8px}
+.tag-pill{padding:8px 14px;border-radius:var(--r);border:.5px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tag-pill:hover{color:var(--text)}
+.tag-pill.tag-add{padding:8px 12px;border-style:dashed;color:var(--text3)}
+.tag-group[data-accent="green"] .tag-pill.active{background:#22c55e;color:#06240f;font-weight:800;border-color:transparent}
+.tag-group[data-accent="indigo"] .tag-pill.active{background:#6366f1;color:#fff;font-weight:800;border-color:transparent}
+.tag-group[data-accent="mistake"] .tag-pill{background:rgba(216,90,48,0.12);border-color:transparent;color:#ffb199}
+.tag-group[data-accent="mistake"] .tag-pill.active{background:var(--red);color:#fff}
+.at-dropzone-sub{font-size:12px;color:var(--text3)}
+@media(max-width:700px){.at-grid{grid-template-columns:1fr}}
 .ph{margin-bottom:1.5rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
 /* MOBILE: sidebar becomes an off-canvas drawer instead of a permanent fixed column */
@@ -292,6 +350,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .pair-picker{position:relative}
 .pair-picker-btn{width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:10px 12px;background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left}
 .pair-picker-btn.err{border-color:var(--red)!important}
+.tag-group.err{outline:1.5px solid var(--red);outline-offset:6px;border-radius:var(--r)}
 .pair-picker-btn i{font-size:14px;color:var(--text3);flex-shrink:0}
 .pair-picker-btn .pp-placeholder{color:var(--text3)}
 .pair-picker-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:340px;overflow-y:auto;padding:6px}
@@ -1035,16 +1094,28 @@ table.tt tr:last-child td{border-bottom:none}
   <div class="addtrade-modal-backdrop" id="addtrade-modal-backdrop" onclick="if(event.target===this)closeAddTradeModal()">
   <div class="addtrade-modal" id="page-log">
     <div class="addtrade-modal-header">
-      <div>
+      <button class="addtrade-modal-back" onclick="closeAddTradeModal()" title="Close"><i class="ti ti-arrow-left"></i></button>
+      <div class="addtrade-modal-title-wrap">
         <h2>Add Trade</h2>
-        <p>Enter the details of your trade.</p>
+        <div class="at-date-row" onclick="const d=document.getElementById('f-date');if(d.showPicker){d.showPicker();}else{d.focus();}">
+          <i class="ti ti-calendar"></i> TRADE DATE: <span id="f-date-display" class="at-date-display">Select date</span>
+          <input type="date" id="f-date" onchange="updateTradeDateDisplay()"/>
+        </div>
       </div>
-      <button class="addtrade-modal-close" onclick="closeAddTradeModal()" title="Close"><i class="ti ti-x"></i></button>
+      <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save</button>
     </div>
     <div class="card">
-      <div class="fg">
-        <div class="field"><label>Date</label><input type="date" id="f-date"/></div>
-        <div class="field"><label>Pair</label>
+      <div style="text-align:right"><span class="save-msg" id="save-msg">✓ Saved!</span><span class="err-msg" id="err-msg"></span></div>
+
+      <div class="field-row">
+        <div class="field"><label>Account <span class="req">*</span></label>
+          <select id="f-account">
+            <option value="">Choose an account…</option>
+          </select>
+          <a href="javascript:void(0)" id="f-no-account-link" onclick="closeAddTradeModal();go('accounts')" style="display:none;font-size:13px;color:#818cf8;text-decoration:underline">No trading accounts — create one</a>
+        </div>
+        <div class="field">
+          <label>Asset <span class="req">*</span></label>
           <div class="pair-picker">
             <button type="button" class="pair-picker-btn" id="f-sym-btn" onclick="togglePairPicker('f')">
               <span id="f-sym-label" class="pp-placeholder">Select pair</span>
@@ -1052,122 +1123,176 @@ table.tt tr:last-child td{border-bottom:none}
             </button>
             <div class="pair-picker-panel" id="f-sym-panel" style="display:none"></div>
           </div>
-          <select id="f-sym" style="display:none">
-            <option value="" disabled selected>Select pair</option>
-            <optgroup label="Forex — Majors">
-              <option value="EURUSD">EUR/USD</option>
-              <option value="GBPUSD">GBP/USD</option>
-              <option value="USDJPY">USD/JPY</option>
-              <option value="USDCHF">USD/CHF</option>
-              <option value="USDCAD">USD/CAD</option>
-              <option value="AUDUSD">AUD/USD</option>
-              <option value="NZDUSD">NZD/USD</option>
-            </optgroup>
-            <optgroup label="Forex — Crosses">
-              <option value="EURGBP">EUR/GBP</option>
-              <option value="EURJPY">EUR/JPY</option>
-              <option value="EURCHF">EUR/CHF</option>
-              <option value="EURAUD">EUR/AUD</option>
-              <option value="EURCAD">EUR/CAD</option>
-              <option value="EURNZD">EUR/NZD</option>
-              <option value="GBPJPY">GBP/JPY</option>
-              <option value="GBPCHF">GBP/CHF</option>
-              <option value="GBPAUD">GBP/AUD</option>
-              <option value="GBPCAD">GBP/CAD</option>
-              <option value="GBPNZD">GBP/NZD</option>
-              <option value="AUDJPY">AUD/JPY</option>
-              <option value="AUDCAD">AUD/CAD</option>
-              <option value="AUDCHF">AUD/CHF</option>
-              <option value="AUDNZD">AUD/NZD</option>
-              <option value="NZDJPY">NZD/JPY</option>
-              <option value="NZDCAD">NZD/CAD</option>
-              <option value="NZDCHF">NZD/CHF</option>
-              <option value="CADJPY">CAD/JPY</option>
-              <option value="CADCHF">CAD/CHF</option>
-              <option value="CHFJPY">CHF/JPY</option>
-            </optgroup>
-            <optgroup label="Indices">
-              <option value="NQ">NQ — Nasdaq 100</option>
-              <option value="ES">ES — S&amp;P 500</option>
-              <option value="YM">YM — Dow Jones</option>
-              <option value="RTY">RTY — Russell 2000</option>
-              <option value="GER40">GER40 — Germany 40</option>
-            </optgroup>
-            <optgroup label="Metals">
-              <option value="GC">GC — Gold</option>
-              <option value="SI">SI — Silver</option>
-            </optgroup>
-            <optgroup label="Oils / Energy">
-              <option value="CL">CL — Crude Oil WTI</option>
-              <option value="HO">HO — Heating Oil</option>
-              <option value="RB">RB — RBOB Gasoline</option>
-            </optgroup>
-            <optgroup label="Crypto">
-              <option value="BTC">BTC — Bitcoin</option>
-              <option value="ETH">ETH — Ethereum</option>
-            </optgroup>
-          </select>
+          <input type="hidden" id="f-sym" value=""/>
+          <div style="margin-top:8px">
+            <a href="javascript:void(0)" onclick="toggleCreatePairInput('f')" style="font-size:12px;color:var(--text3)">Can't find a symbol? <span style="color:var(--text);text-decoration:underline;font-weight:600">Create it</span></a>
+            <div id="f-create-pair-wrap" style="display:none;margin-top:8px;gap:6px">
+              <input type="text" id="f-create-pair-input" placeholder="e.g. SPX500" style="text-transform:uppercase;flex:1"/>
+              <button type="button" class="btn-ghost" onclick="createCustomPair('f')">Add</button>
+            </div>
+          </div>
         </div>
-        <div class="field"><label>Session</label>
-          <select id="f-sess">
-            <option value="" disabled selected>Select session</option>
-            <option value="London">London</option>
-            <option value="NewYork">New York</option>
-            <option value="Asia">Asia</option>
-          </select>
+      </div>
+
+      <div class="field">
+        <label>Direction <span class="req">*</span></label>
+        <div class="tag-group" data-accent="green" id="f-direction-group">
+          <button type="button" class="tag-pill" data-val="Long" onclick="setSinglePill('f-direction-group',this,'f-dir')">Long</button>
+          <button type="button" class="tag-pill" data-val="Short" onclick="setSinglePill('f-direction-group',this,'f-dir')">Short</button>
         </div>
-        <div class="field"><label>Direction</label>
-          <select id="f-dir">
-            <option value="" disabled selected>Select direction...</option>
-            <option value="Long">Long</option>
-            <option value="Short">Short</option>
-          </select>
+        <select id="f-dir" style="display:none"><option value="" disabled selected></option><option value="Long">Long</option><option value="Short">Short</option></select>
+      </div>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-trophy"></i></span><h4>Result</h4></div>
+        <div class="tag-group" data-accent="mixed" id="f-result-group">
+          <button type="button" class="tag-pill" data-val="Win" style="background:rgba(34,197,94,0.15)" onclick="setResultPill(this,'Win')">Win</button>
+          <button type="button" class="tag-pill" data-val="Loss" style="background:rgba(216,90,48,0.15)" onclick="setResultPill(this,'Loss')">Loss</button>
+          <button type="button" class="tag-pill" data-val="Break Even" onclick="setResultPill(this,'Break Even')">BE</button>
         </div>
-        <div class="field"><label>Outcome</label>
-          <select id="f-out" onchange="syncPnlSign('f')">
-            <option value="" disabled selected>Select outcome...</option>
-            <option value="Win">Win</option>
-            <option value="Loss">Loss</option>
-            <option value="Break Even">Break Even</option>
-          </select>
-        </div>
-        <div class="field"><label>P&amp;L ($)</label><input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')"/></div>
-        <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any" oninput="syncPnlSign('f')"/></div>
+        <select id="f-out" style="display:none" onchange="syncPnlSign('f')"><option value="" disabled selected></option><option value="Win">Win</option><option value="Loss">Loss</option><option value="Break Even">Break Even</option></select>
+      </div>
+
+      <div class="field-row field-row-3">
         <div class="field">
-          <label>Screenshots</label>
-          <button type="button" id="f-img-btn" class="screenshots-icon-btn" onclick="openScreenshotsManager('f')" title="Add screenshots">
-            <i class="ti ti-photo-plus"></i>
-            <span id="f-img-trigger-title">Add</span>
-          </button>
+          <label>P&amp;L ($) <span class="req">*</span></label>
+          <div class="pnl-input-wrap">
+            <span class="pnl-dollar">$</span>
+            <input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')"/>
+          </div>
         </div>
-        <div class="field"><label>Playbook (optional)</label>
+        <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any" oninput="syncPnlSign('f')"/></div>
+        <div class="field"><label>Entry Timeframe</label>
+          <div class="tag-group" data-accent="indigo" id="f-timeframe-group">
+            <button type="button" class="tag-pill" data-val="1m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">1m</button>
+            <button type="button" class="tag-pill" data-val="5m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">5m</button>
+            <button type="button" class="tag-pill" data-val="15m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">15m</button>
+            <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-timeframe-group','single')">+</button>
+          </div>
+          <input type="hidden" id="f-timeframe" value=""/>
+        </div>
+      </div>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-stack-2"></i></span><h4>PD Array (entry)</h4></div>
+        <div class="tag-group" data-accent="indigo" id="f-pdarray-group">
+          <button type="button" class="tag-pill" data-val="Fair Value Gap" onclick="toggleMultiPill(this)">Fair Value Gap</button>
+          <button type="button" class="tag-pill" data-val="Inversion FVG" onclick="toggleMultiPill(this)">Inversion FVG</button>
+          <button type="button" class="tag-pill" data-val="Order Block" onclick="toggleMultiPill(this)">Order Block</button>
+          <button type="button" class="tag-pill" data-val="Breaker" onclick="toggleMultiPill(this)">Breaker</button>
+          <button type="button" class="tag-pill" data-val="Mitigation Block" onclick="toggleMultiPill(this)">Mitigation Block</button>
+          <button type="button" class="tag-pill" data-val="Rejection Block" onclick="toggleMultiPill(this)">Rejection Block</button>
+          <button type="button" class="tag-pill" data-val="Liquidity Void" onclick="toggleMultiPill(this)">Liquidity Void</button>
+          <button type="button" class="tag-pill" data-val="Equal Highs/Lows" onclick="toggleMultiPill(this)">Equal Highs/Lows</button>
+          <button type="button" class="tag-pill" data-val="Old High/Low" onclick="toggleMultiPill(this)">Old High/Low</button>
+          <button type="button" class="tag-pill" data-val="Volume Imbalance" onclick="toggleMultiPill(this)">Volume Imbalance</button>
+          <button type="button" class="tag-pill" data-val="Discount/Premium Array" onclick="toggleMultiPill(this)">Discount/Premium Array</button>
+          <button type="button" class="tag-pill" data-val="Dealing Range 50%" onclick="toggleMultiPill(this)">Dealing Range 50%</button>
+          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-pdarray-group','multi')">+</button>
+        </div>
+      </div>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-layers-intersect"></i></span><h4>PD Confluences (optional)</h4></div>
+        <div class="tag-group" data-accent="indigo" id="f-pdconfluence-group">
+          <button type="button" class="tag-pill" data-val="Fair Value Gap" onclick="toggleMultiPill(this)">Fair Value Gap</button>
+          <button type="button" class="tag-pill" data-val="Inversion FVG" onclick="toggleMultiPill(this)">Inversion FVG</button>
+          <button type="button" class="tag-pill" data-val="Order Block" onclick="toggleMultiPill(this)">Order Block</button>
+          <button type="button" class="tag-pill" data-val="Breaker" onclick="toggleMultiPill(this)">Breaker</button>
+          <button type="button" class="tag-pill" data-val="Mitigation Block" onclick="toggleMultiPill(this)">Mitigation Block</button>
+          <button type="button" class="tag-pill" data-val="Rejection Block" onclick="toggleMultiPill(this)">Rejection Block</button>
+          <button type="button" class="tag-pill" data-val="Liquidity Void" onclick="toggleMultiPill(this)">Liquidity Void</button>
+          <button type="button" class="tag-pill" data-val="Equal Highs/Lows" onclick="toggleMultiPill(this)">Equal Highs/Lows</button>
+          <button type="button" class="tag-pill" data-val="Old High/Low" onclick="toggleMultiPill(this)">Old High/Low</button>
+          <button type="button" class="tag-pill" data-val="Volume Imbalance" onclick="toggleMultiPill(this)">Volume Imbalance</button>
+          <button type="button" class="tag-pill" data-val="Discount/Premium Array" onclick="toggleMultiPill(this)">Discount/Premium Array</button>
+          <button type="button" class="tag-pill" data-val="Dealing Range 50%" onclick="toggleMultiPill(this)">Dealing Range 50%</button>
+          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-pdconfluence-group','multi')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Trade Session <span class="req">*</span></label>
+        <div class="tag-group" data-accent="indigo" id="f-session-group">
+          <button type="button" class="tag-pill" data-val="New York" onclick="setSinglePillFree('f-session-group',this,'f-sess')">New York</button>
+          <button type="button" class="tag-pill" data-val="London" onclick="setSinglePillFree('f-session-group',this,'f-sess')">London</button>
+          <button type="button" class="tag-pill" data-val="Asia" onclick="setSinglePillFree('f-session-group',this,'f-sess')">Asia</button>
+          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-session-group','single')">+</button>
+        </div>
+        <input type="hidden" id="f-sess" value=""/>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Setup Template <span style="font-size:11px;color:var(--text3);font-weight:500">(optional)</span></label>
           <select id="f-playbook" onchange="onTradePlaybookChange('f')">
-            <option value="">No playbook</option>
+            <option value="">No template</option>
           </select>
+          <div id="f-checklist-wrap" style="display:none;margin-top:14px">
+            <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
+            <div id="f-checklist-list" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
         </div>
-        <div class="field"><label>Account</label>
-          <select id="f-account">
-            <option value="">Choose an account…</option>
-          </select>
+        <div class="field" style="justify-content:flex-end;align-items:flex-end;display:flex">
+          <a href="javascript:void(0)" onclick="closeAddTradeModal();go('playbooks')" style="font-size:13px;color:#818cf8;text-decoration:underline;padding-bottom:11px">Manage templates →</a>
         </div>
       </div>
-      <div id="f-checklist-wrap" style="display:none;margin-bottom:16px">
-        <div class="field" style="margin-bottom:8px"><label>Checklist — did you follow this setup?</label></div>
-        <div id="f-checklist-list" style="display:flex;flex-direction:column;gap:6px"></div>
+
+      <div class="at-grid">
+        <div class="at-col">
+          <div class="field">
+            <label>Screenshots</label>
+            <div class="at-dropzone" id="f-dropzone" onclick="openScreenshotsManager('f')">
+              <i class="ti ti-cloud-upload"></i>
+              <div class="at-dropzone-title">Upload Screenshot</div>
+              <div class="at-dropzone-sub">Drop here, paste with Ctrl+V or click</div>
+            </div>
+            <div id="f-img-trigger-title" style="display:none"></div>
+          </div>
+        </div>
+        <div class="at-col">
+          <div class="field notes-field">
+            <label>Notes (optional)</label>
+            <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:110px;width:100%"></textarea>
+          </div>
+        </div>
       </div>
-      <div class="field notes-field" style="margin-bottom:16px">
-        <label>Notes (optional)</label>
-        <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:90px"></textarea>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-book-2"></i></span><h4>Learning</h4></div>
+        <div class="at-learning-field">
+          <div class="at-section-sub"><span>What I did right</span><span class="show-prompts" onclick="this.closest('.at-learning-field').querySelector('textarea').placeholder='e.g. Waited for confirmation, followed my plan, managed risk well'">Show prompts</span></div>
+          <textarea id="f-learn-right" placeholder="What I did right..."></textarea>
+        </div>
+        <div class="at-learning-field">
+          <div class="at-section-sub"><span>What I did wrong</span><span class="show-prompts" onclick="this.closest('.at-learning-field').querySelector('textarea').placeholder='e.g. Entered too early, ignored my bias, moved stop loss'">Show prompts</span></div>
+          <textarea id="f-learn-wrong" placeholder="What I did wrong..."></textarea>
+        </div>
+        <div class="at-learning-field">
+          <div class="at-section-sub"><span>What I'll do next time</span><span class="show-prompts" onclick="this.closest('.at-learning-field').querySelector('textarea').placeholder='e.g. Wait for the retest, size down after a loss, journal before entry'">Show prompts</span></div>
+          <textarea id="f-learn-next" placeholder="What I'll do next time..."></textarea>
+        </div>
       </div>
-      <div class="save-row" style="margin-top:16px">
-        <button class="btn-primary" onclick="saveTrade()"><i class="ti ti-device-floppy"></i> Save Trade</button>
-        <span class="save-msg" id="save-msg">✓ Saved!</span>
-        <span class="err-msg" id="err-msg"></span>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon warn"><i class="ti ti-alert-triangle"></i></span><h4>Mistakes</h4></div>
+        <div class="tag-group" data-accent="mistake" id="f-mistakes-group">
+          <button type="button" class="tag-pill" data-val="Entered Early" onclick="toggleMultiPill(this)">Entered Early</button>
+          <button type="button" class="tag-pill" data-val="Ignored HTF Bias" onclick="toggleMultiPill(this)">Ignored HTF Bias</button>
+          <button type="button" class="tag-pill" data-val="Traded During News" onclick="toggleMultiPill(this)">Traded During News</button>
+          <button type="button" class="tag-pill" data-val="Over Risk" onclick="toggleMultiPill(this)">Over Risk</button>
+          <button type="button" class="tag-pill" data-val="Revenge Trade" onclick="toggleMultiPill(this)">Revenge Trade</button>
+          <button type="button" class="tag-pill" data-val="No Confirmation" onclick="toggleMultiPill(this)">No Confirmation</button>
+          <button type="button" class="tag-pill" data-val="Closed Early" onclick="toggleMultiPill(this)">Closed Early</button>
+          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-mistakes-group','multi')">+</button>
+        </div>
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--text3)" id="log-hint"></div>
+
+      <div style="margin-top:4px;font-size:12px;color:var(--text3)" id="log-hint"></div>
     </div>
   </div>
   </div>
+
 
   <!-- TRADES -->
   <div id="page-trades" class="page">
@@ -2275,6 +2400,14 @@ function openAddTradeModal(){
   backdrop.classList.add('open');
   populatePlaybookDropdown('f');
   populateAccountDropdown('f');
+  const dateEl=document.getElementById('f-date');
+  if(dateEl&&!dateEl.value)dateEl.value=today();
+  updateTradeDateDisplay();
+  const acctSel=document.getElementById('f-account');
+  const noAcctLink=document.getElementById('f-no-account-link');
+  const hasAccounts=(db.propfirms||[]).length>0;
+  if(acctSel)acctSel.style.display=hasAccounts?'':'none';
+  if(noAcctLink)noAcctLink.style.display=hasAccounts?'none':'inline';
   refreshSelectPlaceholderStyles(document.getElementById('page-log'));
 }
 function closeAddTradeModal(){
@@ -3472,6 +3605,11 @@ function renderImagePreview(prefix){
   if(title)title.textContent=arr.length?String(arr.length):'Add';
   const btn=document.getElementById(prefix+'-img-btn');
   if(btn)btn.title=arr.length?`${arr.length} screenshot${arr.length>1?'s':''} — click to view`:'Add screenshots';
+  const dz=document.getElementById(prefix+'-dropzone');
+  if(dz){
+    const sub=dz.querySelector('.at-dropzone-sub');
+    if(sub)sub.textContent=arr.length?`${arr.length} screenshot${arr.length>1?'s':''} added — click to view`:'Drop here, paste with Ctrl+V or click';
+  }
 }
 
 function removeTradeImage(prefix,idx){
@@ -3587,6 +3725,131 @@ function resetPairPicker(prefix){
   if(label){label.textContent='Select pair';label.classList.add('pp-placeholder');}
 }
 
+function setSide(prefix,dir){
+  const sel=document.getElementById(prefix+'-dir');
+  if(sel){sel.value=dir;sel.classList.remove('err');}
+  const buyBtn=document.getElementById(prefix+'-side-buy');
+  const sellBtn=document.getElementById(prefix+'-side-sell');
+  if(buyBtn)buyBtn.classList.toggle('active',dir==='Long');
+  if(sellBtn)sellBtn.classList.toggle('active',dir==='Short');
+}
+function onRRSliderInput(prefix){
+  const slider=document.getElementById(prefix+'-rr-slider');
+  const label=document.getElementById(prefix+'-rr-label');
+  const hidden=document.getElementById(prefix+'-rr');
+  if(!slider)return;
+  const val=parseFloat(slider.value);
+  if(label)label.textContent=val>0?('1:'+val.toFixed(1).replace(/\.0$/,'')):'1:—';
+  if(hidden)hidden.value=val>0?val:'';
+}
+function toggleAdvancedOptions(prefix,btn){
+  const body=document.getElementById(prefix+'-adv-body');
+  if(!body)return;
+  const willOpen=body.style.display==='none'||!body.style.display;
+  body.style.display=willOpen?'flex':'none';
+  if(btn)btn.classList.toggle('open',willOpen);
+}
+function toggleCreatePairInput(prefix){
+  const wrap=document.getElementById(prefix+'-create-pair-wrap');
+  if(!wrap)return;
+  const willOpen=wrap.style.display==='none'||!wrap.style.display;
+  wrap.style.display=willOpen?'flex':'none';
+  if(willOpen){
+    const input=document.getElementById(prefix+'-create-pair-input');
+    if(input)setTimeout(()=>input.focus(),50);
+  }
+}
+function createCustomPair(prefix){
+  const input=document.getElementById(prefix+'-create-pair-input');
+  if(!input)return;
+  const raw=input.value.trim().toUpperCase();
+  if(!raw)return;
+  PAIRS[raw]=raw;
+  selectPair(prefix,raw);
+  input.value='';
+  const wrap=document.getElementById(prefix+'-create-pair-wrap');
+  if(wrap)wrap.style.display='none';
+}
+
+// Single-select pill group backed by a hidden <select> with matching options (e.g. Direction)
+function setSinglePill(groupId,btn,hiddenSelectId){
+  const group=document.getElementById(groupId);
+  if(group)group.querySelectorAll('.tag-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const sel=document.getElementById(hiddenSelectId);
+  if(sel){sel.value=btn.dataset.val;sel.classList.remove('err');}
+}
+// Single-select pill group backed by a plain hidden input (supports custom "+" values, e.g. Session/Timeframe)
+function setSinglePillFree(groupId,btn,hiddenInputId){
+  const group=document.getElementById(groupId);
+  if(group)group.querySelectorAll('.tag-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  if(hiddenInputId){
+    const hidden=document.getElementById(hiddenInputId);
+    if(hidden){hidden.value=btn.dataset.val;hidden.classList.remove('err');}
+  }
+}
+// Multi-select tag toggle (e.g. PD Array, PD Confluences, Mistakes)
+function toggleMultiPill(btn){
+  btn.classList.toggle('active');
+}
+function getMultiPillValues(groupId){
+  const group=document.getElementById(groupId);
+  if(!group)return[];
+  return[...group.querySelectorAll('.tag-pill.active')].map(b=>b.dataset.val);
+}
+function resetMultiPillGroup(groupId){
+  const group=document.getElementById(groupId);
+  if(group)group.querySelectorAll('.tag-pill.active').forEach(p=>p.classList.remove('active'));
+}
+// Result pill (Win/Loss/BE) - drives the hidden #f-out select used by saveTrade()
+function setResultPill(btn,val){
+  const group=document.getElementById('f-result-group');
+  if(group)group.querySelectorAll('.tag-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const sel=document.getElementById('f-out');
+  if(sel){sel.value=val;sel.classList.remove('err');}
+  syncPnlSign('f');
+}
+// Add a custom tag pill to any group (single or multi select)
+function addCustomTagPill(groupId,mode){
+  const val=prompt('Add custom tag:');
+  if(!val||!val.trim())return;
+  const trimmed=val.trim();
+  const group=document.getElementById(groupId);
+  if(!group)return;
+  const addBtn=group.querySelector('.tag-add');
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.className='tag-pill active';
+  btn.dataset.val=trimmed;
+  btn.textContent=trimmed;
+  if(mode==='multi'){
+    btn.onclick=()=>toggleMultiPill(btn);
+  }else{
+    group.querySelectorAll('.tag-pill').forEach(p=>p.classList.remove('active'));
+    const hiddenInputId=groupId==='f-session-group'?'f-sess':(groupId==='f-timeframe-group'?'f-timeframe':null);
+    btn.onclick=()=>setSinglePillFree(groupId,btn,hiddenInputId);
+    if(hiddenInputId){const hidden=document.getElementById(hiddenInputId);if(hidden)hidden.value=trimmed;}
+  }
+  if(addBtn)group.insertBefore(btn,addBtn);else group.appendChild(btn);
+}
+function formatOrdinalDate(dateStr){
+  if(!dateStr)return'Select date';
+  const[y,m,d]=dateStr.split('-').map(Number);
+  const dt=new Date(y,m-1,d);
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const day=dt.getDate();
+  const suffix=(day%10===1&&day!==11)?'st':(day%10===2&&day!==12)?'nd':(day%10===3&&day!==13)?'rd':'th';
+  return`${days[dt.getDay()]}, ${months[dt.getMonth()]} ${day}${suffix}, ${y}`;
+}
+function updateTradeDateDisplay(){
+  const val=document.getElementById('f-date').value;
+  const disp=document.getElementById('f-date-display');
+  if(disp)disp.textContent=formatOrdinalDate(val);
+}
+
 function saveTrade(){
   const pnlEl=document.getElementById('f-pnl');
   const rrEl=document.getElementById('f-rr');
@@ -3597,13 +3860,13 @@ function saveTrade(){
   const acctSel=document.getElementById('f-account');
   const errEl=document.getElementById('err-msg');
   [pnlEl,rrEl,symEl,sessEl,dirEl,outEl,acctSel].forEach(el=>el.classList.remove('err'));
-  const fSymBtn=document.getElementById('f-sym-btn');if(fSymBtn)fSymBtn.classList.remove('err');
+  ['f-sym-btn','f-direction-group','f-result-group','f-session-group'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('err');});
   errEl.style.display='none';
   const errs=[];
-  if(!symEl.value){symEl.classList.add('err');if(fSymBtn)fSymBtn.classList.add('err');errs.push('Pair');}
-  if(!sessEl.value){sessEl.classList.add('err');errs.push('Session');}
-  if(!dirEl.value){dirEl.classList.add('err');errs.push('Direction');}
-  if(!outEl.value){outEl.classList.add('err');errs.push('Outcome');}
+  if(!symEl.value){symEl.classList.add('err');document.getElementById('f-sym-btn')?.classList.add('err');errs.push('Asset');}
+  if(!sessEl.value){sessEl.classList.add('err');document.getElementById('f-session-group')?.classList.add('err');errs.push('Session');}
+  if(!dirEl.value){dirEl.classList.add('err');document.getElementById('f-direction-group')?.classList.add('err');errs.push('Direction');}
+  if(!outEl.value){outEl.classList.add('err');document.getElementById('f-result-group')?.classList.add('err');errs.push('Result');}
   if(pnlEl.value.trim()===''){pnlEl.classList.add('err');errs.push('P&L');}
   if(rrEl.value.trim()===''){rrEl.classList.add('err');errs.push('RR');}
   if(!acctSel.value){acctSel.classList.add('err');errs.push('Account');}
@@ -3619,6 +3882,7 @@ function saveTrade(){
   const pbSel=document.getElementById('f-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
   const accountId=acctSel.value;
+  const timeframeEl=document.getElementById('f-timeframe');
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
@@ -3627,6 +3891,13 @@ function saveTrade(){
     outcome,
     pnl:finalPnl,
     rr:finalRR,
+    timeframe:timeframeEl?timeframeEl.value:'',
+    pdArray:getMultiPillValues('f-pdarray-group'),
+    pdConfluences:getMultiPillValues('f-pdconfluence-group'),
+    mistakes:getMultiPillValues('f-mistakes-group'),
+    learningRight:(document.getElementById('f-learn-right')?.value||'').trim(),
+    learningWrong:(document.getElementById('f-learn-wrong')?.value||'').trim(),
+    learningNext:(document.getElementById('f-learn-next')?.value||'').trim(),
     images:fImages.slice(),
     notes:document.getElementById('f-notes').value.trim(),
     playbookId,
@@ -3643,7 +3914,14 @@ function saveTrade(){
   // Reset form fields to empty
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
+  if(timeframeEl)timeframeEl.value='';
   resetPairPicker('f');
+  ['f-direction-group','f-result-group','f-session-group','f-timeframe-group'].forEach(id=>{
+    const g=document.getElementById(id);
+    if(g)g.querySelectorAll('.tag-pill.active').forEach(p=>p.classList.remove('active'));
+  });
+  ['f-pdarray-group','f-pdconfluence-group','f-mistakes-group'].forEach(resetMultiPillGroup);
+  ['f-learn-right','f-learn-wrong','f-learn-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   fImages=[];renderImagePreview('f');
   document.getElementById('f-notes').value='';
   if(pbSel)pbSel.value='';
