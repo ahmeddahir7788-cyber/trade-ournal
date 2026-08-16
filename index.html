@@ -82,6 +82,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .side-btn.active.side-buy{background:rgba(29,158,117,0.18);border-color:var(--green);color:var(--green)}
 .side-btn.active.side-sell{background:rgba(216,90,48,0.18);border-color:var(--red);color:var(--red)}
 .pnl-input-wrap{position:relative;display:flex;align-items:center}
+.at-input-sm{padding:7px 10px!important;font-size:13px!important}
 .pnl-input-wrap .pnl-dollar{position:absolute;left:14px;color:var(--text3);font-size:14px;pointer-events:none}
 .pnl-input-wrap input{padding-left:28px!important}
 .rr-slider-row{display:flex;align-items:center;gap:12px}
@@ -1134,98 +1135,57 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <div class="field">
-        <label>Direction <span class="req">*</span></label>
-        <div class="tag-group" data-accent="green" id="f-direction-group">
-          <button type="button" class="tag-pill" data-val="Long" onclick="setSinglePill('f-direction-group',this,'f-dir')">Long</button>
-          <button type="button" class="tag-pill" data-val="Short" onclick="setSinglePill('f-direction-group',this,'f-dir')">Short</button>
-        </div>
-        <select id="f-dir" style="display:none"><option value="" disabled selected></option><option value="Long">Long</option><option value="Short">Short</option></select>
-      </div>
-
       <div class="at-section">
-        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-trophy"></i></span><h4>Result</h4></div>
-        <div class="tag-group" data-accent="mixed" id="f-result-group">
-          <button type="button" class="tag-pill" data-val="Win" style="background:rgba(34,197,94,0.15)" onclick="setResultPill(this,'Win')">Win</button>
-          <button type="button" class="tag-pill" data-val="Loss" style="background:rgba(216,90,48,0.15)" onclick="setResultPill(this,'Loss')">Loss</button>
-          <button type="button" class="tag-pill" data-val="Break Even" onclick="setResultPill(this,'Break Even')">BE</button>
+        <div class="field-row field-row-3" style="margin-bottom:14px">
+          <div class="at-section-head" style="margin-bottom:0"><span class="at-section-icon"><i class="ti ti-trophy"></i></span><h4>Result</h4></div>
+          <div class="at-section-head" style="margin-bottom:0"><h4>Direction <span class="req">*</span></h4></div>
+          <div class="at-section-head" style="margin-bottom:0"><h4>Trade Session <span class="req">*</span></h4></div>
         </div>
-        <select id="f-out" style="display:none" onchange="syncPnlSign('f')"><option value="" disabled selected></option><option value="Win">Win</option><option value="Loss">Loss</option><option value="Break Even">Break Even</option></select>
-      </div>
-
-      <div class="field-row field-row-3">
-        <div class="field">
-          <label>P&amp;L ($) <span class="req">*</span></label>
-          <div class="pnl-input-wrap">
-            <span class="pnl-dollar">$</span>
-            <input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')"/>
+        <div class="field-row field-row-3">
+          <div class="field" style="margin-bottom:0">
+            <div class="tag-group" data-accent="mixed" id="f-result-group">
+              <button type="button" class="tag-pill" data-val="Win" style="background:rgba(34,197,94,0.15)" onclick="setResultPill(this,'Win')">Win</button>
+              <button type="button" class="tag-pill" data-val="Loss" style="background:rgba(216,90,48,0.15)" onclick="setResultPill(this,'Loss')">Loss</button>
+              <button type="button" class="tag-pill" data-val="Break Even" onclick="setResultPill(this,'Break Even')">BE</button>
+            </div>
+            <select id="f-out" style="display:none" onchange="syncPnlSign('f')"><option value="" disabled selected></option><option value="Win">Win</option><option value="Loss">Loss</option><option value="Break Even">Break Even</option></select>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <div class="tag-group" data-accent="green" id="f-direction-group">
+              <button type="button" class="tag-pill" data-val="Long" onclick="setSinglePill('f-direction-group',this,'f-dir')">Long</button>
+              <button type="button" class="tag-pill" data-val="Short" onclick="setSinglePill('f-direction-group',this,'f-dir')">Short</button>
+            </div>
+            <select id="f-dir" style="display:none"><option value="" disabled selected></option><option value="Long">Long</option><option value="Short">Short</option></select>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <div class="tag-group" data-accent="indigo" id="f-session-group">
+              <button type="button" class="tag-pill" data-val="New York" onclick="setSinglePillFree('f-session-group',this,'f-sess')">New York</button>
+              <button type="button" class="tag-pill" data-val="London" onclick="setSinglePillFree('f-session-group',this,'f-sess')">London</button>
+              <button type="button" class="tag-pill" data-val="Asia" onclick="setSinglePillFree('f-session-group',this,'f-sess')">Asia</button>
+              <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-session-group','single')">+</button>
+            </div>
+            <input type="hidden" id="f-sess" value=""/>
           </div>
         </div>
-        <div class="field"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any" oninput="syncPnlSign('f')"/></div>
-        <div class="field"><label>Entry Timeframe</label>
-          <div class="tag-group" data-accent="indigo" id="f-timeframe-group">
-            <button type="button" class="tag-pill" data-val="1m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">1m</button>
-            <button type="button" class="tag-pill" data-val="5m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">5m</button>
-            <button type="button" class="tag-pill" data-val="15m" onclick="setSinglePillFree('f-timeframe-group',this,'f-timeframe')">15m</button>
-            <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-timeframe-group','single')">+</button>
+      </div>
+
+      <div class="at-section">
+        <div class="field-row" style="align-items:end">
+          <div class="field" style="margin-bottom:0">
+            <label>P&amp;L ($) <span class="req">*</span></label>
+            <div class="pnl-input-wrap">
+              <span class="pnl-dollar">$</span>
+              <input type="number" id="f-pnl" placeholder="e.g. 250 or -100" step="any" oninput="syncPnlSign('f')" class="at-input-sm"/>
+            </div>
           </div>
-          <input type="hidden" id="f-timeframe" value=""/>
+          <div class="field" style="margin-bottom:0"><label>Risk/Reward (RR)</label><input type="number" id="f-rr" placeholder="e.g. 2.5" step="any" oninput="syncPnlSign('f')" class="at-input-sm"/></div>
         </div>
       </div>
 
       <div class="at-section">
-        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-stack-2"></i></span><h4>PD Array (entry)</h4></div>
-        <div class="tag-group" data-accent="indigo" id="f-pdarray-group">
-          <button type="button" class="tag-pill" data-val="Fair Value Gap" onclick="toggleMultiPill(this)">Fair Value Gap</button>
-          <button type="button" class="tag-pill" data-val="Inversion FVG" onclick="toggleMultiPill(this)">Inversion FVG</button>
-          <button type="button" class="tag-pill" data-val="Order Block" onclick="toggleMultiPill(this)">Order Block</button>
-          <button type="button" class="tag-pill" data-val="Breaker" onclick="toggleMultiPill(this)">Breaker</button>
-          <button type="button" class="tag-pill" data-val="Mitigation Block" onclick="toggleMultiPill(this)">Mitigation Block</button>
-          <button type="button" class="tag-pill" data-val="Rejection Block" onclick="toggleMultiPill(this)">Rejection Block</button>
-          <button type="button" class="tag-pill" data-val="Liquidity Void" onclick="toggleMultiPill(this)">Liquidity Void</button>
-          <button type="button" class="tag-pill" data-val="Equal Highs/Lows" onclick="toggleMultiPill(this)">Equal Highs/Lows</button>
-          <button type="button" class="tag-pill" data-val="Old High/Low" onclick="toggleMultiPill(this)">Old High/Low</button>
-          <button type="button" class="tag-pill" data-val="Volume Imbalance" onclick="toggleMultiPill(this)">Volume Imbalance</button>
-          <button type="button" class="tag-pill" data-val="Discount/Premium Array" onclick="toggleMultiPill(this)">Discount/Premium Array</button>
-          <button type="button" class="tag-pill" data-val="Dealing Range 50%" onclick="toggleMultiPill(this)">Dealing Range 50%</button>
-          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-pdarray-group','multi')">+</button>
-        </div>
-      </div>
-
-      <div class="at-section">
-        <div class="at-section-head"><span class="at-section-icon"><i class="ti ti-layers-intersect"></i></span><h4>PD Confluences (optional)</h4></div>
-        <div class="tag-group" data-accent="indigo" id="f-pdconfluence-group">
-          <button type="button" class="tag-pill" data-val="Fair Value Gap" onclick="toggleMultiPill(this)">Fair Value Gap</button>
-          <button type="button" class="tag-pill" data-val="Inversion FVG" onclick="toggleMultiPill(this)">Inversion FVG</button>
-          <button type="button" class="tag-pill" data-val="Order Block" onclick="toggleMultiPill(this)">Order Block</button>
-          <button type="button" class="tag-pill" data-val="Breaker" onclick="toggleMultiPill(this)">Breaker</button>
-          <button type="button" class="tag-pill" data-val="Mitigation Block" onclick="toggleMultiPill(this)">Mitigation Block</button>
-          <button type="button" class="tag-pill" data-val="Rejection Block" onclick="toggleMultiPill(this)">Rejection Block</button>
-          <button type="button" class="tag-pill" data-val="Liquidity Void" onclick="toggleMultiPill(this)">Liquidity Void</button>
-          <button type="button" class="tag-pill" data-val="Equal Highs/Lows" onclick="toggleMultiPill(this)">Equal Highs/Lows</button>
-          <button type="button" class="tag-pill" data-val="Old High/Low" onclick="toggleMultiPill(this)">Old High/Low</button>
-          <button type="button" class="tag-pill" data-val="Volume Imbalance" onclick="toggleMultiPill(this)">Volume Imbalance</button>
-          <button type="button" class="tag-pill" data-val="Discount/Premium Array" onclick="toggleMultiPill(this)">Discount/Premium Array</button>
-          <button type="button" class="tag-pill" data-val="Dealing Range 50%" onclick="toggleMultiPill(this)">Dealing Range 50%</button>
-          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-pdconfluence-group','multi')">+</button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Trade Session <span class="req">*</span></label>
-        <div class="tag-group" data-accent="indigo" id="f-session-group">
-          <button type="button" class="tag-pill" data-val="New York" onclick="setSinglePillFree('f-session-group',this,'f-sess')">New York</button>
-          <button type="button" class="tag-pill" data-val="London" onclick="setSinglePillFree('f-session-group',this,'f-sess')">London</button>
-          <button type="button" class="tag-pill" data-val="Asia" onclick="setSinglePillFree('f-session-group',this,'f-sess')">Asia</button>
-          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-session-group','single')">+</button>
-        </div>
-        <input type="hidden" id="f-sess" value=""/>
-      </div>
-
-      <div class="field-row">
         <div class="field">
           <label>Setup Template <span style="font-size:11px;color:var(--text3);font-weight:500">(optional)</span></label>
-          <select id="f-playbook" onchange="onTradePlaybookChange('f')">
+          <select id="f-playbook" onchange="onTradePlaybookChange('f')" class="at-input-sm">
             <option value="">No template</option>
           </select>
           <div id="f-checklist-wrap" style="display:none;margin-top:14px">
@@ -1233,28 +1193,29 @@ table.tt tr:last-child td{border-bottom:none}
             <div id="f-checklist-list" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
         </div>
-        <div class="field" style="justify-content:flex-end;align-items:flex-end;display:flex">
-          <a href="javascript:void(0)" onclick="closeAddTradeModal();go('playbooks')" style="font-size:13px;color:#818cf8;text-decoration:underline;padding-bottom:11px">Manage templates →</a>
-        </div>
       </div>
 
-      <div class="at-grid">
-        <div class="at-col">
-          <div class="field">
-            <label>Screenshots</label>
-            <div class="at-dropzone" id="f-dropzone" onclick="openScreenshotsManager('f')">
-              <i class="ti ti-cloud-upload"></i>
-              <div class="at-dropzone-title">Upload Screenshot</div>
-              <div class="at-dropzone-sub">Drop here, paste with Ctrl+V or click</div>
-            </div>
-            <div id="f-img-trigger-title" style="display:none"></div>
-          </div>
+      <div class="field">
+        <label>Screenshots</label>
+        <div class="at-dropzone" id="f-dropzone" onclick="openScreenshotsManager('f')">
+          <i class="ti ti-cloud-upload"></i>
+          <div class="at-dropzone-title">Upload Screenshot</div>
+          <div class="at-dropzone-sub">Drop here, paste with Ctrl+V or click</div>
         </div>
-        <div class="at-col">
-          <div class="field notes-field">
-            <label>Notes (optional)</label>
-            <textarea id="f-notes" placeholder="Setup, reasoning, mistakes, lessons learned..." style="min-height:110px;width:100%"></textarea>
-          </div>
+        <div id="f-img-trigger-title" style="display:none"></div>
+      </div>
+
+      <div class="at-section">
+        <div class="at-section-head"><span class="at-section-icon warn"><i class="ti ti-alert-triangle"></i></span><h4>Mistakes</h4></div>
+        <div class="tag-group" data-accent="mistake" id="f-mistakes-group">
+          <button type="button" class="tag-pill" data-val="Entered Early" onclick="toggleMultiPill(this)">Entered Early</button>
+          <button type="button" class="tag-pill" data-val="Ignored HTF Bias" onclick="toggleMultiPill(this)">Ignored HTF Bias</button>
+          <button type="button" class="tag-pill" data-val="Traded During News" onclick="toggleMultiPill(this)">Traded During News</button>
+          <button type="button" class="tag-pill" data-val="Over Risk" onclick="toggleMultiPill(this)">Over Risk</button>
+          <button type="button" class="tag-pill" data-val="Revenge Trade" onclick="toggleMultiPill(this)">Revenge Trade</button>
+          <button type="button" class="tag-pill" data-val="No Confirmation" onclick="toggleMultiPill(this)">No Confirmation</button>
+          <button type="button" class="tag-pill" data-val="Closed Early" onclick="toggleMultiPill(this)">Closed Early</button>
+          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-mistakes-group','multi')">+</button>
         </div>
       </div>
 
@@ -1271,20 +1232,6 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="at-learning-field">
           <div class="at-section-sub"><span>What I'll do next time</span><span class="show-prompts" onclick="this.closest('.at-learning-field').querySelector('textarea').placeholder='e.g. Wait for the retest, size down after a loss, journal before entry'">Show prompts</span></div>
           <textarea id="f-learn-next" placeholder="What I'll do next time..."></textarea>
-        </div>
-      </div>
-
-      <div class="at-section">
-        <div class="at-section-head"><span class="at-section-icon warn"><i class="ti ti-alert-triangle"></i></span><h4>Mistakes</h4></div>
-        <div class="tag-group" data-accent="mistake" id="f-mistakes-group">
-          <button type="button" class="tag-pill" data-val="Entered Early" onclick="toggleMultiPill(this)">Entered Early</button>
-          <button type="button" class="tag-pill" data-val="Ignored HTF Bias" onclick="toggleMultiPill(this)">Ignored HTF Bias</button>
-          <button type="button" class="tag-pill" data-val="Traded During News" onclick="toggleMultiPill(this)">Traded During News</button>
-          <button type="button" class="tag-pill" data-val="Over Risk" onclick="toggleMultiPill(this)">Over Risk</button>
-          <button type="button" class="tag-pill" data-val="Revenge Trade" onclick="toggleMultiPill(this)">Revenge Trade</button>
-          <button type="button" class="tag-pill" data-val="No Confirmation" onclick="toggleMultiPill(this)">No Confirmation</button>
-          <button type="button" class="tag-pill" data-val="Closed Early" onclick="toggleMultiPill(this)">Closed Early</button>
-          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-mistakes-group','multi')">+</button>
         </div>
       </div>
 
@@ -3882,7 +3829,6 @@ function saveTrade(){
   const pbSel=document.getElementById('f-playbook');
   const playbookId=pbSel&&pbSel.value?parseInt(pbSel.value):null;
   const accountId=acctSel.value;
-  const timeframeEl=document.getElementById('f-timeframe');
   db.trades[key].push({
     id:Date.now(),date,
     symbol:symEl.value,
@@ -3891,15 +3837,12 @@ function saveTrade(){
     outcome,
     pnl:finalPnl,
     rr:finalRR,
-    timeframe:timeframeEl?timeframeEl.value:'',
-    pdArray:getMultiPillValues('f-pdarray-group'),
-    pdConfluences:getMultiPillValues('f-pdconfluence-group'),
     mistakes:getMultiPillValues('f-mistakes-group'),
     learningRight:(document.getElementById('f-learn-right')?.value||'').trim(),
     learningWrong:(document.getElementById('f-learn-wrong')?.value||'').trim(),
     learningNext:(document.getElementById('f-learn-next')?.value||'').trim(),
     images:fImages.slice(),
-    notes:document.getElementById('f-notes').value.trim(),
+    notes:(document.getElementById('f-notes')?.value||'').trim(),
     playbookId,
     accountId,
     checklistResults:playbookId?readChecklistResults('f'):[]
@@ -3914,16 +3857,15 @@ function saveTrade(){
   // Reset form fields to empty
   pnlEl.value='';rrEl.value='';
   symEl.value='';sessEl.value='';dirEl.value='';outEl.value='';
-  if(timeframeEl)timeframeEl.value='';
   resetPairPicker('f');
-  ['f-direction-group','f-result-group','f-session-group','f-timeframe-group'].forEach(id=>{
+  ['f-direction-group','f-result-group','f-session-group'].forEach(id=>{
     const g=document.getElementById(id);
     if(g)g.querySelectorAll('.tag-pill.active').forEach(p=>p.classList.remove('active'));
   });
-  ['f-pdarray-group','f-pdconfluence-group','f-mistakes-group'].forEach(resetMultiPillGroup);
+  ['f-mistakes-group'].forEach(resetMultiPillGroup);
   ['f-learn-right','f-learn-wrong','f-learn-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   fImages=[];renderImagePreview('f');
-  document.getElementById('f-notes').value='';
+  const notesEl=document.getElementById('f-notes');if(notesEl)notesEl.value='';
   if(pbSel)pbSel.value='';
   if(acctSel)acctSel.value='';
   refreshSelectPlaceholderStyles(document.getElementById('page-log'));
