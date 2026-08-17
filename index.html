@@ -15,7 +15,7 @@
 /* Hide scrollbar everywhere */
 *::-webkit-scrollbar{display:none}
 *{-ms-overflow-style:none;scrollbar-width:none}
-[data-theme="dark"]{--bg:#000000;--surface:#000000;--surface2:#0d0d0d;--card:#000000;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0f0f0;--text2:#aaa;--text3:#666;--shadow:rgba(0,0,0,0.6)}
+[data-theme="dark"]{--bg:#000000;--surface:#000000;--surface2:#111111;--card:#0a0a0a;--border:rgba(255,255,255,0.14);--border2:rgba(255,255,255,0.22);--text:#f0f0f0;--text2:#aaa;--text3:#666;--shadow:rgba(0,0,0,0.6)}
 [data-theme="light"]{--bg:#f0f2f5;--surface:#ffffff;--surface2:#f5f7fa;--card:#ffffff;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#111;--text2:#555;--text3:#999;--shadow:rgba(0,0,0,0.08)}
 :root{--green:#1D9E75;--red:#D85A30;--blue:#378ADD;--gold:#f59e0b;--purple:#a78bfa;--r:10px;--rlg:14px}
 html{overflow-x:clip;width:100%}
@@ -355,6 +355,8 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .tag-group.err{outline:1.5px solid var(--red);outline-offset:6px;border-radius:var(--r)}
 .pair-picker-btn i{font-size:14px;color:var(--text3);flex-shrink:0}
 .pair-picker-btn .pp-placeholder{color:var(--text3)}
+.at-add-pair-btn{width:41px;height:41px;flex-shrink:0;border-radius:var(--r);border:1.5px dashed var(--border2);background:var(--surface2);color:var(--text3);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.at-add-pair-btn:hover{color:var(--text);border-color:var(--text3)}
 .pair-picker-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.35);max-height:340px;overflow-y:auto;padding:6px}
 .pp-cat-header{width:100%;background:none;border:none;display:flex;align-items:center;gap:8px;padding:9px 8px;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;border-radius:8px;font-family:'Inter',sans-serif}
 .pp-cat-header:hover{background:var(--surface2)}
@@ -1110,33 +1112,33 @@ table.tt tr:last-child td{border-bottom:none}
       <div style="text-align:right"><span class="save-msg" id="save-msg">✓ Saved!</span><span class="err-msg" id="err-msg"></span></div>
 
       <div class="field-row">
-        <div class="field"><label>Account <span class="req">*</span></label>
+        <div class="at-section"><label>Account <span class="req">*</span></label>
           <select id="f-account">
             <option value="">Choose an account…</option>
           </select>
           <a href="javascript:void(0)" id="f-no-account-link" onclick="closeAddTradeModal();go('accounts')" style="display:none;font-size:13px;color:#818cf8;text-decoration:underline">No trading accounts — create one</a>
         </div>
-        <div class="field">
+        <div class="at-section">
           <label>Asset <span class="req">*</span></label>
-          <div class="pair-picker">
-            <button type="button" class="pair-picker-btn" id="f-sym-btn" onclick="togglePairPicker('f')">
-              <span id="f-sym-label" class="pp-placeholder">Select pair</span>
-              <i class="ti ti-chevron-down"></i>
-            </button>
-            <div class="pair-picker-panel" id="f-sym-panel" style="display:none"></div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <div class="pair-picker" style="flex:1;max-width:220px">
+              <button type="button" class="pair-picker-btn" id="f-sym-btn" onclick="togglePairPicker('f')">
+                <span id="f-sym-label" class="pp-placeholder">Select pair</span>
+                <i class="ti ti-chevron-down"></i>
+              </button>
+              <div class="pair-picker-panel" id="f-sym-panel" style="display:none"></div>
+            </div>
+            <button type="button" class="at-add-pair-btn" onclick="toggleCreatePairInput('f')" title="Add a new pair"><i class="ti ti-plus"></i></button>
           </div>
           <input type="hidden" id="f-sym" value=""/>
-          <div style="margin-top:8px">
-            <a href="javascript:void(0)" onclick="toggleCreatePairInput('f')" style="font-size:12px;color:var(--text3)">Can't find a symbol? <span style="color:var(--text);text-decoration:underline;font-weight:600">Create it</span></a>
-            <div id="f-create-pair-wrap" style="display:none;margin-top:8px;gap:6px">
-              <input type="text" id="f-create-pair-input" placeholder="e.g. SPX500" style="text-transform:uppercase;flex:1"/>
-              <button type="button" class="btn-ghost" onclick="createCustomPair('f')">Add</button>
-            </div>
+          <div id="f-create-pair-wrap" style="display:none;margin-top:8px;gap:6px">
+            <input type="text" id="f-create-pair-input" placeholder="e.g. SPX500" style="text-transform:uppercase;flex:1"/>
+            <button type="button" class="btn-ghost" onclick="createCustomPair('f')">Add</button>
           </div>
         </div>
       </div>
 
-      <div class="field-row field-row-3">
+      <div class="field-row field-row-3" style="grid-template-columns:1fr 0.85fr 1.15fr">
         <div class="at-section">
           <h4 class="at-plain-head">Result</h4>
           <div class="tag-group" data-accent="mixed" id="f-result-group">
@@ -1192,7 +1194,7 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <div class="field">
+      <div class="at-section">
         <label>Screenshots</label>
         <div class="at-dropzone" id="f-dropzone" onclick="openScreenshotsManager('f')">
           <i class="ti ti-cloud-upload"></i>
@@ -1200,20 +1202,6 @@ table.tt tr:last-child td{border-bottom:none}
           <div class="at-dropzone-sub">Drop here, paste with Ctrl+V or click</div>
         </div>
         <div id="f-img-trigger-title" style="display:none"></div>
-      </div>
-
-      <div class="at-section">
-        <div class="at-section-head"><span class="at-section-icon warn"><i class="ti ti-alert-triangle"></i></span><h4>Mistakes</h4></div>
-        <div class="tag-group" data-accent="mistake" id="f-mistakes-group">
-          <button type="button" class="tag-pill" data-val="Entered Early" onclick="toggleMultiPill(this)">Entered Early</button>
-          <button type="button" class="tag-pill" data-val="Ignored HTF Bias" onclick="toggleMultiPill(this)">Ignored HTF Bias</button>
-          <button type="button" class="tag-pill" data-val="Traded During News" onclick="toggleMultiPill(this)">Traded During News</button>
-          <button type="button" class="tag-pill" data-val="Over Risk" onclick="toggleMultiPill(this)">Over Risk</button>
-          <button type="button" class="tag-pill" data-val="Revenge Trade" onclick="toggleMultiPill(this)">Revenge Trade</button>
-          <button type="button" class="tag-pill" data-val="No Confirmation" onclick="toggleMultiPill(this)">No Confirmation</button>
-          <button type="button" class="tag-pill" data-val="Closed Early" onclick="toggleMultiPill(this)">Closed Early</button>
-          <button type="button" class="tag-pill tag-add" onclick="addCustomTagPill('f-mistakes-group','multi')">+</button>
-        </div>
       </div>
 
       <div class="at-section">
@@ -3834,7 +3822,6 @@ function saveTrade(){
     outcome,
     pnl:finalPnl,
     rr:finalRR,
-    mistakes:getMultiPillValues('f-mistakes-group'),
     learningRight:(document.getElementById('f-learn-right')?.value||'').trim(),
     learningWrong:(document.getElementById('f-learn-wrong')?.value||'').trim(),
     learningNext:(document.getElementById('f-learn-next')?.value||'').trim(),
@@ -3859,7 +3846,7 @@ function saveTrade(){
     const g=document.getElementById(id);
     if(g)g.querySelectorAll('.tag-pill.active').forEach(p=>p.classList.remove('active'));
   });
-  ['f-mistakes-group'].forEach(resetMultiPillGroup);
+
   ['f-learn-right','f-learn-wrong','f-learn-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   fImages=[];renderImagePreview('f');
   const notesEl=document.getElementById('f-notes');if(notesEl)notesEl.value='';
