@@ -290,12 +290,14 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 
 .dash-stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.85rem;flex:1}
 .snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
-.dash-stat-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:.7rem .85rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:6px;justify-content:flex-start;min-height:68px}
-.dash-stat-icon{width:26px;height:26px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center}
-.dash-stat-icon i{font-size:13px;color:var(--text2)}
-.dash-stat-lbl{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.dash-stat-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(var(--accent-rgb,102,102,102),0.10),transparent 65%),var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem .95rem .8rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:10px;justify-content:flex-start;min-height:68px}
+.dash-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent,#666) 0%,var(--accent,#666) 55%,transparent 100%)}
+.dash-stat-icon{display:none}
+.dash-stat-lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:4px}
 .dash-stat-lbl i{font-size:11px;color:var(--text3)}
-.dash-stat-val{font-size:17px;font-weight:800;color:var(--text)}
+.dash-stat-val{font-size:22px;font-weight:800;color:var(--accent,var(--text))}
+.dash-stat-card{border-top:none}
+.dash-stat-card::after{content:'';margin-top:auto;border-top:.5px solid var(--border);padding-top:2px}
 
 .dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
 .dash-chart-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
@@ -2402,6 +2404,14 @@ function computeMetrics(trades){
   return{n,grossWin,grossLoss,net,pf,wins,losses,be,wr,avgWin,avgLoss,avgWinLossRatio};
 }
 
+function setStatAccent(id,isGood){
+  const el=document.getElementById('snc-'+id);
+  const card=el?el.closest('.dash-stat-card'):null;
+  if(!card)return;
+  if(isGood){card.style.setProperty('--accent','var(--green)');card.style.setProperty('--accent-rgb','29,158,117');}
+  else{card.style.setProperty('--accent','var(--red)');card.style.setProperty('--accent-rgb','216,90,48');}
+}
+
 function setStatCard(id,val,opts){
   opts=opts||{};
   const valEl=document.getElementById('snc-'+id);
@@ -2438,20 +2448,26 @@ function drawSparkline(canvasId,color,pts){
 function renderNewStatCards(trades){
   const m=computeMetrics(trades);
   setStatCard('netpnl',m.net);
+  setStatAccent('netpnl',m.net>=0);
   setStatCard('pf',m.pf,{isPF:true});
+  setStatAccent('pf',!isFinite(m.pf)||m.pf>=1);
   setStatCard('winrate',m.wr,{isPct:true});
+  setStatAccent('winrate',m.wr>=50);
 
   // Day Win %
   const ds=computeDayWinStats(trades);
   const dwEl=document.getElementById('snc-daywr');if(dwEl)dwEl.textContent=trades.length?ds.wr+'%':'0%';
+  setStatAccent('daywr',ds.wr>=50);
 
   // Avg Win / Loss
   const ratioEl=document.getElementById('snc-avgwl-ratio');
   if(ratioEl)ratioEl.textContent=(m.avgLoss>0||m.avgWin>0)?(isFinite(m.avgWinLossRatio)?m.avgWinLossRatio.toFixed(2):'∞'):'—';
+  setStatAccent('avgwl-ratio',!isFinite(m.avgWinLossRatio)||m.avgWinLossRatio>=1);
 
   // Total Trades
   const ttEl=document.getElementById('snc-totaltrades');
   if(ttEl)ttEl.textContent=trades.length.toLocaleString();
+  setStatAccent('totaltrades',true);
 
   // Max Drawdown — largest peak-to-trough dip in cumulative P&L, over the same
   // (filtered) trades shown in the rest of the dashboard.
@@ -2466,6 +2482,7 @@ function renderNewStatCards(trades){
       if(dd<worstDD)worstDD=dd;
     });
     maxddEl.textContent=worstDD>=0?'$0':'-$'+Math.abs(Math.round(worstDD)).toLocaleString();
+    setStatAccent('maxdd',worstDD>=0);
   }
 
   // Account Balance — sum of every non-failed tracked account's initial balance + its trades' P&L
@@ -2474,6 +2491,7 @@ function renderNewStatCards(trades){
     checkAccountAutoFund();
     const totalBal=(db.propfirms||[]).filter(a=>a.status!=='failed').reduce((s,a)=>s+accountBalance(a).balance,0);
     balEl.textContent='$'+totalBal.toLocaleString(undefined,{maximumFractionDigits:0});
+    setStatAccent('balance',totalBal>=0);
   }
 
   const sorted=[...trades].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
