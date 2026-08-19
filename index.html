@@ -30,7 +30,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .logo-text-stack{display:flex;flex-direction:column;line-height:1.2}
 .logo-plan{font-size:11px;font-weight:600;color:var(--text3)}
 .logo-text{white-space:nowrap}
-.sb-acct-switch{margin:12px 12px 6px;background:var(--surface2);border-radius:12px;padding:9px 10px;display:flex;align-items:center;gap:10px}
+.sb-acct-switch{margin:12px 12px 6px;background:var(--surface2);border:1px solid rgba(124,109,242,0.45);box-shadow:0 0 0 1px rgba(124,109,242,0.08),0 0 14px rgba(124,109,242,0.12);border-radius:12px;padding:9px 10px;display:flex;align-items:center;gap:10px}
+.sb-acct-switch:hover{border-color:rgba(124,109,242,0.7)}
 .sb-acct-dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sb-acct-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .sb-acct-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -257,7 +258,10 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .tb-filter{display:flex;align-items:center;gap:7px;background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
 .tb-filter:hover{background:var(--border)}
 .tb-filter i{font-size:14px;color:var(--text3)}
-.tb-filter-badge{background:var(--border2);color:var(--text2);font-size:11px;font-weight:700;padding:2px 9px;border-radius:100px;margin-left:1px}
+.acct-filter-card{display:flex;flex-direction:column;gap:2px;background:var(--surface2);border:1px solid rgba(124,109,242,0.45);border-radius:12px;padding:9px 16px;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;box-shadow:0 0 0 1px rgba(124,109,242,0.08),0 0 14px rgba(124,109,242,0.12)}
+.acct-filter-card:hover{border-color:rgba(124,109,242,0.7)}
+.acct-filter-card-title{font-size:14px;font-weight:700;color:var(--text)}
+.acct-filter-card-sub{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text3)}
 .tb-filter-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:.5px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.35);min-width:210px;z-index:200;padding:6px;max-height:340px;overflow-y:auto}
 .tb-filter-item{padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .tb-filter-item:hover{background:var(--surface2)}
@@ -303,14 +307,27 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .snc-cards.dash-stat-grid{grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-bottom:0;align-content:stretch}
 .dash-stat-card{position:relative;overflow:hidden;background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1rem 1.05rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:8px;justify-content:flex-start;min-height:68px}
 .dash-stat-icon{display:none}
-.dash-stat-lbl{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:4px}
-.dash-stat-lbl i{font-size:11px;color:var(--text3)}
+.dash-stat-lbl{font-size:12.5px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:5px}
 .dash-stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1.1}
-.dash-stat-sub{font-size:12px;font-weight:500;color:var(--accent,var(--text3));display:flex;align-items:center;gap:5px;margin-top:2px}
-.dash-stat-sub i{font-size:13px}
+.dash-stat-val.v-pos{color:var(--green)}
+.dash-stat-val.v-neg{color:var(--red)}
+.wr-card{gap:10px}
+.wr-total-trades{font-size:12px;color:var(--text3);margin-top:-4px}
+.wr-row{display:flex;flex-direction:column;gap:6px}
+.wr-row-top{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.wr-row-lbl{color:var(--text2)}
+.wr-row-val{color:var(--text);font-weight:700}
+.wr-row-bar{height:3px;border-radius:100px;background:var(--border);overflow:hidden}
+.wr-row-fill{height:100%;background:var(--text2);border-radius:100px;transition:width .25s}
 
 .dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
-.checklist-card{display:flex;flex-direction:column;min-width:0}
+.checklist-card{display:flex;flex-direction:column;min-width:0;max-height:440px}
+.cl-items{display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;min-height:0;padding-right:10px}
+.cl-items::-webkit-scrollbar{width:6px}
+.cl-items::-webkit-scrollbar-track{background:transparent}
+.cl-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:100px}
+.cl-items::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.3)}
+.cl-items{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.18) transparent}
 .cl-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
 .cl-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
 .cl-title i{font-size:15px;color:var(--blue)}
@@ -323,7 +340,6 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .cl-pct{font-size:15px;font-weight:800;color:var(--text2)}
 .cl-progress{height:5px;border-radius:100px;background:var(--border);overflow:hidden;margin-bottom:16px}
 .cl-progress-bar{height:100%;background:var(--blue);border-radius:100px;transition:width .25s}
-.cl-items{display:flex;flex-direction:column;gap:14px;flex:1}
 .cl-item{display:flex;align-items:center;gap:12px;cursor:pointer}
 .cl-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
 .cl-check i{font-size:13px;color:#fff;opacity:0;transition:opacity .15s}
@@ -852,15 +868,11 @@ table.tt tr:last-child td{border-bottom:none}
       </span>
     </div>
   </div>
-  <div class="sb-acct-switch" id="sb-acct-switch">
-    <span class="sb-acct-dot" id="sb-acct-dot"></span>
-    <span class="sb-acct-info">
-      <span class="sb-acct-name" id="sb-acct-name">No accounts yet</span>
-      <span class="sb-acct-bal" id="sb-acct-bal">$0</span>
-    </span>
-    <button class="sb-acct-btn" onclick="sbEditActiveAccount()" title="Edit account"><i class="ti ti-pencil"></i></button>
-    <button class="sb-acct-btn" onclick="toggleAcctFilterPanel()" title="Switch account"><i class="ti ti-selector"></i></button>
-  </div>
+  <button class="acct-filter-card" id="sb-acct-switch" onclick="toggleSbAcctFilterPanel()" style="position:relative;margin:12px 12px 6px;width:calc(100% - 24px)">
+    <span class="acct-filter-card-title" id="sb-acct-name">All Accounts</span>
+    <span class="acct-filter-card-sub" id="sb-acct-bal">0 TOTAL</span>
+    <div class="tb-filter-panel" id="sb-acct-filter-panel" style="display:none;left:0;right:auto;top:calc(100% + 8px)"></div>
+  </button>
   <div class="nav-section-lbl">Journaling</div>
   <nav>
     <button class="active" onclick="go('dashboard',this)"><span class="nav-tile"><i class="ti ti-layout-dashboard"></i></span><span class="nav-label">Dashboard</span></button>
@@ -955,8 +967,9 @@ table.tt tr:last-child td{border-bottom:none}
           </button>
         </div>
         <div id="acct-filter-wrap" style="position:relative">
-          <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="tb-filter">
-            <i class="ti ti-filter"></i> Accounts <span class="tb-filter-badge" id="acct-filter-badge">All</span>
+          <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="acct-filter-card">
+            <span class="acct-filter-card-title" id="acct-filter-title">All Accounts</span>
+            <span class="acct-filter-card-sub" id="acct-filter-badge">2 TOTAL</span>
           </button>
           <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
         </div>
@@ -968,41 +981,43 @@ table.tt tr:last-child td{border-bottom:none}
     <div class="dash-top-grid dashboard-block" data-block-id="hero-top">
       <div class="dash-left-col">
         <div class="snc-cards dash-stat-grid" data-block-id="stats">
-          <div class="dash-stat-card sub-block" data-sub-id="netpnl">
+          <div class="dash-stat-card sub-block wr-card" data-sub-id="winrate">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Net P&amp;L <i class="ti ti-info-circle"></i></div>
-            <div class="dash-stat-val" id="snc-netpnl">$0</div>
-            <div class="dash-stat-sub" id="snc-netpnl-sub"><i class="ti ti-minus"></i>All time</div>
-          </div>
-          <div class="dash-stat-card sub-block" data-sub-id="winrate">
-            <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Trade win% <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-lbl">Trade win rate</div>
             <div class="dash-stat-val" id="snc-winrate">0%</div>
-            <div class="dash-stat-sub" id="snc-winrate-sub">0W 0L 0BE</div>
+            <div class="wr-total-trades" id="wr-total-trades">0 Total Trades</div>
+            <div class="wr-row">
+              <div class="wr-row-top"><span class="wr-row-lbl">Winning</span><span class="wr-row-val" id="wr-val-win">0</span></div>
+              <div class="wr-row-bar"><div class="wr-row-fill" id="wr-bar-win" style="width:0%"></div></div>
+            </div>
+            <div class="wr-row">
+              <div class="wr-row-top"><span class="wr-row-lbl">Losing</span><span class="wr-row-val" id="wr-val-loss">0</span></div>
+              <div class="wr-row-bar"><div class="wr-row-fill" id="wr-bar-loss" style="width:0%"></div></div>
+            </div>
+            <div class="wr-row">
+              <div class="wr-row-top"><span class="wr-row-lbl">Breakeven</span><span class="wr-row-val" id="wr-val-be">0</span></div>
+              <div class="wr-row-bar"><div class="wr-row-fill" id="wr-bar-be" style="width:0%"></div></div>
+            </div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="pf">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Profit factor <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-lbl">Profit factor</div>
             <div class="dash-stat-val" id="snc-pf">—</div>
-            <div class="dash-stat-sub">Gross profit / loss</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="daywr">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Day win <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-lbl">Day win %</div>
             <div class="dash-stat-val" id="snc-daywr">0%</div>
-            <div class="dash-stat-sub">Winning trading days</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="avgwl">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Avg Win/Loss <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-lbl">Avg win/loss trade</div>
             <div class="dash-stat-val" id="snc-avgwl-ratio">—</div>
-            <div class="dash-stat-sub">Avg win vs avg loss</div>
           </div>
           <div class="dash-stat-card sub-block" data-sub-id="maxdd">
             <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
-            <div class="dash-stat-lbl">Max Drawdown <i class="ti ti-info-circle"></i></div>
+            <div class="dash-stat-lbl">Max Drawdown</div>
             <div class="dash-stat-val" id="snc-maxdd">$0</div>
-            <div class="dash-stat-sub">Peak to trough</div>
           </div>
         </div>
       </div>
@@ -1011,7 +1026,7 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="dash-chart-card" style="min-width:0">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <div>
-            <div class="dash-chart-title" style="margin-bottom:8px">Daily Net Cumulative P&amp;L <i class="ti ti-info-circle"></i></div>
+            <div class="dash-chart-title" style="margin-bottom:8px">Account Balance</div>
             <div id="equity-big-value" style="font-size:30px;font-weight:800;color:var(--text);line-height:1.1">$0</div>
             <div style="font-size:13px;color:var(--text3);margin-top:4px">Last 30 Days</div>
           </div>
@@ -1043,12 +1058,12 @@ table.tt tr:last-child td{border-bottom:none}
     <!-- Net Daily P&L / Overall score (combined radar + gauge) / Recent trades -->
     <div class="dash-row2 dashboard-block" data-block-id="hero-row2">
       <div class="dash-chart-card">
-        <div class="dash-chart-title">Net Daily P&amp;L <i class="ti ti-info-circle"></i></div>
+        <div class="dash-chart-title">Net Daily P&amp;L</div>
         <div class="chart-wrap" style="height:240px;overflow:hidden"><canvas id="daily-pnl-chart"></canvas></div>
       </div>
 
       <div class="dash-chart-card score-combo-card">
-        <div class="dash-chart-title">Overall Score <i class="ti ti-info-circle"></i></div>
+        <div class="dash-chart-title">Overall Score</div>
         <div style="position:relative;height:220px;overflow:hidden"><canvas id="radar-chart-hero"></canvas></div>
         <div class="score-combo-bottom">
           <div class="score-hero-lbl">Overall Score</div>
@@ -2390,11 +2405,9 @@ function computeMetrics(trades){
 
 function setStatAccent(id,isGood){
   const el=document.getElementById('snc-'+id);
-  const card=el?el.closest('.dash-stat-card'):null;
-  if(!card)return;
-  card.style.setProperty('--accent',isGood?'var(--green)':'var(--red)');
-  const subIcon=card.querySelector('.dash-stat-sub i');
-  if(subIcon){subIcon.className='ti '+(isGood?'ti-trending-up':'ti-trending-down');}
+  if(!el)return;
+  el.classList.remove('v-pos','v-neg');
+  el.classList.add(isGood?'v-pos':'v-neg');
 }
 
 function setStatCard(id,val,opts){
@@ -2432,16 +2445,24 @@ function drawSparkline(canvasId,color,pts){
 
 function renderNewStatCards(trades){
   const m=computeMetrics(trades);
-  setStatCard('netpnl',m.net);
-  const netSub=document.getElementById('snc-netpnl-sub');
-  if(netSub)netSub.innerHTML='<i class="ti"></i>'+(trades.length?trades.length+' trade'+(trades.length===1?'':'s'):'All time');
-  setStatAccent('netpnl',m.net>=0);
   setStatCard('pf',m.pf,{isPF:true});
   setStatAccent('pf',!isFinite(m.pf)||m.pf>=1);
   setStatCard('winrate',m.wr,{isPct:true});
   setStatAccent('winrate',m.wr>=50);
-  const wrSub=document.getElementById('snc-winrate-sub');
-  if(wrSub)wrSub.textContent=m.wins+'W '+m.losses+'L '+m.be+'BE';
+  {
+    const totalEl=document.getElementById('wr-total-trades');
+    if(totalEl)totalEl.textContent=m.n+' Total Trade'+(m.n===1?'':'s');
+    const maxCount=Math.max(m.wins,m.losses,m.be,1);
+    const setRow=(key,count)=>{
+      const valEl=document.getElementById('wr-val-'+key);
+      const barEl=document.getElementById('wr-bar-'+key);
+      if(valEl)valEl.textContent=count;
+      if(barEl)barEl.style.width=(count/maxCount*100)+'%';
+    };
+    setRow('win',m.wins);
+    setRow('loss',m.losses);
+    setRow('be',m.be);
+  }
 
   // Day Win %
   const ds=computeDayWinStats(trades);
@@ -3988,23 +4009,25 @@ function exportCSV(){
 
 function renderSbAcctSwitch(){
   const nameEl=document.getElementById('sb-acct-name');
-  const balEl=document.getElementById('sb-acct-bal');
-  const dotEl=document.getElementById('sb-acct-dot');
-  if(!nameEl||!balEl)return;
+  const badgeEl=document.getElementById('sb-acct-bal');
+  if(!nameEl||!badgeEl)return;
   const all=(db.propfirms||[]);
-  const active=all.find(a=>a.status!=='failed')||all[0];
-  if(!active){
-    nameEl.textContent='No accounts yet';
-    balEl.textContent='$0';
-    if(dotEl)dotEl.style.background='var(--text3)';
+  if(!dashAccountFilter){
+    nameEl.textContent='All Accounts';
+    badgeEl.textContent=all.length+' TOTAL';
     sbActiveAcctId=null;
     return;
   }
-  const {balance}=accountBalance(active);
-  nameEl.textContent=active.name||'Account';
-  balEl.textContent='$'+Math.round(balance).toLocaleString();
-  if(dotEl)dotEl.style.background=active.status==='failed'?'var(--red)':'var(--green)';
-  sbActiveAcctId=active.id;
+  const active=all.find(a=>String(a.id)===String(dashAccountFilter));
+  if(active){
+    nameEl.textContent=active.name||active.broker||'Account';
+    badgeEl.textContent=(active.status?active.status.toUpperCase():'ACTIVE');
+    sbActiveAcctId=active.id;
+  } else {
+    nameEl.textContent='All Accounts';
+    badgeEl.textContent=all.length+' TOTAL';
+    sbActiveAcctId=null;
+  }
 }
 let sbActiveAcctId=null;
 function sbEditActiveAccount(){
@@ -4806,50 +4829,73 @@ function populateAccountDropdown(prefix){
 // Refreshes the "Accounts" filter badge to reflect the current selection —
 // call whenever the account list or the active filter changes.
 function populateDashAccountFilter(){
+  const titleEl=document.getElementById('acct-filter-title');
   const badge=document.getElementById('acct-filter-badge');
-  if(!badge)return;
-  if(!dashAccountFilter){badge.textContent='All';return;}
-  const a=(db.propfirms||[]).find(p=>String(p.id)===String(dashAccountFilter));
-  if(a)badge.textContent=a.name||a.broker||'Account';
-  else{dashAccountFilter='';badge.textContent='All';}
+  if(!titleEl||!badge)return;
+  const all=(db.propfirms||[]);
+  if(!dashAccountFilter){
+    titleEl.textContent='All Accounts';
+    badge.textContent=all.length+' TOTAL';
+    return;
+  }
+  const a=all.find(p=>String(p.id)===String(dashAccountFilter));
+  if(a){
+    titleEl.textContent=a.name||a.broker||'Account';
+    badge.textContent=(a.status?a.status.toUpperCase():'ACTIVE');
+  } else {
+    dashAccountFilter='';
+    titleEl.textContent='All Accounts';
+    badge.textContent=all.length+' TOTAL';
+  }
 }
 
-function toggleAcctFilterPanel(){
-  const panel=document.getElementById('acct-filter-panel');
+function toggleAcctFilterPanel(){toggleAcctFilterPanelFor('acct-filter-panel')}
+function toggleSbAcctFilterPanel(){toggleAcctFilterPanelFor('sb-acct-filter-panel')}
+
+function toggleAcctFilterPanelFor(panelId){
+  const panel=document.getElementById(panelId);
   if(!panel)return;
   const willOpen=panel.style.display==='none'||!panel.style.display;
+  closeAcctFilterPanel();
   panel.style.display=willOpen?'block':'none';
-  if(willOpen)renderAcctFilterPanel();
+  if(willOpen)renderAcctFilterPanel(panelId);
 }
 
-function renderAcctFilterPanel(){
-  const panel=document.getElementById('acct-filter-panel');
-  if(!panel)return;
-  let html=`<div class="tb-filter-item${!dashAccountFilter?' active':''}" onclick="selectAcctFilter('')"><i class="ti ti-list"></i> All Accounts</div>`;
-  (db.propfirms||[]).forEach(a=>{
-    const active=String(dashAccountFilter)===String(a.id);
-    html+=`<div class="tb-filter-item${active?' active':''}" onclick="selectAcctFilter('${a.id}')"><i class="ti ti-${(a.type||'').startsWith('prop')?'building-bank':'wallet'}"></i> ${a.name||a.broker||'Account'}</div>`;
+function renderAcctFilterPanel(panelId){
+  ['acct-filter-panel','sb-acct-filter-panel'].forEach(id=>{
+    if(panelId&&id!==panelId)return;
+    const panel=document.getElementById(id);
+    if(!panel)return;
+    let html=`<div class="tb-filter-item${!dashAccountFilter?' active':''}" onclick="selectAcctFilter('')"><i class="ti ti-list"></i> All Accounts</div>`;
+    (db.propfirms||[]).forEach(a=>{
+      const active=String(dashAccountFilter)===String(a.id);
+      html+=`<div class="tb-filter-item${active?' active':''}" onclick="selectAcctFilter('${a.id}')"><i class="ti ti-${(a.type||'').startsWith('prop')?'building-bank':'wallet'}"></i> ${a.name||a.broker||'Account'}</div>`;
+    });
+    html+=`<div class="tb-filter-divider"></div><div class="tb-filter-item" onclick="closeAcctFilterPanel();openPFModal(null,null)"><i class="ti ti-plus"></i> Create Account</div>`;
+    panel.innerHTML=html;
   });
-  html+=`<div class="tb-filter-divider"></div><div class="tb-filter-item" onclick="closeAcctFilterPanel();openPFModal(null,null)"><i class="ti ti-plus"></i> Create Account</div>`;
-  panel.innerHTML=html;
 }
 
 function closeAcctFilterPanel(){
-  const panel=document.getElementById('acct-filter-panel');
-  if(panel)panel.style.display='none';
+  const p1=document.getElementById('acct-filter-panel');if(p1)p1.style.display='none';
+  const p2=document.getElementById('sb-acct-filter-panel');if(p2)p2.style.display='none';
 }
 
 function selectAcctFilter(id){
   dashAccountFilter=id;
   populateDashAccountFilter();
   closeAcctFilterPanel();
+  renderSbAcctSwitch();
   if(drpActivePreset)applyDRPPreset(drpActivePreset);
   else renderDashboard(currentDashKey);
 }
 
 document.addEventListener('click',function(e){
   const wrap=document.getElementById('acct-filter-wrap');
-  if(wrap&&!wrap.contains(e.target))closeAcctFilterPanel();
+  const sbWrap=document.getElementById('sb-acct-switch');
+  const insideTop=wrap&&wrap.contains(e.target);
+  const insideSb=sbWrap&&sbWrap.contains(e.target);
+  if(!insideTop&&!insideSb)closeAcctFilterPanel();
 });
 
 // Renders the checklist for whichever playbook is currently selected.
