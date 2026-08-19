@@ -315,7 +315,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .cl-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
 .cl-title i{font-size:15px;color:var(--blue)}
 .cl-picker{background:var(--surface2);border:.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;cursor:default;white-space:nowrap}
-.cl-picker span{color:var(--text3);font-weight:500}
+.cl-picker span.cl-picker-muted{color:var(--text3);font-weight:500}
 .cl-settings-btn{width:30px;height:30px;border-radius:8px;background:var(--surface2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;flex-shrink:0}
 .cl-count-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
 .cl-count{font-size:26px;font-weight:800;color:var(--text)}
@@ -332,6 +332,23 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .cl-item-label{font-size:14.5px;font-weight:500;color:var(--text)}
 .cl-item.checked .cl-item-label{color:var(--text3);text-decoration:line-through}
 .cl-footer{text-align:center;font-size:11.5px;color:var(--text3);margin-top:14px}
+.cl-manage-group{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:16px}
+.cl-manage-group-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.cl-manage-group-head h4{margin:0;font-size:15px;font-weight:700;color:var(--text)}
+.cl-builtin-tag{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--text3);background:var(--card);border:.5px solid var(--border);border-radius:6px;padding:2px 6px}
+.cl-manage-del-list{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px}
+.cl-manage-item-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cl-manage-item-row input{flex:1;background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif}
+.cl-manage-item-row button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;flex-shrink:0}
+.cl-manage-item-row button:hover{color:var(--red)}
+.cl-manage-add-row{display:flex;gap:8px;margin-top:4px}
+.cl-manage-add-row input{flex:1;background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif}
+.cl-manage-add-row button{background:var(--blue);border:none;color:#fff;border-radius:8px;width:36px;flex-shrink:0;cursor:pointer;font-size:15px}
+.cl-dropdown{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:var(--card);border:.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px var(--shadow);z-index:50;padding:6px;display:none}
+.cl-dropdown.open{display:block}
+.cl-dropdown-item{padding:8px 10px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cl-dropdown-item:hover{background:var(--surface2)}
+.cl-dropdown-item.active{color:var(--blue)}
 .dash-chart-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px}
 .dash-chart-title i{font-size:13px;color:var(--text3)}
 
@@ -1007,8 +1024,11 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="dash-chart-card checklist-card">
         <div class="cl-header">
           <div class="cl-title"><i class="ti ti-checklist"></i> Checklists</div>
-          <div class="cl-picker">Daily Routine <span>· daily</span> <i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
-          <button class="cl-settings-btn" title="Checklist settings"><i class="ti ti-adjustments"></i></button>
+          <div style="position:relative">
+            <div class="cl-picker" onclick="toggleClDropdown()" id="cl-picker-btn"><span id="cl-picker-name">Daily Routine</span> <span id="cl-picker-freq" class="cl-picker-muted">· daily</span> <i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+            <div class="cl-dropdown" id="cl-dropdown"></div>
+          </div>
+          <button class="cl-settings-btn" title="Manage checklists" onclick="openChecklistManageModal()"><i class="ti ti-adjustments"></i></button>
         </div>
         <div class="cl-count-row">
           <div class="cl-count"><span id="cl-done-count">0</span><small> / <span id="cl-total-count">5</span></small></div>
@@ -1519,6 +1539,21 @@ table.tt tr:last-child td{border-bottom:none}
       <button class="mc" onclick="closeOverlay('playbook-modal')">Cancel</button>
       <button class="mp" id="pb-save-btn" onclick="savePlaybook()">Create playbook</button>
     </div>
+  </div>
+</div>
+
+<!-- MANAGE CHECKLISTS MODAL -->
+<div class="overlay" id="checklist-manage-modal">
+  <div class="modal" style="max-width:560px;max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <h2 style="margin-bottom:0">Manage checklists</h2>
+      <button onclick="closeOverlay('checklist-manage-modal')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px;line-height:1">×</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:20px">
+      <input type="text" id="cl-new-name" placeholder="New checklist name (e.g. Weekend review)" style="flex:1" onkeydown="if(event.key==='Enter')createChecklist()"/>
+      <button class="btn-blue" onclick="createChecklist()"><i class="ti ti-plus"></i> Add</button>
+    </div>
+    <div id="cl-manage-lists" style="display:flex;flex-direction:column;gap:16px"></div>
   </div>
 </div>
 
@@ -4300,43 +4335,187 @@ const CHECKLIST_DEFAULT_ITEMS=[
   'Set daily risk limit'
 ];
 
-function getChecklistState(){
-  let raw=null;
-  try{raw=JSON.parse(localStorage.getItem('tj_v10_checklist')||'null');}catch(e){}
-  if(!raw||raw.date!==today()){
-    raw={date:today(),checked:CHECKLIST_DEFAULT_ITEMS.map(()=>false)};
-    localStorage.setItem('tj_v10_checklist',JSON.stringify(raw));
+function getChecklistLists(){
+  let store=null;
+  try{store=JSON.parse(localStorage.getItem('tj_v10_checklists')||'null');}catch(e){}
+  if(!store||!Array.isArray(store.lists)||!store.lists.length){
+    store={lists:[{id:'daily-routine',name:'Daily Routine',freq:'daily',builtin:true,items:CHECKLIST_DEFAULT_ITEMS.slice()}],activeId:'daily-routine'};
+    saveChecklistLists(store);
   }
-  if(raw.checked.length!==CHECKLIST_DEFAULT_ITEMS.length){
-    raw.checked=CHECKLIST_DEFAULT_ITEMS.map((_,i)=>!!raw.checked[i]);
+  if(!store.activeId||!store.lists.find(l=>l.id===store.activeId)){
+    store.activeId=store.lists[0].id;
+    saveChecklistLists(store);
   }
-  return raw;
+  return store;
+}
+function saveChecklistLists(store){localStorage.setItem('tj_v10_checklists',JSON.stringify(store));}
+
+function getActiveChecklist(){
+  const store=getChecklistLists();
+  return store.lists.find(l=>l.id===store.activeId)||store.lists[0];
+}
+
+function getChecklistProgress(){
+  let store=null;
+  try{store=JSON.parse(localStorage.getItem('tj_v10_checklist_progress')||'null');}catch(e){}
+  if(!store||store.date!==today()){
+    store={date:today(),byList:{}};
+    localStorage.setItem('tj_v10_checklist_progress',JSON.stringify(store));
+  }
+  return store;
+}
+function getCheckedArray(list){
+  const prog=getChecklistProgress();
+  let arr=prog.byList[list.id];
+  if(!Array.isArray(arr)||arr.length!==list.items.length){
+    arr=list.items.map((_,i)=>arr&&arr[i]!==undefined?!!arr[i]:false);
+  }
+  return arr;
 }
 
 function toggleChecklistItem(i){
-  const state=getChecklistState();
-  state.checked[i]=!state.checked[i];
-  localStorage.setItem('tj_v10_checklist',JSON.stringify(state));
+  const list=getActiveChecklist();
+  const prog=getChecklistProgress();
+  const arr=getCheckedArray(list);
+  arr[i]=!arr[i];
+  prog.byList[list.id]=arr;
+  localStorage.setItem('tj_v10_checklist_progress',JSON.stringify(prog));
   renderChecklistCard();
 }
 
 function renderChecklistCard(){
   const itemsEl=document.getElementById('cl-items');
   if(!itemsEl)return;
-  const state=getChecklistState();
-  itemsEl.innerHTML=CHECKLIST_DEFAULT_ITEMS.map((label,i)=>`
-    <div class="cl-item ${state.checked[i]?'checked':''}" onclick="toggleChecklistItem(${i})">
-      <span class="cl-check"><i class="ti ti-check"></i></span>
-      <span class="cl-item-label">${label}</span>
-    </div>`).join('');
-  const done=state.checked.filter(Boolean).length;
-  const total=CHECKLIST_DEFAULT_ITEMS.length;
+  const list=getActiveChecklist();
+  const checked=getCheckedArray(list);
+  document.getElementById('cl-picker-name').textContent=list.name;
+  document.getElementById('cl-picker-freq').textContent='· '+(list.freq||'daily');
+  if(!list.items.length){
+    itemsEl.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">No items yet — add some in Manage checklists.</div>';
+  } else {
+    itemsEl.innerHTML=list.items.map((label,i)=>`
+      <div class="cl-item ${checked[i]?'checked':''}" onclick="toggleChecklistItem(${i})">
+        <span class="cl-check"><i class="ti ti-check"></i></span>
+        <span class="cl-item-label">${escapeHtml(label)}</span>
+      </div>`).join('');
+  }
+  const done=checked.filter(Boolean).length;
+  const total=list.items.length;
   document.getElementById('cl-done-count').textContent=done;
   document.getElementById('cl-total-count').textContent=total;
   const pct=total?Math.round(done/total*100):0;
   document.getElementById('cl-pct').textContent=pct+'%';
   document.getElementById('cl-progress-bar').style.width=pct+'%';
 }
+
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function toggleClDropdown(){
+  const dd=document.getElementById('cl-dropdown');
+  if(!dd)return;
+  const isOpen=dd.classList.contains('open');
+  dd.classList.remove('open');
+  if(!isOpen){
+    const store=getChecklistLists();
+    dd.innerHTML=store.lists.map(l=>`<div class="cl-dropdown-item ${l.id===store.activeId?'active':''}" onclick="selectChecklist('${l.id}')">${escapeHtml(l.name)}${l.id===store.activeId?' <i class=\"ti ti-check\"></i>':''}</div>`).join('')
+      +`<div class="cl-dropdown-item" style="color:var(--text3)" onclick="closeClDropdown();openChecklistManageModal()"><i class="ti ti-settings" style="font-size:14px"></i> Manage checklists</div>`;
+    dd.classList.add('open');
+  }
+}
+function closeClDropdown(){const dd=document.getElementById('cl-dropdown');if(dd)dd.classList.remove('open');}
+function selectChecklist(id){
+  const store=getChecklistLists();
+  store.activeId=id;
+  saveChecklistLists(store);
+  closeClDropdown();
+  renderChecklistCard();
+}
+document.addEventListener('click',function(e){
+  const dd=document.getElementById('cl-dropdown');
+  const btn=document.getElementById('cl-picker-btn');
+  if(dd&&dd.classList.contains('open')&&!dd.contains(e.target)&&e.target!==btn&&!btn?.contains(e.target)){
+    dd.classList.remove('open');
+  }
+});
+
+function openChecklistManageModal(){
+  renderChecklistManageModal();
+  document.getElementById('checklist-manage-modal').classList.add('open');
+}
+function renderChecklistManageModal(){
+  const store=getChecklistLists();
+  const wrap=document.getElementById('cl-manage-lists');
+  wrap.innerHTML=store.lists.map(list=>`
+    <div class="cl-manage-group">
+      <div class="cl-manage-group-head">
+        <h4>${escapeHtml(list.name)}</h4>
+        ${list.builtin?'<span class="cl-builtin-tag">BUILT-IN</span>':`<button class="cl-manage-del-list" title="Delete checklist" onclick="deleteChecklist('${list.id}')"><i class="ti ti-trash"></i></button>`}
+      </div>
+      ${list.items.map((item,i)=>`
+        <div class="cl-manage-item-row">
+          <input type="text" value="${escapeHtml(item)}" onchange="renameChecklistItem('${list.id}',${i},this.value)"/>
+          <button title="Delete item" onclick="deleteChecklistItem('${list.id}',${i})"><i class="ti ti-trash"></i></button>
+        </div>`).join('')}
+      <div class="cl-manage-add-row">
+        <input type="text" placeholder="Add item" id="cl-add-item-${list.id}" onkeydown="if(event.key==='Enter')addChecklistItem('${list.id}')"/>
+        <button onclick="addChecklistItem('${list.id}')"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>`).join('');
+}
+function createChecklist(){
+  const input=document.getElementById('cl-new-name');
+  const name=input.value.trim();
+  if(!name)return;
+  const store=getChecklistLists();
+  const id='cl-'+Date.now();
+  store.lists.push({id,name,freq:'daily',builtin:false,items:[]});
+  store.activeId=id;
+  saveChecklistLists(store);
+  input.value='';
+  renderChecklistManageModal();
+  renderChecklistCard();
+}
+function deleteChecklist(id){
+  const store=getChecklistLists();
+  const list=store.lists.find(l=>l.id===id);
+  if(list&&list.builtin)return;
+  store.lists=store.lists.filter(l=>l.id!==id);
+  if(!store.lists.length){store.lists=[{id:'daily-routine',name:'Daily Routine',freq:'daily',builtin:true,items:CHECKLIST_DEFAULT_ITEMS.slice()}];}
+  if(store.activeId===id)store.activeId=store.lists[0].id;
+  saveChecklistLists(store);
+  renderChecklistManageModal();
+  renderChecklistCard();
+}
+function addChecklistItem(listId){
+  const input=document.getElementById('cl-add-item-'+listId);
+  const val=input.value.trim();
+  if(!val)return;
+  const store=getChecklistLists();
+  const list=store.lists.find(l=>l.id===listId);
+  list.items.push(val);
+  saveChecklistLists(store);
+  input.value='';
+  renderChecklistManageModal();
+  renderChecklistCard();
+}
+function deleteChecklistItem(listId,i){
+  const store=getChecklistLists();
+  const list=store.lists.find(l=>l.id===listId);
+  list.items.splice(i,1);
+  saveChecklistLists(store);
+  renderChecklistManageModal();
+  renderChecklistCard();
+}
+function renameChecklistItem(listId,i,val){
+  val=val.trim();
+  if(!val)return;
+  const store=getChecklistLists();
+  const list=store.lists.find(l=>l.id===listId);
+  list.items[i]=val;
+  saveChecklistLists(store);
+  renderChecklistCard();
+}
+
 
 function closeOverlay(id){document.getElementById(id).classList.remove('open')}
 
