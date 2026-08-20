@@ -321,20 +321,20 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .stat-v3-val.v-pos{color:var(--green)}
 .stat-v3-val.v-neg{color:var(--red)}
 .stat-v3-sub{font-size:12px;font-weight:600;color:var(--text3)}
-.mini-cal-card{padding:1.1rem 1.15rem}
-.mini-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.mini-cal-title{font-size:15px;font-weight:700;color:var(--text)}
-.mini-cal-nav{display:flex;align-items:center;gap:8px}
-.mini-cal-nav-btn{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
-.mini-cal-nav-btn:hover{background:var(--border)}
-.mini-cal-month{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap}
-.mini-cal-month .mini-cal-year{font-weight:500;color:var(--text3)}
-.mini-cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px}
-.mini-cal-dow span{font-size:11px;font-weight:600;color:var(--text3)}
-.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6px}
-.mini-cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--text2);border-radius:9px;cursor:default}
-.mini-cal-day.empty{visibility:hidden}
-.mini-cal-day.today{background:var(--green);color:#fff}
+.dcal-card{padding:1.1rem 1.15rem;display:flex;flex-direction:column}
+.dcal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
+.dcal-title{font-size:15px;font-weight:700;color:var(--text)}
+.dcal-nav{display:flex;align-items:center;gap:8px}
+.dcal-nav-btn{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.dcal-nav-btn:hover{background:var(--border)}
+.dcal-month{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap}
+.dcal-month .dcal-year{font-weight:500;color:var(--text3)}
+.dcal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px;flex-shrink:0}
+.dcal-dow span{font-size:11px;font-weight:600;color:var(--text3)}
+.dcal-grid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;row-gap:4px;flex:1;min-height:0}
+.dcal-day{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--text2);border-radius:9px;cursor:default}
+.dcal-day-empty{visibility:hidden}
+.dcal-day.today{background:var(--green);color:#fff}
 .acct-compare-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
 .acct-compare-card{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
 .acct-compare-name{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:12px}
@@ -1105,19 +1105,19 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <div class="dash-chart-card mini-cal-card">
-        <div class="mini-cal-header">
-          <div class="mini-cal-title">Calendar</div>
-          <div class="mini-cal-nav">
-            <button class="mini-cal-nav-btn" onclick="miniCalNav(-1)"><i class="ti ti-chevron-left"></i></button>
-            <span class="mini-cal-month" id="mini-cal-month">August <span class="mini-cal-year">2026</span></span>
-            <button class="mini-cal-nav-btn" onclick="miniCalNav(1)"><i class="ti ti-chevron-right"></i></button>
+      <div class="dash-chart-card dcal-card">
+        <div class="dcal-header">
+          <div class="dcal-title">Calendar</div>
+          <div class="dcal-nav">
+            <button class="dcal-nav-btn" onclick="dcalNav(-1)"><i class="ti ti-chevron-left"></i></button>
+            <span class="dcal-month" id="dcal-month">August <span class="dcal-year">2026</span></span>
+            <button class="dcal-nav-btn" onclick="dcalNav(1)"><i class="ti ti-chevron-right"></i></button>
           </div>
         </div>
-        <div class="mini-cal-dow">
+        <div class="dcal-dow">
           <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
         </div>
-        <div class="mini-cal-grid" id="mini-cal-grid"></div>
+        <div class="dcal-grid" id="dcal-grid"></div>
       </div>
 
       <!-- Recent trades -->
@@ -2710,34 +2710,45 @@ function renderTodayCard(){
 
 function renderDashboard(key){
   currentDashKey=key;
-  renderTopBarTitle('dashboard');
   const trades=getTradesForKey(key);
-  renderDashHero();
-  renderNewStatCards(trades);
-  renderTradingScore(trades);
-  drawCharts(trades);
-  drawDailyPnlChart(trades);
-  renderRecentTradesTable();
-  renderCalendar(key,trades);
-  renderTodayCard();
-  renderDirectionAnalysis(Object.values(db.trades).flat());
-  renderChecklistCard();
-  renderMiniCal();
+  const steps=[
+    ['renderTopBarTitle',()=>renderTopBarTitle('dashboard')],
+    ['renderDashHero',renderDashHero],
+    ['renderNewStatCards',()=>renderNewStatCards(trades)],
+    ['renderTradingScore',()=>renderTradingScore(trades)],
+    ['drawCharts',()=>drawCharts(trades)],
+    ['drawDailyPnlChart',()=>drawDailyPnlChart(trades)],
+    ['renderRecentTradesTable',renderRecentTradesTable],
+    ['renderCalendar',()=>renderCalendar(key,trades)],
+    ['renderTodayCard',renderTodayCard],
+    ['renderDirectionAnalysis',()=>renderDirectionAnalysis(Object.values(db.trades).flat())],
+    ['renderChecklistCard',renderChecklistCard],
+    ['renderDcal',renderDcal],
+  ];
+  steps.forEach(([name,fn])=>{
+    try{fn();}catch(e){console.error('renderDashboard step failed: '+name,e);}
+  });
 }
 
 function renderDashboardWithTrades(trades,label){
   const key=currentDashKey||curMonthKey();
-  renderTopBarTitle('dashboard');
-  renderDashHero();
-  renderNewStatCards(trades);
-  renderTradingScore(trades);
-  drawCharts(trades);
-  drawDailyPnlChart(trades);
-  renderRecentTradesTable();
-  renderCalendar(key,trades);
-  renderTodayCard();
-  renderDirectionAnalysis(Object.values(db.trades).flat());
-  renderMiniCal();
+  const steps=[
+    ['renderTopBarTitle',()=>renderTopBarTitle('dashboard')],
+    ['renderDashHero',renderDashHero],
+    ['renderNewStatCards',()=>renderNewStatCards(trades)],
+    ['renderTradingScore',()=>renderTradingScore(trades)],
+    ['drawCharts',()=>drawCharts(trades)],
+    ['drawDailyPnlChart',()=>drawDailyPnlChart(trades)],
+    ['renderRecentTradesTable',renderRecentTradesTable],
+    ['renderCalendar',()=>renderCalendar(key,trades)],
+    ['renderTodayCard',renderTodayCard],
+    ['renderDirectionAnalysis',()=>renderDirectionAnalysis(Object.values(db.trades).flat())],
+    ['renderChecklistCard',renderChecklistCard],
+    ['renderDcal',renderDcal],
+  ];
+  steps.forEach(([name,fn])=>{
+    try{fn();}catch(e){console.error('renderDashboardWithTrades step failed: '+name,e);}
+  });
 }
 
 // ── New hero section: date + welcome ──
@@ -4415,6 +4426,14 @@ function getChecklistLists(){
     builtin.items=CHECKLIST_DEFAULT_ITEMS.slice();
     saveChecklistLists(store);
   }
+  // One-time cleanup: remove a stray accidental "j" item some testing left behind.
+  if(builtin&&Array.isArray(builtin.items)){
+    const cleaned=builtin.items.filter(it=>it.trim().toLowerCase()!=='j');
+    if(cleaned.length!==builtin.items.length){
+      builtin.items=cleaned;
+      saveChecklistLists(store);
+    }
+  }
   if(!store.activeId||!store.lists.find(l=>l.id===store.activeId)){
     store.activeId=store.lists[0].id;
     saveChecklistLists(store);
@@ -5654,28 +5673,28 @@ function renderFearGreed(){
   drawFearGreedGauge(score);
 }
 
-// ── Mini Calendar (plain, dashboard) ─────────────────────────
-let miniCalDate=new Date();
-const MINI_CAL_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-function miniCalNav(dir){
-  miniCalDate=new Date(miniCalDate.getFullYear(),miniCalDate.getMonth()+dir,1);
-  renderMiniCal();
+// ── Dashboard Calendar (plain, navigable) ────────────────────
+let dcalDate=new Date();
+const DCAL_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function dcalNav(dir){
+  dcalDate=new Date(dcalDate.getFullYear(),dcalDate.getMonth()+dir,1);
+  renderDcal();
 }
-function renderMiniCal(){
-  const monthEl=document.getElementById('mini-cal-month');
-  const gridEl=document.getElementById('mini-cal-grid');
+function renderDcal(){
+  const monthEl=document.getElementById('dcal-month');
+  const gridEl=document.getElementById('dcal-grid');
   if(!monthEl||!gridEl)return;
-  const y=miniCalDate.getFullYear(),m=miniCalDate.getMonth();
-  monthEl.innerHTML=MINI_CAL_MONTHS[m]+' <span class="mini-cal-year">'+y+'</span>';
+  const y=dcalDate.getFullYear(),m=dcalDate.getMonth();
+  monthEl.innerHTML=DCAL_MONTHS[m]+' <span class="dcal-year">'+y+'</span>';
   const firstDow=new Date(y,m,1).getDay();
   const daysInMonth=new Date(y,m+1,0).getDate();
   const today=new Date();
   const isCurMonth=today.getFullYear()===y&&today.getMonth()===m;
   let html='';
-  for(let i=0;i<firstDow;i++)html+='<div class="mini-cal-day empty">0</div>';
+  for(let i=0;i<firstDow;i++)html+='<div class="dcal-day dcal-day-empty">0</div>';
   for(let d=1;d<=daysInMonth;d++){
     const isToday=isCurMonth&&today.getDate()===d;
-    html+='<div class="mini-cal-day'+(isToday?' today':'')+'">'+d+'</div>';
+    html+='<div class="dcal-day'+(isToday?' today':'')+'">'+d+'</div>';
   }
   gridEl.innerHTML=html;
 }
