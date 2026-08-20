@@ -66,7 +66,7 @@ nav button.active i{color:var(--text);opacity:1}
 body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 
 /* MAIN */
-.app-body{margin-left:0;flex:1;min-width:0;min-height:100vh}
+.app-body{margin-left:230px;flex:1;min-width:0;min-height:100vh}
 .content{max-width:100%;margin:0 auto;padding:1rem 1.5rem 1.5rem;overflow-x:clip}
 .page{display:none}.page.active{display:block}
 .addtrade-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;padding:2rem 1rem}
@@ -294,7 +294,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .btn-addtrade:hover{opacity:.9}
 .btn-addtrade i{font-size:15px}
 
-.dash-top-grid{display:flex;flex-direction:column;gap:1rem;margin-bottom:1rem}
+.dash-top-grid{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
 .dash-bottom-row{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:1rem;align-items:stretch}
 
 .score-hero-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow)}
@@ -304,7 +304,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .score-hero-thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--text);box-shadow:0 1px 4px rgba(0,0,0,.25);transform:translate(-50%,-50%);transition:left .5s;left:0%}
 .score-hero-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:8px}
 
-.dash-stat-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
+.dash-stat-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem;margin-bottom:0}
 .stat-v3-card{position:relative;overflow:hidden;background:radial-gradient(circle at 15% 0%,rgba(29,158,117,0.09),transparent 60%),var(--card);border:.5px solid var(--border);border-top:2px solid var(--green);border-radius:var(--rlg);padding:1rem 1.1rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:78px}
 .stat-v3-lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:5px}
 .stat-v3-lbl i{font-size:12px;color:var(--text3)}
@@ -366,7 +366,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .score-combo-bottom .score-hero-lbl{text-transform:uppercase;letter-spacing:.04em;font-size:10px;font-weight:700}
 .score-combo-bottom .score-hero-val{font-size:26px;margin-bottom:10px}
 
-.dash-row2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:394px;gap:1rem;align-items:stretch;margin-bottom:1rem}
+.dash-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:394px;gap:1rem;align-items:stretch;margin-bottom:1rem}
 
 .dash-tabs{display:flex;gap:16px;border-bottom:.5px solid var(--border);margin-bottom:8px}
 .dash-tab{background:none;border:none;padding:0 0 9px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;position:relative}
@@ -934,9 +934,6 @@ table.tt tr:last-child td{border-bottom:none}
 <div class="app-body" id="app-body">
 <div class="top-bar">
   <div class="top-bar-left">
-    <button class="sb-toggle-top" onclick="toggleSidebar()" title="Toggle sidebar">
-      <i class="ti ti-menu-2"></i>
-    </button>
     <div class="top-bar-section" id="top-bar-section"></div>
   </div>
   <div class="top-bar-right">
@@ -946,9 +943,8 @@ table.tt tr:last-child td{border-bottom:none}
       </button>
     </div>
     <div id="acct-filter-wrap" style="position:relative">
-      <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="acct-filter-card">
-        <span class="acct-filter-card-title" id="acct-filter-title">All Accounts</span>
-        <span class="acct-filter-card-sub" id="acct-filter-badge">2 TOTAL</span>
+      <button id="acct-filter-btn" onclick="toggleAcctFilterPanel()" class="tb-filter">
+        <i class="ti ti-filter"></i> <span id="acct-filter-title">Accounts</span>
       </button>
       <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
     </div>
@@ -977,13 +973,11 @@ table.tt tr:last-child td{border-bottom:none}
           <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
           <div class="stat-v3-lbl">Total P&amp;L</div>
           <div class="stat-v3-val" id="snc-netpnl">$0</div>
-          <div class="stat-v3-sub" id="snc-netpnl-sub">&nbsp;</div>
         </div>
         <div class="stat-v3-card sub-block" data-sub-id="totaltrades">
           <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
           <div class="stat-v3-lbl">Total Trades</div>
           <div class="stat-v3-val" id="snc-totaltrades">0</div>
-          <div class="stat-v3-sub" id="snc-totaltrades-sub">0W / 0L</div>
         </div>
         <div class="stat-v3-card sub-block" data-sub-id="winrate">
           <div class="sub-drag-handle" title="Drag to reorder"><i class="ti ti-grip-vertical"></i></div>
@@ -1021,7 +1015,7 @@ table.tt tr:last-child td{border-bottom:none}
           <div class="cl-header">
             <div class="cl-title"><i class="ti ti-checklist"></i> Checklists</div>
             <div style="position:relative">
-              <div class="cl-picker" onclick="toggleClDropdown()" id="cl-picker-btn"><span id="cl-picker-name">Daily Routine</span> <span id="cl-picker-freq" class="cl-picker-muted">· daily</span> <i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="cl-picker" onclick="toggleClDropdown()" id="cl-picker-btn"><span id="cl-picker-name">Daily Routine</span> <i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
               <div class="cl-dropdown" id="cl-dropdown"></div>
             </div>
             <button class="cl-settings-btn" title="Manage checklists" onclick="openChecklistManageModal()"><i class="ti ti-adjustments"></i></button>
@@ -1037,13 +1031,8 @@ table.tt tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Net Daily P&L / Overall score (combined radar + gauge) / Recent trades -->
+    <!-- Overall score (combined radar + gauge) / P&L by Weekday -->
     <div class="dash-row2 dashboard-block" data-block-id="hero-row2">
-      <div class="dash-chart-card">
-        <div class="dash-chart-title">Net Daily P&amp;L</div>
-        <div class="chart-wrap" style="height:240px;overflow:hidden"><canvas id="daily-pnl-chart"></canvas></div>
-      </div>
-
       <div class="dash-chart-card score-combo-card">
         <div class="dash-chart-title">Overall Score</div>
         <div style="position:relative;height:220px;overflow:hidden"><canvas id="radar-chart-hero"></canvas></div>
@@ -1064,14 +1053,8 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
         <div class="chart-wrap" style="flex:1;min-height:200px;position:relative;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
       </div>
-    </div>
-
-    <!-- Trading Score + Profit Growth + Profit Distribution -->
-    <!-- Daily Net Cumulative P&L (moved here) + Trading Score mini + Profit Distribution + Fear & Greed -->
-    <div class="dashboard-block" data-block-id="top" style="display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem">
 
       <!-- Recent trades -->
-      <div style="min-width:0">
       <div class="dash-chart-card" style="min-width:0">
         <div class="dash-chart-title" style="margin-bottom:12px">Recent trades</div>
         <div style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -1086,8 +1069,6 @@ table.tt tr:last-child td{border-bottom:none}
           </div>
         </div>
       </div>
-      </div>
-
     </div>
   </div>
 
@@ -2255,22 +2236,18 @@ function toggleNotesGroup(){
 
 function initSidebar(){
   renderSbAcctSwitch();
-  const saved=localStorage.getItem('tj_v10_sidebar_collapsed');
-  const collapsed=saved===null?true:saved==='1';
-  setSidebarCollapsed(collapsed);
+  setSidebarCollapsed(false);
 }
 function setSidebarCollapsed(collapsed){
   const sb=document.getElementById('sidebar');
-  if(sb)sb.classList.toggle('collapsed',collapsed);
-  document.body.classList.toggle('sidebar-collapsed',collapsed);
+  if(sb)sb.classList.remove('collapsed');
+  document.body.classList.remove('sidebar-collapsed');
   const backdrop=document.getElementById('sidebar-backdrop');
-  if(backdrop)backdrop.classList.toggle('open',!collapsed);
-  localStorage.setItem('tj_v10_sidebar_collapsed',collapsed?'1':'0');
+  if(backdrop)backdrop.classList.remove('open');
 }
 function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  const isCollapsed=sb?sb.classList.contains('collapsed'):false;
-  setSidebarCollapsed(!isCollapsed);
+  // Sidebar is permanently docked open on desktop — nothing to toggle here.
+  // (Mobile uses the bottom nav bar instead of this button.)
 }
 function closeMobileSidebar(){}
 function openMobileSidebar(){}
@@ -2431,14 +2408,10 @@ function renderNewStatCards(trades){
   // Total P&L
   setStatCard('netpnl',m.net);
   setStatAccent('netpnl',m.net>=0);
-  const netSub=document.getElementById('snc-netpnl-sub');
-  if(netSub)netSub.textContent=m.wins+'W / '+m.losses+'L';
 
   // Total Trades
   const ttEl=document.getElementById('snc-totaltrades');
   if(ttEl)ttEl.textContent=m.n.toLocaleString();
-  const ttSub=document.getElementById('snc-totaltrades-sub');
-  if(ttSub)ttSub.textContent=m.wins+'W / '+m.losses+'L';
 
   // Win Rate
   setStatCard('winrate',m.wr,{isPct:true});
@@ -4310,6 +4283,13 @@ function getChecklistLists(){
     store={lists:[{id:'daily-routine',name:'Daily Routine',freq:'daily',builtin:true,items:CHECKLIST_DEFAULT_ITEMS.slice()}],activeId:'daily-routine'};
     saveChecklistLists(store);
   }
+  // Safety net: if the built-in checklist ever ends up with no items (e.g. from
+  // earlier testing/corrupted storage), restore its defaults so it's never blank.
+  const builtin=store.lists.find(l=>l.id==='daily-routine'&&l.builtin);
+  if(builtin&&(!Array.isArray(builtin.items)||!builtin.items.length)){
+    builtin.items=CHECKLIST_DEFAULT_ITEMS.slice();
+    saveChecklistLists(store);
+  }
   if(!store.activeId||!store.lists.find(l=>l.id===store.activeId)){
     store.activeId=store.lists[0].id;
     saveChecklistLists(store);
@@ -4357,7 +4337,6 @@ function renderChecklistCard(){
   const list=getActiveChecklist();
   const checked=getCheckedArray(list);
   document.getElementById('cl-picker-name').textContent=list.name;
-  document.getElementById('cl-picker-freq').textContent='· '+(list.freq||'daily');
   if(!list.items.length){
     itemsEl.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">No items yet — add some in Manage checklists.</div>';
   } else {
@@ -4775,22 +4754,18 @@ function populateAccountDropdown(prefix){
 // call whenever the account list or the active filter changes.
 function populateDashAccountFilter(){
   const titleEl=document.getElementById('acct-filter-title');
-  const badge=document.getElementById('acct-filter-badge');
-  if(!titleEl||!badge)return;
+  if(!titleEl)return;
   const all=(db.propfirms||[]);
   if(!dashAccountFilter){
-    titleEl.textContent='All Accounts';
-    badge.textContent=all.length+' TOTAL';
+    titleEl.textContent='Accounts';
     return;
   }
   const a=all.find(p=>String(p.id)===String(dashAccountFilter));
   if(a){
     titleEl.textContent=a.name||a.broker||'Account';
-    badge.textContent=(a.status?a.status.toUpperCase():'ACTIVE');
   } else {
     dashAccountFilter='';
-    titleEl.textContent='All Accounts';
-    badge.textContent=all.length+' TOTAL';
+    titleEl.textContent='Accounts';
   }
 }
 
