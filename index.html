@@ -257,6 +257,15 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .hero-select,select.hero-select{background:var(--surface2);border:.5px solid var(--border2);border-radius:100px;padding:9px 32px 9px 16px;font-size:13px;font-weight:600;color:var(--text);font-family:'Inter',sans-serif;appearance:none;-webkit-appearance:none;cursor:pointer;white-space:nowrap}
 
 .tb-filter{display:flex;align-items:center;gap:7px;background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.tb-icon-btn{width:38px;height:38px;background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tb-icon-btn:hover{background:var(--border)}
+.dm-menu-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:.5px solid var(--border);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);min-width:250px;z-index:200;padding:8px}
+.dm-menu-item{display:flex;align-items:flex-start;gap:12px;padding:12px 12px;border-radius:10px;cursor:pointer}
+.dm-menu-item:hover{background:var(--surface2)}
+.dm-menu-item.active{background:var(--surface2)}
+.dm-menu-item i{font-size:18px;color:var(--text2);margin-top:2px;flex-shrink:0}
+.dm-menu-item-title{font-size:14px;font-weight:700;color:var(--text)}
+.dm-menu-item-sub{font-size:12.5px;color:var(--text3);margin-top:2px}
 .tb-filter:hover{background:var(--border)}
 .tb-filter i{font-size:14px;color:var(--text3)}
 .acct-filter-card{display:flex;flex-direction:column;gap:2px;background:var(--surface2);border:1px solid rgba(124,109,242,0.45);border-radius:12px;padding:9px 16px;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;box-shadow:0 0 0 1px rgba(124,109,242,0.08),0 0 14px rgba(124,109,242,0.12)}
@@ -290,7 +299,7 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .theme-swatch-name{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px}
 .theme-swatch-name i{color:var(--blue);font-size:13px}
 .hero-select:focus{outline:none}
-.btn-addtrade{background:var(--text);color:var(--bg);border:none;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-addtrade{background:var(--text);color:var(--bg);border:none;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap}
 .btn-addtrade:hover{opacity:.9}
 .btn-addtrade i{font-size:15px}
 
@@ -312,6 +321,38 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .stat-v3-val.v-pos{color:var(--green)}
 .stat-v3-val.v-neg{color:var(--red)}
 .stat-v3-sub{font-size:12px;font-weight:600;color:var(--text3)}
+.mini-cal-card{padding:1.1rem 1.15rem}
+.mini-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mini-cal-title{font-size:15px;font-weight:700;color:var(--text)}
+.mini-cal-nav{display:flex;align-items:center;gap:8px}
+.mini-cal-nav-btn{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mini-cal-nav-btn:hover{background:var(--border)}
+.mini-cal-month{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap}
+.mini-cal-month .mini-cal-year{font-weight:500;color:var(--text3)}
+.mini-cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px}
+.mini-cal-dow span{font-size:11px;font-weight:600;color:var(--text3)}
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6px}
+.mini-cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--text2);border-radius:9px;cursor:default}
+.mini-cal-day.empty{visibility:hidden}
+.mini-cal-day.today{background:var(--green);color:#fff}
+.acct-compare-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+.acct-compare-card{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+.acct-compare-name{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:12px}
+.acct-compare-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.acct-compare-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-top:.5px solid var(--border)}
+.acct-compare-row:first-of-type{border-top:none}
+.acct-compare-row-lbl{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text2)}
+.acct-compare-row-lbl i{font-size:14px;color:var(--text3)}
+.acct-compare-row-val{font-size:13.5px;font-weight:700}
+.acct-count-badge{background:rgba(29,158,117,0.18);color:var(--green);font-size:12px;font-weight:700;border-radius:100px;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.acct-list-row{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;border-bottom:.5px solid var(--border)}
+.acct-list-row:last-child{border-bottom:none}
+.acct-list-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.acct-list-name{font-size:14.5px;font-weight:700;color:var(--text);flex:1;min-width:0}
+.acct-list-chip{background:var(--surface2);border:.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap}
+.acct-list-icon-btn{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;flex-shrink:0}
+.acct-list-icon-btn:hover{background:var(--border)}
+.acct-list-icon-btn.del:hover{color:var(--red);border-color:var(--red)}
 
 .dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
 .checklist-card{display:flex;flex-direction:column;min-width:0;max-height:440px}
@@ -862,10 +903,9 @@ table.tt tr:last-child td{border-bottom:none}
       </span>
     </div>
   </div>
-  <button class="acct-filter-card" id="sb-acct-switch" onclick="toggleSbAcctFilterPanel()" style="position:relative;margin:12px 12px 6px;width:calc(100% - 24px)">
+  <button class="acct-filter-card" id="sb-acct-switch" onclick="go('accounts')" style="position:relative;margin:12px 12px 6px;width:calc(100% - 24px)">
     <span class="acct-filter-card-title" id="sb-acct-name">All Accounts</span>
     <span class="acct-filter-card-sub" id="sb-acct-bal">0 TOTAL</span>
-    <div class="tb-filter-panel" id="sb-acct-filter-panel" style="display:none;left:0;right:auto;top:calc(100% + 8px)"></div>
   </button>
   <div class="nav-section-lbl">Journaling</div>
   <nav>
@@ -949,6 +989,25 @@ table.tt tr:last-child td{border-bottom:none}
       <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
     </div>
     <button class="btn-addtrade" onclick="openAddTradeModal()"><i class="ti ti-plus"></i> Add Trade</button>
+    <div id="dm-menu-wrap" style="position:relative">
+      <button id="dm-menu-btn" onclick="toggleDmMenu()" class="tb-icon-btn" title="P&amp;L display">
+        <i class="ti ti-currency-dollar" id="dm-menu-icon"></i>
+      </button>
+      <div class="dm-menu-panel" id="dm-menu-panel" style="display:none">
+        <div class="dm-menu-item" onclick="selectDmMode('dollar')" data-mode="dollar">
+          <i class="ti ti-currency-dollar"></i>
+          <div><div class="dm-menu-item-title">Money View</div><div class="dm-menu-item-sub">View all your PnL in $</div></div>
+        </div>
+        <div class="dm-menu-item" onclick="selectDmMode('percent')" data-mode="percent">
+          <i class="ti ti-percentage"></i>
+          <div><div class="dm-menu-item-title">Percentage View</div><div class="dm-menu-item-sub">View all your PnL in %</div></div>
+        </div>
+        <div class="dm-menu-item" onclick="selectDmMode('hide')" data-mode="hide">
+          <i class="ti ti-eye-off"></i>
+          <div><div class="dm-menu-item-title">Hide P&amp;L</div><div class="dm-menu-item-sub">Show - instead of actual PnL</div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="content">
@@ -1046,12 +1105,19 @@ table.tt tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <div class="dash-chart-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
-          <div class="dash-chart-title" style="margin-bottom:0">P&amp;L by Weekday</div>
-          <span style="font-size:11px;color:var(--text3)">$ · all time</span>
+      <div class="dash-chart-card mini-cal-card">
+        <div class="mini-cal-header">
+          <div class="mini-cal-title">Calendar</div>
+          <div class="mini-cal-nav">
+            <button class="mini-cal-nav-btn" onclick="miniCalNav(-1)"><i class="ti ti-chevron-left"></i></button>
+            <span class="mini-cal-month" id="mini-cal-month">August <span class="mini-cal-year">2026</span></span>
+            <button class="mini-cal-nav-btn" onclick="miniCalNav(1)"><i class="ti ti-chevron-right"></i></button>
+          </div>
         </div>
-        <div class="chart-wrap" style="flex:1;min-height:200px;position:relative;overflow:hidden"><canvas id="weekday-chart"></canvas></div>
+        <div class="mini-cal-dow">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+        <div class="mini-cal-grid" id="mini-cal-grid"></div>
       </div>
 
       <!-- Recent trades -->
@@ -1233,33 +1299,26 @@ table.tt tr:last-child td{border-bottom:none}
 
   <!-- ACCOUNTS -->
   <div id="page-accounts" class="page">
-    <div class="pf-summary">
-      <div class="pf-metric">
-        <div class="pm-lbl" id="pf-invested-lbl">Total Balance</div>
-        <div class="pm-val" id="pf-invested">$0.00</div>
-        <div class="pm-sub" id="pf-invested-sub">Across 0 accounts</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:1.25rem">
+      <div>
+        <h2 style="margin:0 0 4px;font-size:24px">Trading Accounts</h2>
+        <div style="font-size:13.5px;color:var(--text3)">Manage your trading accounts and compare performance</div>
       </div>
-      <div class="pf-metric">
-        <div class="pm-lbl" id="pf-paidout-lbl">Active Accounts</div>
-        <div class="pm-val" id="pf-paidout">0</div>
-        <div class="pm-sub" id="pf-paidout-sub">0 active accounts</div>
-      </div>
-      <div class="pf-metric" id="pf-net-card">
-        <div class="pm-lbl" id="pf-net-lbl">↗ NET RESULT</div>
-        <div class="pm-val" id="pf-net">$0.00</div>
-        <div class="pm-sub" id="pf-net-sub">In profit overall</div>
-      </div>
-      <div class="pf-metric" id="pf-payouts-card" onclick="openPayoutHistory()" style="cursor:pointer">
-        <div class="pm-lbl">💰 PAYOUTS</div>
-        <div class="pm-val" id="pf-payouts-total">$0.00</div>
-        <div class="pm-sub" id="pf-payouts-sub">0 payouts · tap to view</div>
-      </div>
+      <button class="btn-blue" onclick="openPFModal(null,'prop')"><i class="ti ti-plus"></i> Add Account</button>
     </div>
-    <div class="pf-filter-row">
-      <div class="pf-pills" id="pf-pills"></div>
-      <button class="btn-blue" onclick="openPFModal(null,'prop')"><i class="ti ti-plus"></i> Add account</button>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.25rem;border-bottom:.5px solid var(--border)">
+        <h3 style="margin:0;display:flex;align-items:center;gap:8px"><i class="ti ti-wallet" style="color:var(--green)"></i> Your Accounts</h3>
+        <span class="acct-count-badge" id="acct-count-badge">0</span>
+      </div>
+      <div id="acct-list-rows"></div>
     </div>
-    <div id="pf-cards" class="pf-cards"></div>
+
+    <div class="card" style="margin-top:1.25rem">
+      <h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-chart-bar" style="color:var(--green)"></i> Account Comparison</h3>
+      <div id="acct-compare-grid" class="acct-compare-grid"></div>
+    </div>
   </div>
 
   <!-- PLAYBOOKS -->
@@ -1302,6 +1361,11 @@ table.tt tr:last-child td{border-bottom:none}
         <div class="card" style="margin-bottom:0">
           <h3>Best Sessions</h3>
           <div id="rep-sessions"></div>
+        </div>
+        <!-- P&L by Weekday -->
+        <div class="card" style="margin-bottom:0;grid-column:1/-1">
+          <h3>P&amp;L by Weekday</h3>
+          <div class="chart-wrap" style="height:240px;position:relative;overflow:hidden;margin-top:8px"><canvas id="weekday-chart"></canvas></div>
         </div>
         <!-- Long vs Short -->
         <div class="card" style="margin-bottom:0;grid-column:1/-1">
@@ -1815,6 +1879,7 @@ let pbEditId=null,pbDeleteId=null,pbDetailId=null;
 let fImages=[]; // staged images for Add Trade form
 let etImages=[]; // staged images for Edit Trade form
 let displayMode='dollar'; // 'dollar' | 'percent'
+let pnlHidden=false;
 
 // ── Helpers ───────────────────────────────────────────────────
 function today(){return new Date().toISOString().slice(0,10)}
@@ -1959,6 +2024,44 @@ function setDisplayMode(mode){
   }
 }
 
+function toggleDmMenu(){
+  const panel=document.getElementById('dm-menu-panel');
+  if(!panel)return;
+  const willOpen=panel.style.display==='none'||!panel.style.display;
+  closeAcctFilterPanel();
+  const drp=document.getElementById('drp-panel');if(drp)drp.style.display='none';
+  panel.style.display=willOpen?'block':'none';
+  if(willOpen)updateDmMenuActiveState();
+}
+function closeDmMenu(){
+  const panel=document.getElementById('dm-menu-panel');
+  if(panel)panel.style.display='none';
+}
+function updateDmMenuActiveState(){
+  const mode=pnlHidden?'hide':displayMode;
+  document.querySelectorAll('.dm-menu-item').forEach(el=>{
+    el.classList.toggle('active',el.getAttribute('data-mode')===mode);
+  });
+  const icon=document.getElementById('dm-menu-icon');
+  if(icon)icon.className='ti '+(mode==='hide'?'ti-eye-off':mode==='percent'?'ti-percentage':'ti-currency-dollar');
+}
+function selectDmMode(mode){
+  if(mode==='hide'){
+    pnlHidden=true;
+  } else {
+    pnlHidden=false;
+    setDisplayMode(mode);
+  }
+  localStorage.setItem('tj_v10_pnlhidden',pnlHidden?'1':'0');
+  updateDmMenuActiveState();
+  closeDmMenu();
+  try{refreshCurrentDashboardView();}catch(e){}
+}
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('dm-menu-wrap');
+  if(wrap&&!wrap.contains(e.target))closeDmMenu();
+});
+
 // Converts an account saved under the old Prop Firm / Broker split into
 // the current unified account shape (name, broker, type, status, initialBalance, currency).
 // Accounts already in the new shape (v:2) pass through unchanged.
@@ -2021,6 +2124,7 @@ async function loadDB(){
   }
 
   displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
+  pnlHidden=localStorage.getItem('tj_v10_pnlhidden')==='1';
   // Clean phantom trades (trades with missing required fields)
   Object.keys(db.trades).forEach(k=>{
     db.trades[k]=db.trades[k].filter(t=>t.symbol&&t.direction&&t.outcome&&t.date);
@@ -2373,6 +2477,7 @@ function setStatCard(id,val,opts){
   opts=opts||{};
   const valEl=document.getElementById('snc-'+id);
   if(!valEl)return;
+  if(id==='netpnl'&&typeof pnlHidden!=='undefined'&&pnlHidden){valEl.textContent='—';return;}
   if(opts.isPF)valEl.textContent=isFinite(val)?val.toFixed(2):'∞';
   else if(opts.isPct)valEl.textContent=val.toFixed(2)+'%';
   else if(opts.isInt)valEl.textContent=Math.round(val).toLocaleString();
@@ -2615,9 +2720,9 @@ function renderDashboard(key){
   renderRecentTradesTable();
   renderCalendar(key,trades);
   renderTodayCard();
-  renderWeekdayChart(Object.values(db.trades).flat());
   renderDirectionAnalysis(Object.values(db.trades).flat());
   renderChecklistCard();
+  renderMiniCal();
 }
 
 function renderDashboardWithTrades(trades,label){
@@ -2631,8 +2736,8 @@ function renderDashboardWithTrades(trades,label){
   renderRecentTradesTable();
   renderCalendar(key,trades);
   renderTodayCard();
-  renderWeekdayChart(Object.values(db.trades).flat());
   renderDirectionAnalysis(Object.values(db.trades).flat());
+  renderMiniCal();
 }
 
 // ── New hero section: date + welcome ──
@@ -3121,6 +3226,11 @@ function drawCharts(trades){
     function updateEquityHeader(val,dateStr){
       const bigEl=document.getElementById('equity-big-value');
       const badgeEl=document.getElementById('equity-change-badge');
+      if(typeof pnlHidden!=='undefined'&&pnlHidden){
+        if(bigEl)bigEl.textContent='—';
+        if(badgeEl){badgeEl.style.background='var(--surface2)';badgeEl.style.color='var(--text3)';badgeEl.textContent='—';}
+        return;
+      }
       if(bigEl)bigEl.textContent=pct?((val>=0?'+':'-')+Math.abs(val)+'R'):((val>=0?'':'-')+'$'+Math.abs(Math.round(val)).toLocaleString());
       if(badgeEl){
         const startVal=vals[0]||0;
@@ -4155,7 +4265,7 @@ function savePFAccount(){
   };
   if(pfEditId)db.propfirms=db.propfirms.map(p=>String(p.id)===String(pfEditId)?acc:p);
   else db.propfirms.push(acc);
-  persist();closeOverlay('pf-modal');checkAccountAutoFund();renderAccounts();renderRealAccounts();renderSbAcctSwitch();
+  persist();closeOverlay('pf-modal');checkAccountAutoFund();renderAccounts();renderSbAcctSwitch();
   populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
 }
 
@@ -4163,7 +4273,7 @@ function askPFDelete(id){pfDeleteId=id;document.getElementById('pf-del-modal').c
 function confirmPFDelete(){
   if(!pfDeleteId)return;
   db.propfirms=db.propfirms.filter(p=>String(p.id)!==String(pfDeleteId));
-  pfDeleteId=null;persist();closeOverlay('pf-del-modal');renderAccounts();renderRealAccounts();
+  pfDeleteId=null;persist();closeOverlay('pf-del-modal');renderAccounts();
   populateAccountDropdown('f');populateAccountDropdown('et');populateDashAccountFilter();
 }
 
@@ -4227,43 +4337,58 @@ function renderAccounts(){
   checkAccountAutoFund();
   const all=(db.propfirms||[]);
   const withBal=all.map(a=>({...a,...accountBalance(a)}));
-  const totalBalance=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.balance,0);
-  const totalPnl=withBal.filter(a=>a.status!=='failed').reduce((s,a)=>s+a.pnl,0);
-  const activeCount=all.filter(a=>a.status==='active').length;
+  const allTradesFlat=Object.values(db.trades).flat();
 
-  document.getElementById('pf-invested').textContent='$'+totalBalance.toLocaleString(undefined,{maximumFractionDigits:0});
-  document.getElementById('pf-invested-lbl').textContent='Total Balance';
-  document.getElementById('pf-invested-sub').textContent='Across '+all.length+' account'+(all.length===1?'':'s');
-  const netEl=document.getElementById('pf-net');
-  netEl.textContent=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString(undefined,{maximumFractionDigits:0});
-  netEl.style.color=totalPnl>=0?'var(--green)':'var(--red)';
-  document.getElementById('pf-net-lbl').textContent=totalPnl>=0?'↗ NET RESULT':'↘ NET RESULT';
-  document.getElementById('pf-net-sub').textContent=totalPnl>=0?'In profit overall':'Down overall so far';
-  document.getElementById('pf-net-card').className='pf-metric '+(totalPnl>=0?'net-pos':'net-neg');
-  document.getElementById('pf-paidout-lbl').textContent='Active Accounts';
-  document.getElementById('pf-paidout').textContent=activeCount;
-  document.getElementById('pf-paidout-sub').textContent=activeCount+' active account'+(activeCount===1?'':'s');
+  const countBadge=document.getElementById('acct-count-badge');
+  if(countBadge)countBadge.textContent=all.length;
 
-  const statusCounts={};
-  all.forEach(a=>{statusCounts[a.status]=(statusCounts[a.status]||0)+1;});
-  document.getElementById('pf-pills').innerHTML=Object.entries(statusCounts)
-    .map(([s,c])=>`<span class="pf-pill ${s==='active'?'p-active':s==='failed'?'p-failed':'p-phase'}">${c} ${ACCOUNT_STATUS_LABEL[s]||s}</span>`).join('');
-
-  const cards=document.getElementById('pf-cards');
-  if(!all.length){
-    cards.innerHTML='<div class="empty"><i class="ti ti-building-bank"></i>No accounts yet. Add one above!</div>';
-  } else {
-    cards.innerHTML=withBal.map(accountCardHTML).join('');
+  const listEl=document.getElementById('acct-list-rows');
+  if(listEl){
+    if(!all.length){
+      listEl.innerHTML='<div class="empty"><i class="ti ti-wallet"></i>No accounts yet. Add one above!</div>';
+    } else {
+      listEl.innerHTML=withBal.map(a=>{
+        const tradeCount=allTradesFlat.filter(t=>String(t.accountId)===String(a.id)).length;
+        return`<div class="acct-list-row">
+          <span class="acct-list-dot" style="background:${a.status==='failed'?'var(--red)':'var(--green)'}"></span>
+          <span class="acct-list-name">${a.name}</span>
+          <span class="acct-list-chip">$${Math.round(a.balance).toLocaleString()}</span>
+          <span class="acct-list-chip">${tradeCount} trade${tradeCount===1?'':'s'}</span>
+          <button class="acct-list-icon-btn" title="Edit" onclick="openPFModal(${a.id})"><i class="ti ti-pencil"></i></button>
+          <button class="acct-list-icon-btn del" title="Delete" onclick="askPFDelete(${a.id})"><i class="ti ti-trash"></i></button>
+        </div>`;
+      }).join('');
+    }
   }
 
-  // Payouts summary box
+  // Payouts summary (kept for the payout modal flow, but no longer shown as a summary card)
   const allPayouts=[];
   all.forEach(a=>(a.payouts||[]).forEach(p=>allPayouts.push({...p,accountName:a.name})));
-  const totalPayouts=allPayouts.reduce((s,p)=>s+(p.amount||0),0);
-  const payoutsTotalEl=document.getElementById('pf-payouts-total');
-  if(payoutsTotalEl)payoutsTotalEl.textContent='$'+totalPayouts.toLocaleString(undefined,{maximumFractionDigits:0});
-  const payoutsSubEl=document.getElementById('pf-payouts-sub');
-  if(payoutsSubEl)payoutsSubEl.textContent=allPayouts.length+' payout'+(allPayouts.length===1?'':'s')+' · tap to view';
+
+  // Account Comparison
+  const compareGrid=document.getElementById('acct-compare-grid');
+  if(compareGrid){
+    if(!all.length){
+      compareGrid.innerHTML='<div class="empty"><i class="ti ti-chart-bar"></i>No accounts yet.</div>';
+    } else {
+      const allTrades=allTradesFlat;
+      compareGrid.innerHTML=all.map(a=>{
+        const acctTrades=allTrades.filter(t=>String(t.accountId)===String(a.id));
+        const m=computeMetrics(acctTrades);
+        const sorted=[...acctTrades].sort((x,y)=>x.date.localeCompare(y.date)||x.id-y.id);
+        let cum=0,peak=0,worst=0;
+        sorted.forEach(t=>{cum+=(t.pnl||0);if(cum>peak)peak=cum;const dd=cum-peak;if(dd<worst)worst=dd;});
+        return`<div class="acct-compare-card">
+          <div class="acct-compare-name"><span class="acct-compare-dot" style="background:${a.status==='failed'?'var(--red)':'var(--green)'}"></span>${a.name}</div>
+          <div class="acct-compare-row"><span class="acct-compare-row-lbl"><i class="ti ti-trending-up"></i> Total P&amp;L</span><span class="acct-compare-row-val" style="color:${m.net>=0?'var(--green)':'var(--red)'}">${m.net>=0?'+':'-'}$${Math.abs(Math.round(m.net)).toLocaleString()}</span></div>
+          <div class="acct-compare-row"><span class="acct-compare-row-lbl"><i class="ti ti-target"></i> Win Rate</span><span class="acct-compare-row-val" style="color:${m.wr>=50?'var(--green)':'var(--red)'}">${m.wr.toFixed(1)}%</span></div>
+          <div class="acct-compare-row"><span class="acct-compare-row-lbl"><i class="ti ti-list-numbers"></i> Trade Count</span><span class="acct-compare-row-val" style="color:var(--text)">${m.n}</span></div>
+          <div class="acct-compare-row"><span class="acct-compare-row-lbl"><i class="ti ti-trending-up"></i> Profit Factor</span><span class="acct-compare-row-val" style="color:${(!isFinite(m.pf)||m.pf>=1)?'var(--green)':'var(--red)'}">${isFinite(m.pf)?m.pf.toFixed(2):'∞'}</span></div>
+          <div class="acct-compare-row"><span class="acct-compare-row-lbl"><i class="ti ti-trending-down"></i> Max Drawdown</span><span class="acct-compare-row-val" style="color:${worst>=0?'var(--text)':'var(--red)'}">${worst>=0?'$0':'-$'+Math.abs(Math.round(worst)).toLocaleString()}</span></div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 // ── Daily Checklist ──────────────────────────────────────────
@@ -4523,7 +4648,7 @@ function savePayout(){
   // A payout is a withdrawal, not real trading — the balance starts over at the
   // initial balance again after this, same as moving to a new phase.
   a.phaseStartTradeId=Date.now();
-  persist();closeOverlay('payout-modal');renderAccounts();renderRealAccounts();
+  persist();closeOverlay('payout-modal');renderAccounts();
 }
 
 function openPayoutHistory(){
@@ -4907,6 +5032,7 @@ function renderReports(){
   renderRepStreak(trades);
   renderRepSessions(trades);
   renderRepLongShort(trades);
+  renderWeekdayChart(trades);
 }
 
 function renderRepPairs(trades){
@@ -5526,6 +5652,32 @@ function renderFearGreed(){
   if(valEl)valEl.textContent=score;
   if(lblEl)lblEl.textContent=sentimentLabel(score);
   drawFearGreedGauge(score);
+}
+
+// ── Mini Calendar (plain, dashboard) ─────────────────────────
+let miniCalDate=new Date();
+const MINI_CAL_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function miniCalNav(dir){
+  miniCalDate=new Date(miniCalDate.getFullYear(),miniCalDate.getMonth()+dir,1);
+  renderMiniCal();
+}
+function renderMiniCal(){
+  const monthEl=document.getElementById('mini-cal-month');
+  const gridEl=document.getElementById('mini-cal-grid');
+  if(!monthEl||!gridEl)return;
+  const y=miniCalDate.getFullYear(),m=miniCalDate.getMonth();
+  monthEl.innerHTML=MINI_CAL_MONTHS[m]+' <span class="mini-cal-year">'+y+'</span>';
+  const firstDow=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const today=new Date();
+  const isCurMonth=today.getFullYear()===y&&today.getMonth()===m;
+  let html='';
+  for(let i=0;i<firstDow;i++)html+='<div class="mini-cal-day empty">0</div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=isCurMonth&&today.getDate()===d;
+    html+='<div class="mini-cal-day'+(isToday?' today':'')+'">'+d+'</div>';
+  }
+  gridEl.innerHTML=html;
 }
 
 function renderWeekdayChart(trades){
@@ -6253,6 +6405,7 @@ document.addEventListener('wheel',function(e){
   renderMoreSheetPinnable();
   applyTheme();
   initSidebar();
+  updateDmMenuActiveState();
   document.getElementById('f-date').value=today();
   populatePlaybookDropdown('f');
   populateAccountDropdown('f');
