@@ -13,7 +13,24 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* Hide scrollbar everywhere */
-*::-webkit-scrollbar{display:none}
+*::-webkit-scrollbar{width:9px;height:9px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:transparent;border-radius:100px}
+*:hover::-webkit-scrollbar-thumb{background:var(--green)}
+*{scrollbar-width:thin;scrollbar-color:transparent transparent}
+*:hover{scrollbar-color:var(--green) transparent}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:9px;height:9px}
+html::-webkit-scrollbar-track,body::-webkit-scrollbar-track{background:transparent}
+html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb{background:transparent;border-radius:100px}
+html:hover::-webkit-scrollbar-thumb,body:hover::-webkit-scrollbar-thumb{background:var(--green)}
+html,body{scrollbar-width:thin;scrollbar-color:transparent transparent}
+html:hover,body:hover{scrollbar-color:var(--green) transparent}
+select::-webkit-scrollbar,textarea::-webkit-scrollbar{width:9px}
+select::-webkit-scrollbar-track,textarea::-webkit-scrollbar-track{background:transparent}
+select::-webkit-scrollbar-thumb,textarea::-webkit-scrollbar-thumb{background:transparent;border-radius:100px}
+select:hover::-webkit-scrollbar-thumb,textarea:hover::-webkit-scrollbar-thumb{background:var(--green)}
+select,textarea{scrollbar-width:thin;scrollbar-color:transparent transparent}
+select:hover,textarea:hover{scrollbar-color:var(--green) transparent}
 *{-ms-overflow-style:none;scrollbar-width:none}
 [data-theme="dark"]{--bg:#000000;--surface:#000000;--surface2:#111111;--card:#0a0a0a;--border:rgba(255,255,255,0.14);--border2:rgba(255,255,255,0.22);--text:#f0f0f0;--text2:#aaa;--text3:#666;--shadow:rgba(0,0,0,0.6)}
 [data-theme="light"]{--bg:#f0f2f5;--surface:#ffffff;--surface2:#f5f7fa;--card:#ffffff;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#111;--text2:#555;--text3:#999;--shadow:rgba(0,0,0,0.08)}
@@ -348,8 +365,15 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .dcal-day.loss{background:var(--red);color:#fff;cursor:pointer}
 .dcal-day.breakeven{background:var(--text3);color:#fff;cursor:pointer}
 .dcal-day:not(.dcal-day-empty):hover{opacity:.85}
-.dcal-popover{position:absolute;background:var(--card);border:.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:10px 14px;z-index:50;white-space:nowrap;pointer-events:none}
+.dcal-popover{position:absolute;background:var(--card);border:.5px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:12px 16px;z-index:50;white-space:nowrap;pointer-events:none}
 .dcal-popover-date{font-size:13px;font-weight:700;color:var(--text)}
+.dcal-popover-val{font-size:19px;font-weight:800;margin-top:2px}
+.dcal-popover-val.up{color:var(--green)}
+.dcal-popover-val.down{color:var(--red)}
+.dcal-popover-stats{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:3px}
+.dcal-popover-stats .w{color:var(--green)}
+.dcal-popover-stats .l{color:var(--red)}
+.dcal-popover-stats .n{color:var(--text3);font-weight:500}
 .dcal-popover-sub{font-size:12px;color:var(--text3);margin-top:2px}
 .dcal-popover-sub.up{color:var(--green)}
 .dcal-popover-sub.down{color:var(--red)}
@@ -375,11 +399,6 @@ body.sidebar-collapsed .sb-toggle-fixed{left:16px}
 .dash-chart-card{background:var(--card);border:.5px solid var(--border);border-radius:var(--rlg);padding:1.1rem 1.25rem;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;min-width:0}
 .checklist-card{display:flex;flex-direction:column;min-width:0;max-height:440px}
 .cl-items{display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;min-height:0;padding-right:10px}
-.cl-items::-webkit-scrollbar{width:6px}
-.cl-items::-webkit-scrollbar-track{background:transparent}
-.cl-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.18);border-radius:100px}
-.cl-items::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.3)}
-.cl-items{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.18) transparent}
 .cl-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
 .cl-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
 .cl-title i{font-size:15px;color:var(--blue)}
@@ -1004,10 +1023,9 @@ table.tt tr:last-child td{border-bottom:none}
       </button>
       <div class="tb-filter-panel" id="acct-filter-panel" style="display:none"></div>
     </div>
-    <button class="btn-addtrade" onclick="openAddTradeModal()"><i class="ti ti-plus"></i> Add Trade</button>
     <div id="dm-menu-wrap" style="position:relative">
       <button id="dm-menu-btn" onclick="toggleDmMenu()" class="tb-icon-btn" title="P&amp;L display">
-        <i class="ti ti-currency-dollar" id="dm-menu-icon"></i>
+        <i class="ti ti-percentage" id="dm-menu-icon"></i>
       </button>
       <div class="dm-menu-panel" id="dm-menu-panel" style="display:none">
         <div class="dm-menu-item" onclick="selectDmMode('dollar')" data-mode="dollar">
@@ -1896,7 +1914,7 @@ let pbCriteriaCount=0; // number of criteria rows currently in the Add/Edit Play
 let pbEditId=null,pbDeleteId=null,pbDetailId=null;
 let fImages=[]; // staged images for Add Trade form
 let etImages=[]; // staged images for Edit Trade form
-let displayMode='dollar'; // 'dollar' | 'percent'
+let displayMode='percent'; // 'dollar' | 'percent'
 let pnlHidden=false;
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -2141,7 +2159,7 @@ async function loadDB(){
     console.error('loadDB error',e);
   }
 
-  displayMode=localStorage.getItem('tj_v10_dispmode')||'dollar';
+  displayMode=localStorage.getItem('tj_v10_dispmode')||'percent';
   pnlHidden=localStorage.getItem('tj_v10_pnlhidden')==='1';
   // Clean phantom trades (trades with missing required fields)
   Object.keys(db.trades).forEach(k=>{
@@ -3292,17 +3310,18 @@ function drawCharts(trades){
   const gc=dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)';
   const tc=dark?'#555':'#aaa';
 
-  let cum=0;
   const pct=displayMode==='percent';
+  const startingBalance=pct?0:(db.propfirms||[]).filter(a=>a.status!=='failed').reduce((s,a)=>s+(a.initialBalance||0),0);
+  let cum=startingBalance;
   const ed=trades.map(t=>{cum+=pct?(t.rr||0):(t.pnl||0);return{x:t.date,y:pct?Math.round(cum*100)/100:Math.round(cum)};});
   const labels=['start',...ed.map(d=>d.x)];
-  const vals=[0,...ed.map(d=>d.y)];
+  const vals=[startingBalance,...ed.map(d=>d.y)];
   const c1=document.getElementById('equity-chart')?.getContext('2d');
   if(c1){
     if(eqChart){eqChart.destroy();eqChart=null;}
     const chartH=c1.canvas.clientHeight||240;
     const lastVal=vals[vals.length-1]||0;
-    const isProfit=lastVal>=0;
+    const isProfit=(lastVal-startingBalance)>=0;
     const lineColor=isProfit?'#1D9E75':'#D85A30';
     const grad=c1.createLinearGradient(0,0,0,chartH);
     if(isProfit){
@@ -5813,6 +5832,8 @@ function dcalShowPopover(e,dateStr){
   const allTrades=Object.values(db.trades).flat();
   const dayTrades=allTrades.filter(t=>t.date===dateStr);
   const pnl=dayTrades.reduce((s,t)=>s+(t.pnl||0),0);
+  const wins=dayTrades.filter(t=>t.outcome==='Win').length;
+  const losses=dayTrades.filter(t=>t.outcome==='Loss').length;
   const d=new Date(dateStr+'T00:00:00');
   const label=DCAL_MONTHS[d.getMonth()].slice(0,3)+' '+d.getDate();
   const pop=document.createElement('div');
@@ -5820,7 +5841,8 @@ function dcalShowPopover(e,dateStr){
   pop.id='dcal-popover';
   pop.innerHTML=`<div class="dcal-popover-date">${label}</div>`+
     (dayTrades.length
-      ? `<div class="dcal-popover-sub ${pnl>=0?'up':'down'}">${dayTrades.length} trade${dayTrades.length===1?'':'s'} · ${pnl>=0?'+':'-'}$${Math.abs(Math.round(pnl)).toLocaleString()}</div>`
+      ? `<div class="dcal-popover-val ${pnl>=0?'up':'down'}">${pnl>=0?'+':'-'}$${Math.abs(Math.round(pnl)).toLocaleString()}</div>
+         <div class="dcal-popover-stats"><span class="w">${wins}W</span><span class="l">${losses}L</span><span class="n">${dayTrades.length} trade${dayTrades.length===1?'':'s'}</span></div>`
       : `<div class="dcal-popover-sub">No trades</div>`);
   card.appendChild(pop);
   let left=cellRect.left-cardRect.left+cellRect.width/2-pop.offsetWidth/2;
